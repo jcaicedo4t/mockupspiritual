@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reporte Universal de Clientes · Crear Lista</title>
+<style>
+  :root {
+    --navy-900:#123047; --navy-800:#1B4C6E; --navy-700:#265E85; --navy-100:#EAF1F6;
+    --ink:#1C2B36; --muted:#6B7C88; --line:#DCE4EA; --bg:#F4F7F9; --white:#FFFFFF;
+    --amber:#D98E2B; --green:#2E9E5B; --red:#C0392B; --purple:#6B4FA0; --teal:#1E8A8A;
+    --radius:6px; --shadow:0 2px 10px rgba(18,48,71,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;}
+  .app{max-width:1220px;margin:28px auto 60px;padding:0 16px;}
+
+  .topbar{background:linear-gradient(180deg,var(--navy-800),var(--navy-900));color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:16px 22px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
+  .topbar svg{flex:none;}
+  .topbar h1{font-size:16px;font-weight:600;letter-spacing:.2px;margin:0;}
+  .topbar .sub{font-size:12px;color:#BBD4E4;margin-left:auto;}
+
+  .panel{background:var(--white);border:1px solid var(--line);border-top:none;padding:20px 22px 26px;}
+
+  /* Filtros */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:8px;}
+  .field-inline{display:flex;flex-direction:column;gap:5px;}
+  .field-inline label{font-size:11px;font-weight:700;color:var(--navy-800);letter-spacing:.2px;}
+  select, input[type=text], input[type=date], textarea{
+    font-family:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:var(--radius);
+    padding:9px 12px;color:var(--ink);background:#fff;outline:none;
+  }
+  select:focus, input:focus, textarea:focus{border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(38,94,133,0.15);}
+  #reportType{min-width:170px;}
+  #clientType{min-width:150px;}
+  #monthSelect{min-width:140px;}
+  .date-range{display:flex;gap:8px;align-items:flex-end;}
+
+  .btn{font-family:inherit;font-size:13.5px;font-weight:600;border:none;border-radius:var(--radius);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:filter .12s ease, transform .05s ease;white-space:nowrap;}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.55;cursor:not-allowed;}
+  .btn-primary{background:var(--navy-800);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--navy-800);}
+  .btn-outline:hover{background:var(--navy-100);}
+  .btn-success{background:var(--green);color:#fff;}
+  .btn-success:hover:not(:disabled){filter:brightness(1.06);}
+  .btn-danger-outline{background:#fff;border:1px solid #EEC9C0;color:var(--red);}
+  .btn-danger-outline:hover{background:#FBEFEC;}
+
+  .search-wrap{position:relative;flex:1;min-width:220px;}
+  .search-wrap input{padding-left:32px;width:100%;}
+  .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5;}
+
+  .active-filters{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px;}
+  .chip{font-size:11.5px;font-weight:600;background:var(--navy-100);color:var(--navy-800);padding:4px 10px;border-radius:20px;}
+
+  /* Selection bar */
+  .selection-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 4px;margin:10px 0 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .selection-bar .count{margin-left:auto;font-weight:600;color:var(--navy-800);background:var(--navy-100);padding:5px 12px;border-radius:20px;font-size:12.5px;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;margin-top:4px;}
+  thead th{text-align:left;font-size:11px;letter-spacing:.3px;color:var(--navy-800);padding:10px 10px;border-bottom:2px solid var(--navy-800);white-space:nowrap;}
+  tbody td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink);}
+  tbody tr:hover{background:var(--navy-100);}
+  tbody tr.row-selected{background:#FBF3E4;}
+  tbody tr.row-selected:hover{background:#F8ECD6;}
+  .checkbox{width:17px;height:17px;accent-color:var(--navy-800);cursor:pointer;}
+  .cod{color:var(--muted);}
+  .cliente{font-weight:600;}
+  .info-tag{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:#F1D9D5;color:var(--red);}
+  .tipo-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .tipo-nuevo{background:#E1EFE4;color:var(--green);}
+  .tipo-recurrente{background:#E4E8F7;color:var(--purple);}
+  .tipo-inactivo{background:#F1D9D5;color:var(--red);}
+  .tipo-lead{background:#E1F1F1;color:var(--teal);}
+  .empty-row td{text-align:center;color:var(--muted);padding:34px 0;}
+
+  /* Pagination */
+  .pagination-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+  .pagination-bar .info{font-size:12.5px;color:var(--muted);}
+  .pagination-bar .pages{display:flex;gap:4px;margin-left:auto;}
+  .page-btn{min-width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:var(--radius);font-size:12.5px;font-weight:600;color:var(--navy-800);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 8px;}
+  .page-btn:hover:not(:disabled){background:var(--navy-100);}
+  .page-btn.active{background:var(--navy-800);color:#fff;border-color:var(--navy-800);}
+  .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .page-size select{padding:6px 10px;font-size:12.5px;}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(18,48,71,0.45);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
+  .modal-backdrop.open{display:flex;}
+  .modal-box{background:#fff;border-radius:8px;width:100%;max-width:480px;box-shadow:0 12px 40px rgba(0,0,0,0.25);overflow:hidden;}
+  .modal-header{background:var(--navy-800);color:#fff;padding:14px 20px;display:flex;align-items:center;}
+  .modal-header h3{margin:0;font-size:15px;}
+  .modal-header button{margin-left:auto;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;opacity:.85;}
+  .modal-header button:hover{opacity:1;}
+  .modal-body{padding:18px 20px;}
+  .modal-body .field{margin-bottom:14px;}
+  .modal-body label{display:block;font-size:12px;font-weight:700;color:var(--navy-800);margin-bottom:6px;}
+  .modal-body input[type=text], .modal-body select, .modal-body textarea{width:100%;}
+  .modal-body textarea{resize:vertical;min-height:70px;}
+  .modal-body .summary{font-size:12.5px;color:var(--muted);background:var(--navy-100);padding:8px 12px;border-radius:var(--radius);margin-bottom:14px;}
+  .modal-footer{padding:14px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);}
+
+  /* Toast */
+  .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;width:340px;}
+  .toast{background:rgba(255,255,255,0.98);border:1px solid rgba(0,0,0,0.1);border-radius:.25rem;box-shadow:0 .25rem .75rem rgba(0,0,0,0.15);opacity:0;transform:translateX(40px);transition:opacity .25s ease, transform .25s ease;overflow:hidden;font-size:13.5px;}
+  .toast.showing{opacity:1;transform:translateX(0);}
+  .toast-header{display:flex;align-items:center;gap:8px;padding:.5rem .75rem;border-bottom:1px solid rgba(0,0,0,0.05);color:#495057;}
+  .toast-header .icon-dot{width:18px;height:18px;border-radius:3px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;}
+  .toast-header strong{margin-right:auto;font-size:13.5px;color:#212529;}
+  .toast-header small{color:#868e96;font-size:11.5px;}
+  .toast-header .close{background:none;border:none;font-size:16px;line-height:1;color:#868e96;cursor:pointer;padding:0 0 0 8px;}
+  .toast-body{padding:.7rem .75rem;color:#212529;}
+  .toast-progress{height:3px;background:rgba(0,0,0,0.08);}
+  .toast-progress span{display:block;height:100%;background:var(--green);animation:shrink 4.5s linear forwards;}
+  .toast.warning .toast-progress span{background:var(--amber);}
+  @keyframes shrink{from{width:100%;}to{width:0%;}}
+
+  @media (max-width:760px){
+    .search-wrap{width:100%;}
+    .pagination-bar .pages{margin-left:0;width:100%;justify-content:center;}
+    .toast-container{left:12px;right:12px;width:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="#fff" stroke-width="1.6"/><path d="M4 9h16" stroke="#fff" stroke-width="1.6"/></svg>
+    <h1>REPORTE UNIVERSAL DE CLIENTES</h1>
+    <span class="sub">Filtra, marca clientes y genera una lista</span>
+  </div>
+
+  <div class="panel">
+
+    <div class="filters">
+      <div class="field-inline">
+        <label for="reportType">Tipo de reporte</label>
+        <select id="reportType">
+          <option value="cumpleanos">Cumpleaños</option>
+          <option value="inactivos">Inactivos</option>
+          <option value="recurrentes">Recurrentes</option>
+          <option value="nuevos">Nuevos</option>
+          <option value="leads">Leads</option>
+        </select>
+      </div>
+
+      <div class="field-inline">
+        <label for="clientType">Tipo de cliente</label>
+        <select id="clientType">
+          <option value="">Todos</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="recurrente">Recurrente</option>
+          <option value="inactivo">Inactivo</option>
+          <option value="lead">Lead</option>
+        </select>
+      </div>
+
+      <div class="field-inline" id="monthField">
+        <label for="monthSelect">Mes de cumpleaños</label>
+        <select id="monthSelect">
+          <option value="">Todos</option>
+          <option value="01">Enero</option><option value="02">Febrero</option>
+          <option value="03">Marzo</option><option value="04">Abril</option>
+          <option value="05">Mayo</option><option value="06">Junio</option>
+          <option value="07">Julio</option><option value="08" selected>Agosto</option>
+          <option value="09">Septiembre</option><option value="10">Octubre</option>
+          <option value="11">Noviembre</option><option value="12">Diciembre</option>
+        </select>
+      </div>
+
+      <div class="field-inline" id="dateRangeField" style="display:none;">
+        <label>Registrado entre</label>
+        <div class="date-range">
+          <input type="date" id="dateFrom">
+          <span style="color:var(--muted);">–</span>
+          <input type="date" id="dateTo">
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <label for="searchInput" style="display:block;font-size:11px;font-weight:700;color:var(--navy-800);margin-bottom:5px;">Buscar</label>
+        <div style="position:relative;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="top:50%;"><circle cx="11" cy="11" r="7" stroke="#333" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#333" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="Nombre, código o vendedor…">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="buscarBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        Buscar
+      </button>
+    </div>
+
+    <div class="active-filters" id="activeFilters"></div>
+
+    <div class="selection-bar">
+      <button class="btn btn-outline" id="selectAllBtn">Marcar todos (filtrados)</button>
+      <button class="btn btn-danger-outline" id="deselectAllBtn">Desmarcar todos</button>
+      <button class="btn btn-success" id="openModalBtn">+ Crear lista</button>
+      <span class="count" id="selectedCount">0 seleccionados</span>
+    </div>
+
+    <table id="clientsTable">
+      <thead>
+        <tr>
+          <th style="width:34px;"><input type="checkbox" class="checkbox" id="headerCheckbox" title="Marcar / desmarcar página actual"></th>
+          <th>COD</th>
+          <th>CLIENTE</th>
+          <th>TIPO</th>
+          <th>CUMPLE</th>
+          <th>FECHA REGISTRO</th>
+          <th>INFO</th>
+          <th>VENDEDOR</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="pagination-bar">
+      <span class="info" id="paginationInfo">Mostrando 0 de 0</span>
+      <div class="page-size">
+        <select id="pageSizeSelect">
+          <option value="5">5 por página</option>
+          <option value="10" selected>10 por página</option>
+          <option value="20">20 por página</option>
+        </select>
+      </div>
+      <div class="pages" id="pagesContainer"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: Crear lista -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Crear lista de clientes</h3>
+      <button id="closeModalBtn" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="summary" id="modalSummary">0 clientes seleccionados</div>
+
+      <div class="field">
+        <label for="listTitle">Título de la lista</label>
+        <input type="text" id="listTitle" placeholder="Ej: Cumpleaños agosto - contacto pendiente">
+      </div>
+
+      <div class="field">
+        <label for="listMotivo">Motivo</label>
+        <select id="listMotivo">
+          <option value="Seguimiento">Seguimiento</option>
+          <option value="Inactivos">Inactivos</option>
+          <option value="Cumpleaños">Cumpleaños</option>
+          <option value="Nuevos">Nuevos</option>
+          <option value="Leads">Leads</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="listDesc">Descripción (opcional)</label>
+        <textarea id="listDesc" placeholder="Describe el propósito de esta lista…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="cancelModalBtn">Cancelar</button>
+      <button class="btn btn-success" id="saveListBtn">Guardar lista</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  // ---------- Datos de ejemplo ----------
+  const rawClients = [
+    {id:120, cliente:"Lilia Aguirre",    tipo:"inactivo",   cumple:"1985-08-20", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
+    {id:242, cliente:"Tanisha Objia",    tipo:"inactivo",   cumple:"1982-08-27", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
+    {id:245, cliente:"Maria Reyes",      tipo:"recurrente", cumple:"1976-08-25", registro:"2018-03-02", info:"No contesta", vendedor:"Jose Molina"},
+    {id:247, cliente:"Cecilia Sanawani", tipo:"inactivo",   cumple:"1974-08-09", registro:"2019-08-12", info:"No contesta", vendedor:"Mary Polo"},
+    {id:253, cliente:"Agustina Gabriel", tipo:"lead",       cumple:"1948-08-28", registro:"2026-08-02", info:"No contesta", vendedor:"Mary Polo"},
+    {id:261, cliente:"Roberto Fuentes",  tipo:"nuevo",      cumple:"1990-08-03", registro:"2026-08-05", info:"Interesado",  vendedor:"Jose Molina"},
+    {id:274, cliente:"Diana Salgado",    tipo:"nuevo",      cumple:"1988-08-14", registro:"2026-08-06", info:"No contesta", vendedor:"Mary Polo"},
+    {id:281, cliente:"Hector Ramirez",   tipo:"recurrente", cumple:"1965-08-30", registro:"2017-11-07", info:"Contactado",  vendedor:"Jose Molina"},
+    {id:290, cliente:"Jose Fernandez",   tipo:"inactivo",   cumple:"1979-05-11", registro:"2018-01-20", info:"No contesta", vendedor:"Mary Polo"},
+    {id:298, cliente:"Josefina Cruz",    tipo:"lead",       cumple:"1995-08-19", registro:"2026-08-01", info:"Interesado",  vendedor:"Jose Molina"},
+    {id:305, cliente:"Andrea Solano",    tipo:"nuevo",      cumple:"1992-02-10", registro:"2026-08-09", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:311, cliente:"Jose Ramon Diaz",  tipo:"inactivo",   cumple:"1970-08-04", registro:"2016-06-14", info:"No contesta", vendedor:"Jose Molina"},
+    {id:318, cliente:"Karen Ibarra",     tipo:"recurrente", cumple:"1983-08-22", registro:"2019-09-30", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:326, cliente:"Luis Gomez",       tipo:"lead",       cumple:"1998-01-05", registro:"2026-07-28", info:"Interesado",  vendedor:"Jose Molina"},
+    {id:333, cliente:"Patricia Nunez",   tipo:"nuevo",      cumple:"1991-08-17", registro:"2026-08-03", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:340, cliente:"Jose Antonio Vera",tipo:"inactivo",   cumple:"1966-08-29", registro:"2015-12-01", info:"No contesta", vendedor:"Jose Molina"},
+    {id:347, cliente:"Gabriela Ortiz",   tipo:"recurrente", cumple:"1980-08-06", registro:"2020-02-18", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:355, cliente:"Marco Delgado",    tipo:"lead",       cumple:"1997-08-12", registro:"2026-08-04", info:"Interesado",  vendedor:"Jose Molina"},
+  ];
+
+  // estado: Set con los ids seleccionados (persiste aunque cambie de página o filtro)
+  const selectedIds = new Set();
+  let currentPage = 1;
+  let pageSize = 10;
+  let currentFiltered = [];
+
+  const tableBody        = document.getElementById('tableBody');
+  const headerCheckbox   = document.getElementById('headerCheckbox');
+  const selectedCountEl  = document.getElementById('selectedCount');
+  const searchInput      = document.getElementById('searchInput');
+  const reportType       = document.getElementById('reportType');
+  const clientType       = document.getElementById('clientType');
+  const monthField       = document.getElementById('monthField');
+  const monthSelect      = document.getElementById('monthSelect');
+  const dateRangeField   = document.getElementById('dateRangeField');
+  const dateFrom         = document.getElementById('dateFrom');
+  const dateTo           = document.getElementById('dateTo');
+  const activeFiltersEl  = document.getElementById('activeFilters');
+  const pagesContainer   = document.getElementById('pagesContainer');
+  const paginationInfo   = document.getElementById('paginationInfo');
+  const pageSizeSelect   = document.getElementById('pageSizeSelect');
+
+  const modalBackdrop  = document.getElementById('modalBackdrop');
+  const modalSummary   = document.getElementById('modalSummary');
+  const listTitle      = document.getElementById('listTitle');
+  const listMotivo     = document.getElementById('listMotivo');
+  const listDesc       = document.getElementById('listDesc');
+  const toastContainer = document.getElementById('toastContainer');
+
+  const savedLists = []; // mock de "base de datos" de listas guardadas
+
+  const tipoLabel = {nuevo:'Nuevo', recurrente:'Recurrente', inactivo:'Inactivo', lead:'Lead'};
+
+  function formatDateHuman(dateStr){
+    const [y,m,d] = dateStr.split('-');
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return `${d} ${meses[parseInt(m,10)-1]} ${y}`;
+  }
+
+  // ---------- Mostrar/ocultar filtros dinámicos según tipo de reporte ----------
+  function syncReportTypeUI(){
+    const type = reportType.value;
+    monthField.style.display = (type === 'cumpleanos') ? '' : 'none';
+    dateRangeField.style.display = (type === 'nuevos') ? '' : 'none';
+
+    // el tipo de reporte sugiere (pero no obliga) un tipo de cliente
+    const suggestion = {inactivos:'inactivo', recurrentes:'recurrente', nuevos:'nuevo', leads:'lead', cumpleanos:''};
+    if(suggestion[type] !== undefined) clientType.value = suggestion[type];
+  }
+
+  // ---------- Filtrado ----------
+  function applyFilters(){
+    const q = searchInput.value.trim().toLowerCase();
+    const type = reportType.value;
+    const tipoFiltro = clientType.value;
+    const mes = monthSelect.value;
+    const desde = dateFrom.value;
+    const hasta = dateTo.value;
+
+    let result = rawClients.filter(c => {
+      if(tipoFiltro && c.tipo !== tipoFiltro) return false;
+
+      if(type === 'cumpleanos' && mes){
+        const clienteMes = c.cumple.split('-')[1];
+        if(clienteMes !== mes) return false;
+      }
+      if(type === 'nuevos'){
+        if(desde && c.registro < desde) return false;
+        if(hasta && c.registro > hasta) return false;
+      }
+      if(q){
+        const haystack = `${c.cliente} ${c.id} ${c.vendedor}`.toLowerCase();
+        if(!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    currentFiltered = result;
+    renderActiveFilters();
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderActiveFilters(){
+    const chips = [];
+    const reportLabels = {cumpleanos:'Cumpleaños', inactivos:'Inactivos', recurrentes:'Recurrentes', nuevos:'Nuevos', leads:'Leads'};
+    chips.push(reportLabels[reportType.value]);
+    if(clientType.value) chips.push('Tipo: ' + tipoLabel[clientType.value]);
+    if(reportType.value === 'cumpleanos' && monthSelect.value){
+      chips.push('Mes: ' + monthSelect.options[monthSelect.selectedIndex].text);
+    }
+    if(reportType.value === 'nuevos' && (dateFrom.value || dateTo.value)){
+      chips.push(`Registro: ${dateFrom.value || '…'} a ${dateTo.value || '…'}`);
+    }
+    if(searchInput.value.trim()) chips.push('Búsqueda: "' + searchInput.value.trim() + '"');
+
+    activeFiltersEl.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
+  }
+
+  // ---------- Paginación ----------
+  function getPageData(){
+    const start = (currentPage - 1) * pageSize;
+    return currentFiltered.slice(start, start + pageSize);
+  }
+
+  function renderPagination(){
+    const totalPages = Math.max(1, Math.ceil(currentFiltered.length / pageSize));
+    if(currentPage > totalPages) currentPage = totalPages;
+
+    const start = currentFiltered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const end = Math.min(currentPage * pageSize, currentFiltered.length);
+    paginationInfo.textContent = `Mostrando ${start}-${end} de ${currentFiltered.length}`;
+
+    let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+    for(let p = 1; p <= totalPages; p++){
+      if(totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages){
+        if(p === 2 || p === totalPages - 1) html += `<span class="page-btn" style="border:none;">…</span>`;
+        continue;
+      }
+      html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+    }
+    html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+    pagesContainer.innerHTML = html;
+
+    pagesContainer.querySelectorAll('[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => { currentPage = parseInt(btn.dataset.page, 10); renderTable(); });
+    });
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    if(prevBtn) prevBtn.addEventListener('click', () => { currentPage--; renderTable(); });
+    if(nextBtn) nextBtn.addEventListener('click', () => { currentPage++; renderTable(); });
+  }
+
+  // ---------- Render tabla ----------
+  function renderTable(){
+    const pageData = getPageData();
+    tableBody.innerHTML = '';
+
+    if(pageData.length === 0){
+      tableBody.innerHTML = `<tr class="empty-row"><td colspan="8">No se encontraron clientes con los filtros aplicados</td></tr>`;
+    } else {
+      pageData.forEach(c => {
+        const isSelected = selectedIds.has(c.id);
+        const tr = document.createElement('tr');
+        tr.className = isSelected ? 'row-selected' : '';
+        tr.innerHTML = `
+          <td><input type="checkbox" class="checkbox row-check" data-id="${c.id}" ${isSelected ? 'checked' : ''}></td>
+          <td class="cod">${c.id}</td>
+          <td class="cliente">${c.cliente}</td>
+          <td><span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo]}</span></td>
+          <td>${formatDateHuman(c.cumple)}</td>
+          <td>${formatDateHuman(c.registro)}</td>
+          <td><span class="info-tag">${c.info}</span></td>
+          <td>${c.vendedor}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+
+      tableBody.querySelectorAll('.row-check').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const id = parseInt(e.target.dataset.id, 10);
+          if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
+          e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+          updateSelectedCount();
+          updateHeaderCheckboxState();
+        });
+      });
+    }
+
+    updateHeaderCheckboxState();
+    updateSelectedCount();
+    renderPagination();
+  }
+
+  function updateHeaderCheckboxState(){
+    const pageData = getPageData();
+    const allChecked = pageData.length > 0 && pageData.every(c => selectedIds.has(c.id));
+    const someChecked = pageData.some(c => selectedIds.has(c.id));
+    headerCheckbox.checked = allChecked;
+    headerCheckbox.indeterminate = !allChecked && someChecked;
+  }
+
+  function updateSelectedCount(){
+    const n = selectedIds.size;
+    selectedCountEl.textContent = `${n} seleccionado${n === 1 ? '' : 's'}`;
+  }
+
+  // ---------- Eventos de filtros ----------
+  document.getElementById('buscarBtn').addEventListener('click', applyFilters);
+  reportType.addEventListener('change', () => { syncReportTypeUI(); applyFilters(); });
+  clientType.addEventListener('change', applyFilters);
+  monthSelect.addEventListener('change', applyFilters);
+  dateFrom.addEventListener('change', applyFilters);
+  dateTo.addEventListener('change', applyFilters);
+  searchInput.addEventListener('input', applyFilters);
+  pageSizeSelect.addEventListener('change', () => {
+    pageSize = parseInt(pageSizeSelect.value, 10);
+    currentPage = 1;
+    renderTable();
+  });
+
+  // ---------- Selección ----------
+  document.getElementById('selectAllBtn').addEventListener('click', () => {
+    currentFiltered.forEach(c => selectedIds.add(c.id));
+    renderTable();
+  });
+  document.getElementById('deselectAllBtn').addEventListener('click', () => {
+    selectedIds.clear();
+    renderTable();
+  });
+  headerCheckbox.addEventListener('change', (e) => {
+    getPageData().forEach(c => {
+      if(e.target.checked) selectedIds.add(c.id); else selectedIds.delete(c.id);
+    });
+    renderTable();
+  });
+
+  // ---------- Modal: Crear lista ----------
+  const openModalBtn  = document.getElementById('openModalBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const cancelModalBtn= document.getElementById('cancelModalBtn');
+  const saveListBtn   = document.getElementById('saveListBtn');
+
+  function openModal(){
+    if(selectedIds.size === 0){
+      showToast('warning', 'No se pudo abrir', 'Marca al menos un cliente antes de crear la lista.');
+      return;
+    }
+    modalSummary.textContent = `${selectedIds.size} cliente${selectedIds.size === 1 ? '' : 's'} seleccionado${selectedIds.size === 1 ? '' : 's'}`;
+    // sugiere motivo según el reporte activo
+    const suggestMotivo = {cumpleanos:'Cumpleaños', inactivos:'Inactivos', recurrentes:'Seguimiento', nuevos:'Nuevos', leads:'Leads'};
+    listMotivo.value = suggestMotivo[reportType.value] || 'Seguimiento';
+    modalBackdrop.classList.add('open');
+  }
+  function closeModal(){
+    modalBackdrop.classList.remove('open');
+  }
+
+  openModalBtn.addEventListener('click', openModal);
+  closeModalBtn.addEventListener('click', closeModal);
+  cancelModalBtn.addEventListener('click', closeModal);
+  modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
+
+  saveListBtn.addEventListener('click', () => {
+    if(selectedIds.size === 0){
+      showToast('warning', 'No se pudo guardar', 'Marca al menos un cliente antes de guardar la lista.');
+      closeModal();
+      return;
+    }
+    const titulo = listTitle.value.trim() || `Lista sin título (${new Date().toLocaleDateString('es-ES')})`;
+    const motivo = listMotivo.value;
+    const descripcion = listDesc.value.trim();
+    const clientesSeleccionados = rawClients.filter(c => selectedIds.has(c.id));
+
+    const nuevaLista = {
+      id: savedLists.length + 1,
+      titulo, motivo, descripcion,
+      clientes: clientesSeleccionados.map(c => ({id:c.id, cliente:c.cliente})),
+      creado: new Date().toLocaleString('es-ES')
+    };
+    savedLists.push(nuevaLista);
+
+    showToast('success', 'Lista creada', `"${titulo}" guardada con ${clientesSeleccionados.length} cliente${clientesSeleccionados.length === 1 ? '' : 's'}.`);
+
+    selectedIds.clear();
+    listTitle.value = '';
+    listDesc.value = '';
+    closeModal();
+    renderTable();
+  });
+
+  // ---------- Toast tipo Bootstrap 4.6 ----------
+  function showToast(type, title, message){
+    const isSuccess = type === 'success';
+    const toast = document.createElement('div');
+    toast.className = `toast ${isSuccess ? '' : 'warning'}`;
+    toast.innerHTML = `
+      <div class="toast-header">
+        <span class="icon-dot" style="background:${isSuccess ? '#2E9E5B' : '#D98E2B'};">
+          ${isSuccess
+            ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'}
+        </span>
+        <strong>${title}</strong>
+        <small>ahora</small>
+        <button class="close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="toast-body">${message}</div>
+      <div class="toast-progress"><span></span></div>
+    `;
+    toastContainer.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('showing'));
+
+    const remove = () => {
+      toast.classList.remove('showing');
+      setTimeout(() => toast.remove(), 250);
+    };
+    toast.querySelector('.close').addEventListener('click', remove);
+    setTimeout(remove, 4500);
+  }
+
+  // ---------- Init ----------
+  syncReportTypeUI();
+  applyFilters();
+</script>
+
+</body>
+</html>
