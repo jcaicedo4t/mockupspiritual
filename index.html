@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Reporte Universal de Clientes · Crear Lista</title>
+<title>Lista de Contactos · Crear Lista</title>
 <style>
   :root {
     --navy-900:#123047; --navy-800:#1B4C6E; --navy-700:#265E85; --navy-100:#EAF1F6;
@@ -31,11 +31,11 @@
     padding:9px 12px;color:var(--ink);background:#fff;outline:none;
   }
   select:focus, input:focus, textarea:focus{border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(38,94,133,0.15);}
-  #reportType{min-width:170px;}
-  #clientType{min-width:150px;}
+  #contactType{min-width:160px;}
   #monthSelect{min-width:140px;}
-  #codeSelect{min-width:120px;}
+  #codeInput{min-width:120px;width:120px;}
   #vendorSelect{min-width:170px;}
+  .tooltip-icon{cursor:help;color:var(--muted);font-weight:700;margin-left:3px;}
   .date-range{display:flex;gap:8px;align-items:flex-end;}
 
   .btn{font-family:inherit;font-size:13.5px;font-weight:600;border:none;border-radius:var(--radius);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:filter .12s ease, transform .05s ease;white-space:nowrap;}
@@ -132,7 +132,7 @@
 <div class="app">
   <div class="topbar">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="#fff" stroke-width="1.6"/><path d="M4 9h16" stroke="#fff" stroke-width="1.6"/></svg>
-    <h1>REPORTE UNIVERSAL DE CLIENTES</h1>
+    <h1>LISTA DE CONTACTOS</h1>
     <span class="sub">Filtra, marca clientes y genera una lista</span>
   </div>
 
@@ -140,19 +140,8 @@
 
     <div class="filters">
       <div class="field-inline">
-        <label for="reportType">Tipo de reporte</label>
-        <select id="reportType">
-          <option value="cumpleanos">Cumpleaños</option>
-          <option value="inactivos">Inactivos</option>
-          <option value="recurrentes">Recurrentes</option>
-          <option value="nuevos">Nuevos</option>
-          <option value="leads">Leads</option>
-        </select>
-      </div>
-
-      <div class="field-inline">
-        <label for="clientType">Tipo de cliente</label>
-        <select id="clientType">
+        <label for="contactType">Tipo de contacto</label>
+        <select id="contactType">
           <option value="">Todos</option>
           <option value="nuevo">Nuevo</option>
           <option value="recurrente">Recurrente</option>
@@ -174,7 +163,7 @@
         </select>
       </div>
 
-      <div class="field-inline" id="dateRangeField" style="display:none;">
+      <div class="field-inline" id="dateRangeField">
         <label>Registrado entre</label>
         <div class="date-range">
           <input type="date" id="dateFrom">
@@ -184,14 +173,15 @@
       </div>
 
       <div class="field-inline">
-        <label for="codeSelect">Código</label>
-        <select id="codeSelect">
-          <option value="">Todos</option>
-        </select>
+        <label for="codeInput">Código</label>
+        <input type="text" id="codeInput" placeholder="Ej: 245">
       </div>
 
       <div class="field-inline">
-        <label for="vendorSelect">Vendedor</label>
+        <label for="vendorSelect">
+          Vendedor
+          <span class="tooltip-icon" title="Último agente de ventas que le atendió">ⓘ</span>
+        </label>
         <select id="vendorSelect">
           <option value="">Todos</option>
         </select>
@@ -324,14 +314,11 @@
   const headerCheckbox   = document.getElementById('headerCheckbox');
   const selectedCountEl  = document.getElementById('selectedCount');
   const searchInput      = document.getElementById('searchInput');
-  const reportType       = document.getElementById('reportType');
-  const clientType       = document.getElementById('clientType');
-  const monthField       = document.getElementById('monthField');
+  const contactType      = document.getElementById('contactType');
   const monthSelect      = document.getElementById('monthSelect');
-  const dateRangeField   = document.getElementById('dateRangeField');
   const dateFrom         = document.getElementById('dateFrom');
   const dateTo           = document.getElementById('dateTo');
-  const codeSelect       = document.getElementById('codeSelect');
+  const codeInput        = document.getElementById('codeInput');
   const vendorSelect     = document.getElementById('vendorSelect');
   const activeFiltersEl  = document.getElementById('activeFilters');
   const pagesContainer   = document.getElementById('pagesContainer');
@@ -355,52 +342,30 @@
     return `${d} ${meses[parseInt(m,10)-1]} ${y}`;
   }
 
-  // ---------- Poblar selects de Código y Vendedor con valores únicos ----------
+  // ---------- Poblar select de Vendedor con valores únicos ----------
   function populateFilterOptions(){
-    const codes = [...new Set(rawClients.map(c => c.id))].sort((a,b) => a - b);
-    codeSelect.innerHTML = '<option value="">Todos</option>' +
-      codes.map(id => `<option value="${id}">${id}</option>`).join('');
-
     const vendors = [...new Set(rawClients.map(c => c.vendedor))].sort((a,b) => a.localeCompare(b));
     vendorSelect.innerHTML = '<option value="">Todos</option>' +
       vendors.map(v => `<option value="${v}">${v}</option>`).join('');
   }
 
-  // ---------- Mostrar/ocultar filtros dinámicos según tipo de reporte ----------
-  function syncReportTypeUI(){
-    const type = reportType.value;
-    monthField.style.display = (type === 'cumpleanos') ? '' : 'none';
-    dateRangeField.style.display = (type === 'nuevos') ? '' : 'none';
-
-    // el tipo de reporte sugiere (pero no obliga) un tipo de cliente
-    const suggestion = {inactivos:'inactivo', recurrentes:'recurrente', nuevos:'nuevo', leads:'lead', cumpleanos:''};
-    if(suggestion[type] !== undefined) clientType.value = suggestion[type];
-  }
-
   // ---------- Filtrado ----------
   function applyFilters(){
     const q = searchInput.value.trim().toLowerCase();
-    const type = reportType.value;
-    const tipoFiltro = clientType.value;
+    const tipoFiltro = contactType.value;
     const mes = monthSelect.value;
     const desde = dateFrom.value;
     const hasta = dateTo.value;
-    const codigo = codeSelect.value;
+    const codigo = codeInput.value.trim();
     const vendedor = vendorSelect.value;
 
     let result = rawClients.filter(c => {
       if(tipoFiltro && c.tipo !== tipoFiltro) return false;
-      if(codigo && String(c.id) !== codigo) return false;
+      if(codigo && !String(c.id).includes(codigo)) return false;
       if(vendedor && c.vendedor !== vendedor) return false;
-
-      if(type === 'cumpleanos' && mes){
-        const clienteMes = c.cumple.split('-')[1];
-        if(clienteMes !== mes) return false;
-      }
-      if(type === 'nuevos'){
-        if(desde && c.registro < desde) return false;
-        if(hasta && c.registro > hasta) return false;
-      }
+      if(mes && c.cumple.split('-')[1] !== mes) return false;
+      if(desde && c.registro < desde) return false;
+      if(hasta && c.registro > hasta) return false;
       if(q && !c.cliente.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -413,16 +378,10 @@
 
   function renderActiveFilters(){
     const chips = [];
-    const reportLabels = {cumpleanos:'Cumpleaños', inactivos:'Inactivos', recurrentes:'Recurrentes', nuevos:'Nuevos', leads:'Leads'};
-    chips.push(reportLabels[reportType.value]);
-    if(clientType.value) chips.push('Tipo: ' + tipoLabel[clientType.value]);
-    if(reportType.value === 'cumpleanos' && monthSelect.value){
-      chips.push('Mes: ' + monthSelect.options[monthSelect.selectedIndex].text);
-    }
-    if(reportType.value === 'nuevos' && (dateFrom.value || dateTo.value)){
-      chips.push(`Registro: ${dateFrom.value || '…'} a ${dateTo.value || '…'}`);
-    }
-    if(codeSelect.value) chips.push('Código: ' + codeSelect.value);
+    if(contactType.value) chips.push('Tipo de contacto: ' + tipoLabel[contactType.value]);
+    if(monthSelect.value) chips.push('Mes de cumpleaños: ' + monthSelect.options[monthSelect.selectedIndex].text);
+    if(dateFrom.value || dateTo.value) chips.push(`Registro: ${dateFrom.value || '…'} a ${dateTo.value || '…'}`);
+    if(codeInput.value.trim()) chips.push('Código: ' + codeInput.value.trim());
     if(vendorSelect.value) chips.push('Vendedor: ' + vendorSelect.value);
     if(searchInput.value.trim()) chips.push('Nombre: "' + searchInput.value.trim() + '"');
 
@@ -519,12 +478,11 @@
 
   // ---------- Eventos de filtros ----------
   document.getElementById('buscarBtn').addEventListener('click', applyFilters);
-  reportType.addEventListener('change', () => { syncReportTypeUI(); applyFilters(); });
-  clientType.addEventListener('change', applyFilters);
+  contactType.addEventListener('change', applyFilters);
   monthSelect.addEventListener('change', applyFilters);
   dateFrom.addEventListener('change', applyFilters);
   dateTo.addEventListener('change', applyFilters);
-  codeSelect.addEventListener('change', applyFilters);
+  codeInput.addEventListener('input', applyFilters);
   vendorSelect.addEventListener('change', applyFilters);
   searchInput.addEventListener('input', applyFilters);
   pageSizeSelect.addEventListener('change', () => {
@@ -561,9 +519,6 @@
       return;
     }
     modalSummary.textContent = `${selectedIds.size} cliente${selectedIds.size === 1 ? '' : 's'} seleccionado${selectedIds.size === 1 ? '' : 's'}`;
-    // sugiere motivo según el reporte activo
-    const suggestMotivo = {cumpleanos:'Cumpleaños', inactivos:'Inactivos', recurrentes:'Seguimiento', nuevos:'Nuevos', leads:'Leads'};
-    listMotivo.value = suggestMotivo[reportType.value] || 'Seguimiento';
     modalBackdrop.classList.add('open');
   }
   function closeModal(){
@@ -635,7 +590,6 @@
 
   // ---------- Init ----------
   populateFilterOptions();
-  syncReportTypeUI();
   applyFilters();
 </script>
 
