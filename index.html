@@ -13,7 +13,7 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;}
-  .app{max-width:1220px;margin:28px auto 60px;padding:0 16px;}
+  .app{max-width:1280px;margin:28px auto 60px;padding:0 16px;}
 
   .topbar{background:linear-gradient(180deg,var(--navy-800),var(--navy-900));color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:16px 22px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
   .topbar svg{flex:none;}
@@ -34,7 +34,7 @@
   #contactType{min-width:160px;}
   #monthSelect{min-width:140px;}
   #codeInput{min-width:120px;width:120px;}
-  #vendorSelect{min-width:170px;}
+  #vendorSelect{min-width:190px;}
   .tooltip-icon{cursor:help;color:var(--muted);font-weight:700;margin-left:3px;}
   .date-range{display:flex;gap:8px;align-items:flex-end;}
 
@@ -59,12 +59,14 @@
 
   /* Selection bar */
   .selection-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 4px;margin:10px 0 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .selection-bar .divider{width:1px;align-self:stretch;background:var(--line);margin:0 2px;}
   .selection-bar .count{margin-left:auto;font-weight:600;color:var(--navy-800);background:var(--navy-100);padding:5px 12px;border-radius:20px;font-size:12.5px;}
 
   /* Table */
-  table{width:100%;border-collapse:collapse;margin-top:4px;}
-  thead th{text-align:left;font-size:11px;letter-spacing:.3px;color:var(--navy-800);padding:10px 10px;border-bottom:2px solid var(--navy-800);white-space:nowrap;}
-  tbody td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink);}
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);}
+  table{width:100%;border-collapse:collapse;margin-top:0;}
+  thead th{text-align:left;font-size:11px;letter-spacing:.3px;color:var(--navy-800);padding:10px 10px;border-bottom:2px solid var(--navy-800);white-space:nowrap;background:#fff;position:sticky;top:0;}
+  tbody td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink);white-space:nowrap;}
   tbody tr:hover{background:var(--navy-100);}
   tbody tr.row-selected{background:#FBF3E4;}
   tbody tr.row-selected:hover{background:#F8ECD6;}
@@ -77,7 +79,14 @@
   .tipo-recurrente{background:#E4E8F7;color:var(--purple);}
   .tipo-inactivo{background:#F1D9D5;color:var(--red);}
   .tipo-lead{background:#E1F1F1;color:var(--teal);}
-  .empty-row td{text-align:center;color:var(--muted);padding:34px 0;}
+  .dir-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+  .dir-outbound{background:#E4E8F7;color:var(--purple);}
+  .dir-inbound{background:#E1EFE4;color:var(--green);}
+  .muted-cell{color:var(--muted);}
+  .empty-row td{text-align:center;color:var(--muted);padding:34px 0;white-space:normal;}
+
+  /* tabla extendida (Nuevo) con muchas columnas: fuente más compacta */
+  .table-nuevo thead th, .table-nuevo tbody td{font-size:12px;padding:9px 8px;}
 
   /* Pagination */
   .pagination-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
@@ -133,7 +142,7 @@
   <div class="topbar">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="#fff" stroke-width="1.6"/><path d="M4 9h16" stroke="#fff" stroke-width="1.6"/></svg>
     <h1>LISTA DE CONTACTOS</h1>
-    <span class="sub">Filtra, marca clientes y genera una lista</span>
+    <span class="sub">Filtra, marca contactos y genera una lista</span>
   </div>
 
   <div class="panel">
@@ -191,13 +200,18 @@
         <label for="searchInput" style="display:block;font-size:11px;font-weight:700;color:var(--navy-800);margin-bottom:5px;">Buscar por nombre</label>
         <div style="position:relative;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="top:50%;"><circle cx="11" cy="11" r="7" stroke="#333" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#333" stroke-width="2" stroke-linecap="round"/></svg>
-          <input type="text" id="searchInput" placeholder="Nombre del cliente…">
+          <input type="text" id="searchInput" placeholder="Nombre del contacto…">
         </div>
       </div>
 
       <button class="btn btn-primary" id="buscarBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
         Buscar
+      </button>
+
+      <button class="btn btn-outline" id="clearFiltersBtn" title="Restablece todos los filtros a su valor por defecto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M3 4v5h5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Limpiar filtros
       </button>
     </div>
 
@@ -207,24 +221,24 @@
       <button class="btn btn-outline" id="selectAllBtn">Marcar todos (filtrados)</button>
       <button class="btn btn-danger-outline" id="deselectAllBtn">Desmarcar todos</button>
       <button class="btn btn-success" id="openModalBtn">+ Crear lista</button>
+      <span class="divider"></span>
+      <button class="btn btn-outline" id="exportCsvBtn" title="Exporta los contactos seleccionados como CSV">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/></svg>
+        Exportar CSV
+      </button>
+      <button class="btn btn-outline" id="exportPdfBtn" title="Exporta los contactos seleccionados como PDF">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/></svg>
+        Exportar PDF
+      </button>
       <span class="count" id="selectedCount">0 seleccionados</span>
     </div>
 
-    <table id="clientsTable">
-      <thead>
-        <tr>
-          <th style="width:34px;"><input type="checkbox" class="checkbox" id="headerCheckbox" title="Marcar / desmarcar página actual"></th>
-          <th>COD</th>
-          <th>CLIENTE</th>
-          <th>TIPO</th>
-          <th>CUMPLE</th>
-          <th>FECHA REGISTRO</th>
-          <th>INFO</th>
-          <th>VENDEDOR</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+    <div class="table-scroll">
+      <table id="clientsTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
 
     <div class="pagination-bar">
       <span class="info" id="paginationInfo">Mostrando 0 de 0</span>
@@ -245,11 +259,11 @@
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>Crear lista de clientes</h3>
+      <h3>Crear lista de contactos</h3>
       <button id="closeModalBtn" aria-label="Cerrar">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="summary" id="modalSummary">0 clientes seleccionados</div>
+      <div class="summary" id="modalSummary">0 contactos seleccionados</div>
 
       <div class="field">
         <label for="listTitle">Título de la lista</label>
@@ -281,28 +295,98 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Librería para exportar a PDF (jsPDF + autotable) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <script>
-  // ---------- Datos de ejemplo ----------
+  // ---------- Dataset general (Recurrente / Inactivo / Lead / Todos) ----------
   const rawClients = [
     {id:120, cliente:"Lilia Aguirre",    tipo:"inactivo",   cumple:"1985-08-20", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
     {id:242, cliente:"Tanisha Objia",    tipo:"inactivo",   cumple:"1982-08-27", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
     {id:245, cliente:"Maria Reyes",      tipo:"recurrente", cumple:"1976-08-25", registro:"2018-03-02", info:"No contesta", vendedor:"Jose Molina"},
     {id:247, cliente:"Cecilia Sanawani", tipo:"inactivo",   cumple:"1974-08-09", registro:"2019-08-12", info:"No contesta", vendedor:"Mary Polo"},
     {id:253, cliente:"Agustina Gabriel", tipo:"lead",       cumple:"1948-08-28", registro:"2026-08-02", info:"No contesta", vendedor:"Mary Polo"},
-    {id:261, cliente:"Roberto Fuentes",  tipo:"nuevo",      cumple:"1990-08-03", registro:"2026-08-05", info:"Interesado",  vendedor:"Jose Molina"},
-    {id:274, cliente:"Diana Salgado",    tipo:"nuevo",      cumple:"1988-08-14", registro:"2026-08-06", info:"No contesta", vendedor:"Mary Polo"},
+    {id:274, cliente:"Diana Salgado",    tipo:"recurrente", cumple:"1988-08-14", registro:"2018-08-06", info:"No contesta", vendedor:"Mary Polo"},
     {id:281, cliente:"Hector Ramirez",   tipo:"recurrente", cumple:"1965-08-30", registro:"2017-11-07", info:"Contactado",  vendedor:"Jose Molina"},
     {id:290, cliente:"Jose Fernandez",   tipo:"inactivo",   cumple:"1979-05-11", registro:"2018-01-20", info:"No contesta", vendedor:"Mary Polo"},
-    {id:298, cliente:"Josefina Cruz",    tipo:"lead",       cumple:"1995-08-19", registro:"2026-08-01", info:"Interesado",  vendedor:"Jose Molina"},
-    {id:305, cliente:"Andrea Solano",    tipo:"nuevo",      cumple:"1992-02-10", registro:"2026-08-09", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:298, cliente:"Josefina Cruz",    tipo:"lead",       cumple:"1995-08-19", registro:"2019-08-01", info:"Interesado",  vendedor:"Jose Molina"},
     {id:311, cliente:"Jose Ramon Diaz",  tipo:"inactivo",   cumple:"1970-08-04", registro:"2016-06-14", info:"No contesta", vendedor:"Jose Molina"},
     {id:318, cliente:"Karen Ibarra",     tipo:"recurrente", cumple:"1983-08-22", registro:"2019-09-30", info:"Contactado",  vendedor:"Mary Polo"},
-    {id:326, cliente:"Luis Gomez",       tipo:"lead",       cumple:"1998-01-05", registro:"2026-07-28", info:"Interesado",  vendedor:"Jose Molina"},
-    {id:333, cliente:"Patricia Nunez",   tipo:"nuevo",      cumple:"1991-08-17", registro:"2026-08-03", info:"Contactado",  vendedor:"Mary Polo"},
+    {id:326, cliente:"Luis Gomez",       tipo:"lead",       cumple:"1998-01-05", registro:"2019-07-28", info:"Interesado",  vendedor:"Jose Molina"},
     {id:340, cliente:"Jose Antonio Vera",tipo:"inactivo",   cumple:"1966-08-29", registro:"2015-12-01", info:"No contesta", vendedor:"Jose Molina"},
     {id:347, cliente:"Gabriela Ortiz",   tipo:"recurrente", cumple:"1980-08-06", registro:"2020-02-18", info:"Contactado",  vendedor:"Mary Polo"},
-    {id:355, cliente:"Marco Delgado",    tipo:"lead",       cumple:"1997-08-12", registro:"2026-08-04", info:"Interesado",  vendedor:"Jose Molina"},
+    {id:355, cliente:"Marco Delgado",    tipo:"lead",       cumple:"1997-08-12", registro:"2019-08-04", info:"Interesado",  vendedor:"Jose Molina"},
   ];
+
+  // ---------- Dataset de contactos "Nuevo" (formato del dialer / call center) ----------
+  const newLeads = [
+    {id:52301, nombres:"MANUEL MINCHALA", telefono:"+23432432432", campaniaPais:"US",
+     fechaRegistro:"2026-09-09 01:15:25", fechaPraLlamada:"", did:"13238801135", ultimaLlamada:"",
+     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
+     creadoPor:"Sebastian Tovar", quienHizoLlamada:"BILLY CASTRO", campaniaPromocional:"N/A", codigoPromocional:"N/A",
+     psiquico:"", medio:"FACEBOOK", cual:"", tipoTracking:"TRK-PB-LA-02", tipoLlamada:"outbound", llamada:""},
+
+    {id:52302, nombres:"ERYIN PARAJON BERRIOS", telefono:"2433423432", campaniaPais:"US",
+     fechaRegistro:"2026-09-09 11:19:23", fechaPraLlamada:"", did:"4142124121", ultimaLlamada:"",
+     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
+     creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
+     psiquico:"", medio:"NINGUNO", cual:"", tipoTracking:"TRK-PB-DAL-02", tipoLlamada:"outbound", llamada:""},
+
+    {id:52303, nombres:"EVELYN SANCHEZ", telefono:"12094518543", campaniaPais:"US",
+     fechaRegistro:"2026-09-09 13:45:34", fechaPraLlamada:"2026-09-09 13:48:46", did:"13233288931", ultimaLlamada:"2026-09-09 13:48:46",
+     venMinsPraConsulta:"$25.00", minPrConsulta:"10", convertidoPor:"HECTOR ORDOSGOITA", venTotMins:"$25.00", tr:"$0.00", tiempoAsignado:"3",
+     creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
+     psiquico:"LUCERO /LILIANA FUENTES", medio:"REDES SOCIALES", cual:"", tipoTracking:"TRK-PB-LA-01", tipoLlamada:"inbound", llamada:""},
+
+    {id:52304, nombres:"BRAILYN MIGUEL ALMONTE HERNANDEZ", telefono:"13478392687", campaniaPais:"US",
+     fechaRegistro:"2026-09-09 14:26:50", fechaPraLlamada:"", did:"", ultimaLlamada:"",
+     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
+     creadoPor:"BILLY CASTRO", quienHizoLlamada:"", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
+     psiquico:"", medio:"WHATSAPP MARKETING", cual:"", tipoTracking:"not_campaign", tipoLlamada:"", llamada:""},
+  ];
+
+  // columnas de la tabla general
+  const generalColumns = [
+    {label:'COD', render:c => c.id, cls:'cod'},
+    {label:'CLIENTE', render:c => c.cliente, cls:'cliente'},
+    {label:'TIPO', render:c => `<span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo]}</span>`},
+    {label:'CUMPLE', render:c => formatDateHuman(c.cumple)},
+    {label:'FECHA REGISTRO', render:c => formatDateHuman(c.registro)},
+    {label:'INFO', render:c => `<span class="info-tag">${c.info}</span>`},
+    {label:'VENDEDOR', render:c => c.vendedor},
+  ];
+
+  // columnas de la tabla de contactos "Nuevo" (dialer / call center)
+  const nuevoColumns = [
+    {label:'Código', render:c => c.id, cls:'cod'},
+    {label:'Nombres', render:c => c.nombres, cls:'cliente'},
+    {label:'Teléfono', render:c => c.telefono},
+    {label:'Campaña País', render:c => c.campaniaPais},
+    {label:'Fecha de Registro', render:c => c.fechaRegistro},
+    {label:'Fecha de Pra Llda.', render:c => dash(c.fechaPraLlamada)},
+    {label:'DID', render:c => dash(c.did)},
+    {label:'Última Llamada', render:c => dash(c.ultimaLlamada)},
+    {label:'Ven Mins Pra Consulta', render:c => c.venMinsPraConsulta},
+    {label:'Min Pr. Consulta', render:c => c.minPrConsulta},
+    {label:'Convertido por', render:c => dash(c.convertidoPor)},
+    {label:'Ven Tot Mins.', render:c => c.venTotMins},
+    {label:'T.R', render:c => c.tr},
+    {label:'Tiempo Asignado', render:c => c.tiempoAsignado},
+    {label:'Creado Por', render:c => c.creadoPor},
+    {label:'Quién Hizo la Llamada', render:c => dash(c.quienHizoLlamada)},
+    {label:'Campaña Promocional', render:c => c.campaniaPromocional},
+    {label:'Código Promocional', render:c => c.codigoPromocional},
+    {label:'Psíquico', render:c => dash(c.psiquico)},
+    {label:'Medio', render:c => c.medio},
+    {label:'Cuál', render:c => dash(c.cual)},
+    {label:'Tipo', render:c => c.tipoTracking},
+    {label:'Tipo de Llamada', render:c => c.tipoLlamada
+      ? `<span class="dir-tag dir-${c.tipoLlamada}">${c.tipoLlamada}</span>` : '—'},
+    {label:'Llamada', render:c => dash(c.llamada)},
+  ];
+
+  function dash(v){ return (v === undefined || v === null || v === '') ? '<span class="muted-cell">—</span>' : v; }
 
   // estado: Set con los ids seleccionados (persiste aunque cambie de página o filtro)
   const selectedIds = new Set();
@@ -310,11 +394,13 @@
   let pageSize = 10;
   let currentFiltered = [];
 
+  const tableHead        = document.getElementById('tableHead');
   const tableBody        = document.getElementById('tableBody');
-  const headerCheckbox   = document.getElementById('headerCheckbox');
+  const clientsTable     = document.getElementById('clientsTable');
   const selectedCountEl  = document.getElementById('selectedCount');
   const searchInput      = document.getElementById('searchInput');
   const contactType      = document.getElementById('contactType');
+  const monthField       = document.getElementById('monthField');
   const monthSelect      = document.getElementById('monthSelect');
   const dateFrom         = document.getElementById('dateFrom');
   const dateTo           = document.getElementById('dateTo');
@@ -342,11 +428,29 @@
     return `${d} ${meses[parseInt(m,10)-1]} ${y}`;
   }
 
-  // ---------- Poblar select de Vendedor con valores únicos ----------
-  function populateFilterOptions(){
-    const vendors = [...new Set(rawClients.map(c => c.vendedor))].sort((a,b) => a.localeCompare(b));
+  function isNuevoMode(){ return contactType.value === 'nuevo'; }
+  function activeDataset(){ return isNuevoMode() ? newLeads : rawClients; }
+  function activeColumns(){ return isNuevoMode() ? nuevoColumns : generalColumns; }
+  function displayName(item){ return isNuevoMode() ? item.nombres : item.cliente; }
+  function agenteAtendio(item){
+    // "vendedor" en el dataset de Nuevo se interpreta como el último agente que atendió la llamada
+    return isNuevoMode() ? (item.quienHizoLlamada || item.creadoPor) : item.vendedor;
+  }
+
+  // ---------- Poblar select de Vendedor según el dataset activo ----------
+  function populateVendorOptions(){
+    const source = activeDataset();
+    const vendors = [...new Set(source.map(c => agenteAtendio(c)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+    const previous = vendorSelect.value;
     vendorSelect.innerHTML = '<option value="">Todos</option>' +
       vendors.map(v => `<option value="${v}">${v}</option>`).join('');
+    if(vendors.includes(previous)) vendorSelect.value = previous;
+  }
+
+  // ---------- Mostrar/ocultar filtros que no aplican al dataset activo ----------
+  function syncFieldVisibility(){
+    // el dataset de "Nuevo" (dialer) no tiene fecha de cumpleaños
+    monthField.style.display = isNuevoMode() ? 'none' : '';
   }
 
   // ---------- Filtrado ----------
@@ -358,15 +462,23 @@
     const hasta = dateTo.value;
     const codigo = codeInput.value.trim();
     const vendedor = vendorSelect.value;
+    const nuevoMode = isNuevoMode();
 
-    let result = rawClients.filter(c => {
-      if(tipoFiltro && c.tipo !== tipoFiltro) return false;
+    const dataset = activeDataset();
+
+    let result = dataset.filter(c => {
+      if(!nuevoMode && tipoFiltro && c.tipo !== tipoFiltro) return false;
       if(codigo && !String(c.id).includes(codigo)) return false;
-      if(vendedor && c.vendedor !== vendedor) return false;
-      if(mes && c.cumple.split('-')[1] !== mes) return false;
-      if(desde && c.registro < desde) return false;
-      if(hasta && c.registro > hasta) return false;
-      if(q && !c.cliente.toLowerCase().includes(q)) return false;
+      if(vendedor && agenteAtendio(c) !== vendedor) return false;
+
+      if(!nuevoMode && mes && c.cumple.split('-')[1] !== mes) return false;
+
+      const fechaRegistro = nuevoMode ? c.fechaRegistro.slice(0, 10) : c.registro;
+      if(desde && fechaRegistro < desde) return false;
+      if(hasta && fechaRegistro > hasta) return false;
+
+      const nombre = displayName(c).toLowerCase();
+      if(q && !nombre.includes(q)) return false;
       return true;
     });
 
@@ -378,14 +490,29 @@
 
   function renderActiveFilters(){
     const chips = [];
-    if(contactType.value) chips.push('Tipo de contacto: ' + tipoLabel[contactType.value]);
-    if(monthSelect.value) chips.push('Mes de cumpleaños: ' + monthSelect.options[monthSelect.selectedIndex].text);
+    if(contactType.value) chips.push('Tipo de contacto: ' + (tipoLabel[contactType.value] || contactType.value));
+    if(!isNuevoMode() && monthSelect.value) chips.push('Mes de cumpleaños: ' + monthSelect.options[monthSelect.selectedIndex].text);
     if(dateFrom.value || dateTo.value) chips.push(`Registro: ${dateFrom.value || '…'} a ${dateTo.value || '…'}`);
     if(codeInput.value.trim()) chips.push('Código: ' + codeInput.value.trim());
     if(vendorSelect.value) chips.push('Vendedor: ' + vendorSelect.value);
     if(searchInput.value.trim()) chips.push('Nombre: "' + searchInput.value.trim() + '"');
 
     activeFiltersEl.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
+  }
+
+  // ---------- Limpiar filtros ----------
+  function clearFilters(){
+    searchInput.value = '';
+    contactType.value = '';
+    monthSelect.value = '';
+    dateFrom.value = '';
+    dateTo.value = '';
+    codeInput.value = '';
+    vendorSelect.value = '';
+    syncFieldVisibility();
+    populateVendorOptions();
+    applyFilters();
+    showToast('success', 'Filtros restablecidos', 'Se muestran todos los contactos nuevamente.');
   }
 
   // ---------- Paginación ----------
@@ -422,13 +549,33 @@
     if(nextBtn) nextBtn.addEventListener('click', () => { currentPage++; renderTable(); });
   }
 
+  // ---------- Render encabezado dinámico ----------
+  function renderHead(){
+    const columns = activeColumns();
+    clientsTable.classList.toggle('table-nuevo', isNuevoMode());
+    tableHead.innerHTML = `
+      <tr>
+        <th style="width:34px;"><input type="checkbox" class="checkbox" id="headerCheckbox" title="Marcar / desmarcar página actual"></th>
+        ${columns.map(col => `<th>${col.label}</th>`).join('')}
+      </tr>
+    `;
+    document.getElementById('headerCheckbox').addEventListener('change', (e) => {
+      getPageData().forEach(c => {
+        if(e.target.checked) selectedIds.add(c.id); else selectedIds.delete(c.id);
+      });
+      renderTable();
+    });
+  }
+
   // ---------- Render tabla ----------
   function renderTable(){
+    renderHead();
+    const columns = activeColumns();
     const pageData = getPageData();
     tableBody.innerHTML = '';
 
     if(pageData.length === 0){
-      tableBody.innerHTML = `<tr class="empty-row"><td colspan="8">No se encontraron clientes con los filtros aplicados</td></tr>`;
+      tableBody.innerHTML = `<tr class="empty-row"><td colspan="${columns.length + 1}">No se encontraron contactos con los filtros aplicados</td></tr>`;
     } else {
       pageData.forEach(c => {
         const isSelected = selectedIds.has(c.id);
@@ -436,13 +583,7 @@
         tr.className = isSelected ? 'row-selected' : '';
         tr.innerHTML = `
           <td><input type="checkbox" class="checkbox row-check" data-id="${c.id}" ${isSelected ? 'checked' : ''}></td>
-          <td class="cod">${c.id}</td>
-          <td class="cliente">${c.cliente}</td>
-          <td><span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo]}</span></td>
-          <td>${formatDateHuman(c.cumple)}</td>
-          <td>${formatDateHuman(c.registro)}</td>
-          <td><span class="info-tag">${c.info}</span></td>
-          <td>${c.vendedor}</td>
+          ${columns.map(col => `<td class="${col.cls || ''}">${col.render(c)}</td>`).join('')}
         `;
         tableBody.appendChild(tr);
       });
@@ -464,6 +605,8 @@
   }
 
   function updateHeaderCheckboxState(){
+    const headerCheckbox = document.getElementById('headerCheckbox');
+    if(!headerCheckbox) return;
     const pageData = getPageData();
     const allChecked = pageData.length > 0 && pageData.every(c => selectedIds.has(c.id));
     const someChecked = pageData.some(c => selectedIds.has(c.id));
@@ -478,7 +621,13 @@
 
   // ---------- Eventos de filtros ----------
   document.getElementById('buscarBtn').addEventListener('click', applyFilters);
-  contactType.addEventListener('change', applyFilters);
+  document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+  contactType.addEventListener('change', () => {
+    selectedIds.clear(); // los datasets son distintos, evita ids "seleccionados" que ya no existen en pantalla
+    syncFieldVisibility();
+    populateVendorOptions();
+    applyFilters();
+  });
   monthSelect.addEventListener('change', applyFilters);
   dateFrom.addEventListener('change', applyFilters);
   dateTo.addEventListener('change', applyFilters);
@@ -500,12 +649,93 @@
     selectedIds.clear();
     renderTable();
   });
-  headerCheckbox.addEventListener('change', (e) => {
-    getPageData().forEach(c => {
-      if(e.target.checked) selectedIds.add(c.id); else selectedIds.delete(c.id);
+
+  // ---------- Exportar selección ----------
+  function stripTags(html){
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return (div.textContent || div.innerText || '').trim();
+  }
+
+  function dateStamp(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+  }
+
+  function getSelectedRows(){
+    const dataset = activeDataset();
+    const columns = activeColumns();
+    const selected = dataset.filter(c => selectedIds.has(c.id));
+    return {
+      columns,
+      rows: selected.map(c => columns.map(col => stripTags(String(col.render(c)))))
+    };
+  }
+
+  function exportSelectionCSV(){
+    if(selectedIds.size === 0){
+      showToast('warning', 'Nada que exportar', 'Marca al menos un contacto antes de exportar.');
+      return;
+    }
+    const { columns, rows } = getSelectedRows();
+    const escapeCsv = (val) => {
+      const s = String(val ?? '');
+      return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const lines = [
+      columns.map(c => escapeCsv(c.label)).join(','),
+      ...rows.map(row => row.map(escapeCsv).join(','))
+    ];
+    const csvContent = '\uFEFF' + lines.join('\r\n'); // BOM para acentos en Excel
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lista-contactos-${dateStamp()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('success', 'CSV exportado', `${rows.length} contacto${rows.length === 1 ? '' : 's'} exportado${rows.length === 1 ? '' : 's'} a CSV.`);
+  }
+
+  function exportSelectionPDF(){
+    if(selectedIds.size === 0){
+      showToast('warning', 'Nada que exportar', 'Marca al menos un contacto antes de exportar.');
+      return;
+    }
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      showToast('warning', 'No se pudo exportar', 'No se pudo cargar el generador de PDF. Revisa tu conexión.');
+      return;
+    }
+    const { columns, rows } = getSelectedRows();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: isNuevoMode() ? 'landscape' : 'portrait', unit: 'pt' });
+
+    doc.setFontSize(14);
+    doc.setTextColor(27, 76, 110);
+    doc.text('Lista de Contactos', 40, 40);
+    doc.setFontSize(9.5);
+    doc.setTextColor(107, 124, 136);
+    doc.text(`Generado el ${new Date().toLocaleString('es-ES')} · ${rows.length} contacto${rows.length === 1 ? '' : 's'} seleccionado${rows.length === 1 ? '' : 's'}`, 40, 56);
+
+    doc.autoTable({
+      head: [columns.map(c => c.label)],
+      body: rows,
+      startY: 68,
+      styles: { fontSize: 7.5, cellPadding: 4, overflow: 'linebreak' },
+      headStyles: { fillColor: [27, 76, 110], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [244, 247, 249] },
+      margin: { left: 40, right: 40 }
     });
-    renderTable();
-  });
+
+    doc.save(`lista-contactos-${dateStamp()}.pdf`);
+    showToast('success', 'PDF exportado', `${rows.length} contacto${rows.length === 1 ? '' : 's'} exportado${rows.length === 1 ? '' : 's'} a PDF.`);
+  }
+
+  document.getElementById('exportCsvBtn').addEventListener('click', exportSelectionCSV);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportSelectionPDF);
 
   // ---------- Modal: Crear lista ----------
   const openModalBtn  = document.getElementById('openModalBtn');
@@ -515,10 +745,10 @@
 
   function openModal(){
     if(selectedIds.size === 0){
-      showToast('warning', 'No se pudo abrir', 'Marca al menos un cliente antes de crear la lista.');
+      showToast('warning', 'No se pudo abrir', 'Marca al menos un contacto antes de crear la lista.');
       return;
     }
-    modalSummary.textContent = `${selectedIds.size} cliente${selectedIds.size === 1 ? '' : 's'} seleccionado${selectedIds.size === 1 ? '' : 's'}`;
+    modalSummary.textContent = `${selectedIds.size} contacto${selectedIds.size === 1 ? '' : 's'} seleccionado${selectedIds.size === 1 ? '' : 's'}`;
     modalBackdrop.classList.add('open');
   }
   function closeModal(){
@@ -532,24 +762,25 @@
 
   saveListBtn.addEventListener('click', () => {
     if(selectedIds.size === 0){
-      showToast('warning', 'No se pudo guardar', 'Marca al menos un cliente antes de guardar la lista.');
+      showToast('warning', 'No se pudo guardar', 'Marca al menos un contacto antes de guardar la lista.');
       closeModal();
       return;
     }
     const titulo = listTitle.value.trim() || `Lista sin título (${new Date().toLocaleDateString('es-ES')})`;
     const motivo = listMotivo.value;
     const descripcion = listDesc.value.trim();
-    const clientesSeleccionados = rawClients.filter(c => selectedIds.has(c.id));
+    const dataset = activeDataset();
+    const contactosSeleccionados = dataset.filter(c => selectedIds.has(c.id));
 
     const nuevaLista = {
       id: savedLists.length + 1,
       titulo, motivo, descripcion,
-      clientes: clientesSeleccionados.map(c => ({id:c.id, cliente:c.cliente})),
+      contactos: contactosSeleccionados.map(c => ({id:c.id, nombre:displayName(c)})),
       creado: new Date().toLocaleString('es-ES')
     };
     savedLists.push(nuevaLista);
 
-    showToast('success', 'Lista creada', `"${titulo}" guardada con ${clientesSeleccionados.length} cliente${clientesSeleccionados.length === 1 ? '' : 's'}.`);
+    showToast('success', 'Lista creada', `"${titulo}" guardada con ${contactosSeleccionados.length} contacto${contactosSeleccionados.length === 1 ? '' : 's'}.`);
 
     selectedIds.clear();
     listTitle.value = '';
@@ -589,7 +820,8 @@
   }
 
   // ---------- Init ----------
-  populateFilterOptions();
+  syncFieldVisibility();
+  populateVendorOptions();
   applyFilters();
 </script>
 
