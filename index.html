@@ -1,907 +1,4234 @@
+```html
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lista de Contactos · Crear Lista</title>
+<title>Lista de Contactos · Gestión de Lotes</title>
+
 <style>
   :root {
-    --navy-900:#123047; --navy-800:#1B4C6E; --navy-700:#265E85; --navy-100:#EAF1F6;
-    --ink:#1C2B36; --muted:#6B7C88; --line:#DCE4EA; --bg:#F4F7F9; --white:#FFFFFF;
-    --amber:#D98E2B; --green:#2E9E5B; --red:#C0392B; --purple:#6B4FA0; --teal:#1E8A8A;
-    --radius:6px; --shadow:0 2px 10px rgba(18,48,71,0.08);
+    --navy-900:#123047;
+    --navy-800:#1B4C6E;
+    --navy-700:#265E85;
+    --navy-100:#EAF1F6;
+    --ink:#1C2B36;
+    --muted:#6B7C88;
+    --line:#DCE4EA;
+    --bg:#F4F7F9;
+    --white:#FFFFFF;
+    --amber:#D98E2B;
+    --green:#2E9E5B;
+    --red:#C0392B;
+    --purple:#6B4FA0;
+    --teal:#1E8A8A;
+    --radius:6px;
+    --shadow:0 2px 10px rgba(18,48,71,0.08);
   }
-  *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;}
-  .app{max-width:1280px;margin:28px auto 60px;padding:0 16px;}
 
-  .topbar{background:linear-gradient(180deg,var(--navy-800),var(--navy-900));color:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:16px 22px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
-  .topbar svg{flex:none;}
-  .topbar h1{font-size:16px;font-weight:600;letter-spacing:.2px;margin:0;}
-  .topbar .sub{font-size:12px;color:#BBD4E4;margin-left:auto;}
-
-  .panel{background:var(--white);border:1px solid var(--line);border-top:none;padding:20px 22px 26px;}
-
-  /* Filtros */
-  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:8px;}
-  .field-inline{display:flex;flex-direction:column;gap:5px;}
-  .field-inline label{font-size:11px;font-weight:700;color:var(--navy-800);letter-spacing:.2px;}
-  select, input[type=text], input[type=date], textarea{
-    font-family:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:var(--radius);
-    padding:9px 12px;color:var(--ink);background:#fff;outline:none;
+  * {
+    box-sizing:border-box;
   }
-  select:focus, input:focus, textarea:focus{border-color:var(--navy-700);box-shadow:0 0 0 3px rgba(38,94,133,0.15);}
-  #contactType{min-width:160px;}
-  #monthSelect{min-width:140px;}
-  #codeInput{min-width:120px;width:120px;}
-  #vendorSelect{min-width:190px;}
-  .tooltip-icon{cursor:help;color:var(--muted);font-weight:700;margin-left:3px;}
-  .date-range{display:flex;gap:8px;align-items:flex-end;}
 
-  .btn{font-family:inherit;font-size:13.5px;font-weight:600;border:none;border-radius:var(--radius);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:filter .12s ease, transform .05s ease;white-space:nowrap;}
-  .btn:active{transform:translateY(1px);}
-  .btn:disabled{opacity:.55;cursor:not-allowed;}
-  .btn-primary{background:var(--navy-800);color:#fff;}
-  .btn-primary:hover{filter:brightness(1.08);}
-  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--navy-800);}
-  .btn-outline:hover{background:var(--navy-100);}
-  .btn-success{background:var(--green);color:#fff;}
-  .btn-success:hover:not(:disabled){filter:brightness(1.06);}
-  .btn-danger-outline{background:#fff;border:1px solid #EEC9C0;color:var(--red);}
-  .btn-danger-outline:hover{background:#FBEFEC;}
+  body {
+    margin:0;
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:14px;
+  }
 
-  .search-wrap{position:relative;flex:1;min-width:220px;}
-  .search-wrap input{padding-left:32px;width:100%;}
-  .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5;}
+  .app {
+    max-width:1280px;
+    margin:28px auto 60px;
+    padding:0 16px;
+  }
 
-  .active-filters{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px;}
-  .chip{font-size:11.5px;font-weight:600;background:var(--navy-100);color:var(--navy-800);padding:4px 10px;border-radius:20px;}
+  .topbar {
+    background:linear-gradient(180deg,var(--navy-800),var(--navy-900));
+    color:#fff;
+    border-radius:var(--radius) var(--radius) 0 0;
+    padding:16px 22px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:var(--shadow);
+  }
 
-  /* Selection bar */
-  .selection-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 4px;margin:10px 0 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
-  .selection-bar .divider{width:1px;align-self:stretch;background:var(--line);margin:0 2px;}
-  .selection-bar .count{margin-left:auto;font-weight:600;color:var(--navy-800);background:var(--navy-100);padding:5px 12px;border-radius:20px;font-size:12.5px;}
+  .topbar h1 {
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:.2px;
+    margin:0;
+  }
 
-  /* Table */
-  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);}
-  table{width:100%;border-collapse:collapse;margin-top:0;}
-  thead th{text-align:left;font-size:11px;letter-spacing:.3px;color:var(--navy-800);padding:10px 10px;border-bottom:2px solid var(--navy-800);white-space:nowrap;background:#fff;position:sticky;top:0;}
-  tbody td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink);white-space:nowrap;}
-  tbody tr:hover{background:var(--navy-100);}
-  tbody tr.row-selected{background:#FBF3E4;}
-  tbody tr.row-selected:hover{background:#F8ECD6;}
-  .checkbox{width:17px;height:17px;accent-color:var(--navy-800);cursor:pointer;}
-  .cod{color:var(--muted);}
-  .cliente{font-weight:600;}
-  .info-tag{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:#F1D9D5;color:var(--red);}
-  .tipo-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
-  .tipo-nuevo{background:#E1EFE4;color:var(--green);}
-  .tipo-recurrente{background:#E4E8F7;color:var(--purple);}
-  .tipo-inactivo{background:#F1D9D5;color:var(--red);}
-  .tipo-lead{background:#E1F1F1;color:var(--teal);}
-  .dir-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
-  .dir-outbound{background:#E4E8F7;color:var(--purple);}
-  .dir-inbound{background:#E1EFE4;color:var(--green);}
-  .muted-cell{color:var(--muted);}
-  .empty-row td{text-align:center;color:var(--muted);padding:34px 0;white-space:normal;}
+  .topbar .sub {
+    font-size:12px;
+    color:#BBD4E4;
+    margin-left:auto;
+  }
 
-  /* tabla extendida (Nuevo) con muchas columnas: fuente más compacta */
-  .table-nuevo thead th, .table-nuevo tbody td{font-size:12px;padding:9px 8px;}
+  .panel {
+    background:var(--white);
+    border:1px solid var(--line);
+    border-top:none;
+    padding:20px 22px 26px;
+  }
 
-  /* Pagination */
-  .pagination-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
-  .pagination-bar .info{font-size:12.5px;color:var(--muted);}
-  .pagination-bar .pages{display:flex;gap:4px;margin-left:auto;}
-  .page-btn{min-width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:var(--radius);font-size:12.5px;font-weight:600;color:var(--navy-800);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 8px;}
-  .page-btn:hover:not(:disabled){background:var(--navy-100);}
-  .page-btn.active{background:var(--navy-800);color:#fff;border-color:var(--navy-800);}
-  .page-btn:disabled{opacity:.4;cursor:not-allowed;}
-  .page-size select{padding:6px 10px;font-size:12.5px;}
+  /* =========================
+     TABS
+  ========================= */
 
-  /* Modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(18,48,71,0.45);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
-  .modal-backdrop.open{display:flex;}
-  .modal-box{background:#fff;border-radius:8px;width:100%;max-width:480px;box-shadow:0 12px 40px rgba(0,0,0,0.25);overflow:hidden;}
-  .modal-header{background:var(--navy-800);color:#fff;padding:14px 20px;display:flex;align-items:center;}
-  .modal-header h3{margin:0;font-size:15px;}
-  .modal-header button{margin-left:auto;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;opacity:.85;}
-  .modal-header button:hover{opacity:1;}
-  .modal-body{padding:18px 20px;}
-  .modal-body .field{margin-bottom:14px;}
-  .modal-body label{display:block;font-size:12px;font-weight:700;color:var(--navy-800);margin-bottom:6px;}
-  .modal-body input[type=text], .modal-body select, .modal-body textarea{width:100%;}
-  .modal-body textarea{resize:vertical;min-height:70px;}
-  .modal-body .summary{font-size:12.5px;color:var(--muted);background:var(--navy-100);padding:8px 12px;border-radius:var(--radius);margin-bottom:14px;}
-  .modal-footer{padding:14px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);}
+  .tabs {
+    display:flex;
+    border-bottom:1px solid var(--line);
+    margin:-20px -22px 20px;
+    padding:0 22px;
+    background:#fff;
+  }
 
-  /* Asignación de lista */
-  .assign-toggle{display:flex;gap:8px;margin-bottom:10px;}
-  .assign-option{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--radius);padding:9px 12px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink);transition:border-color .12s ease, background .12s ease;}
-  .assign-option input{accent-color:var(--navy-800);cursor:pointer;}
-  .assign-option.checked{border-color:var(--navy-800);background:var(--navy-100);color:var(--navy-800);}
-  .assign-sub{margin-top:4px;}
-  .assign-hint{font-size:11.5px;color:var(--muted);margin-top:6px;}
+  .tab-btn {
+    border:none;
+    background:transparent;
+    padding:14px 20px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    transition:.15s ease;
+  }
 
-  /* Toast */
-  .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;width:340px;}
-  .toast{background:rgba(255,255,255,0.98);border:1px solid rgba(0,0,0,0.1);border-radius:.25rem;box-shadow:0 .25rem .75rem rgba(0,0,0,0.15);opacity:0;transform:translateX(40px);transition:opacity .25s ease, transform .25s ease;overflow:hidden;font-size:13.5px;}
-  .toast.showing{opacity:1;transform:translateX(0);}
-  .toast-header{display:flex;align-items:center;gap:8px;padding:.5rem .75rem;border-bottom:1px solid rgba(0,0,0,0.05);color:#495057;}
-  .toast-header .icon-dot{width:18px;height:18px;border-radius:3px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;}
-  .toast-header strong{margin-right:auto;font-size:13.5px;color:#212529;}
-  .toast-header small{color:#868e96;font-size:11.5px;}
-  .toast-header .close{background:none;border:none;font-size:16px;line-height:1;color:#868e96;cursor:pointer;padding:0 0 0 8px;}
-  .toast-body{padding:.7rem .75rem;color:#212529;}
-  .toast-progress{height:3px;background:rgba(0,0,0,0.08);}
-  .toast-progress span{display:block;height:100%;background:var(--green);animation:shrink 4.5s linear forwards;}
-  .toast.warning .toast-progress span{background:var(--amber);}
-  @keyframes shrink{from{width:100%;}to{width:0%;}}
+  .tab-btn:hover {
+    color:var(--navy-800);
+    background:var(--navy-100);
+  }
 
-  @media (max-width:760px){
-    .search-wrap{width:100%;}
-    .pagination-bar .pages{margin-left:0;width:100%;justify-content:center;}
-    .toast-container{left:12px;right:12px;width:auto;}
+  .tab-btn.active {
+    color:var(--navy-800);
+    border-bottom-color:var(--navy-800);
+  }
+
+  .tab-content {
+    display:none;
+  }
+
+  .tab-content.active {
+    display:block;
+  }
+
+  /* =========================
+     FILTROS
+  ========================= */
+
+  .filters {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:flex-end;
+    margin-bottom:8px;
+  }
+
+  .field-inline {
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .field-inline label {
+    font-size:11px;
+    font-weight:700;
+    color:var(--navy-800);
+    letter-spacing:.2px;
+  }
+
+  select,
+  input[type=text],
+  input[type=date],
+  textarea {
+    font-family:inherit;
+    font-size:13.5px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:9px 12px;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+  }
+
+  select:focus,
+  input:focus,
+  textarea:focus {
+    border-color:var(--navy-700);
+    box-shadow:0 0 0 3px rgba(38,94,133,0.15);
+  }
+
+  #contactType {
+    min-width:160px;
+  }
+
+  #monthSelect {
+    min-width:140px;
+  }
+
+  #codeInput {
+    min-width:120px;
+    width:120px;
+  }
+
+  #vendorSelect {
+    min-width:190px;
+  }
+
+  .search-wrap {
+    position:relative;
+    flex:1;
+    min-width:220px;
+  }
+
+  .search-wrap input {
+    padding-left:32px;
+    width:100%;
+  }
+
+  .date-range {
+    display:flex;
+    gap:8px;
+    align-items:flex-end;
+  }
+
+  /* =========================
+     BOTONES
+  ========================= */
+
+  .btn {
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:600;
+    border:none;
+    border-radius:var(--radius);
+    padding:9px 16px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:filter .12s ease, transform .05s ease;
+    white-space:nowrap;
+  }
+
+  .btn:active {
+    transform:translateY(1px);
+  }
+
+  .btn:disabled {
+    opacity:.55;
+    cursor:not-allowed;
+  }
+
+  .btn-primary {
+    background:var(--navy-800);
+    color:#fff;
+  }
+
+  .btn-outline {
+    background:#fff;
+    border:1px solid var(--line);
+    color:var(--navy-800);
+  }
+
+  .btn-success {
+    background:var(--green);
+    color:#fff;
+  }
+
+  .btn-danger-outline {
+    background:#fff;
+    border:1px solid #EEC9C0;
+    color:var(--red);
+  }
+
+  .btn-warning {
+    background:var(--amber);
+    color:#fff;
+  }
+
+  .btn:hover {
+    filter:brightness(1.06);
+  }
+
+  /* =========================
+     FILTROS ACTIVOS
+  ========================= */
+
+  .active-filters {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin:10px 0 4px;
+  }
+
+  .chip {
+    font-size:11.5px;
+    font-weight:600;
+    background:var(--navy-100);
+    color:var(--navy-800);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+
+  /* =========================
+     BARRA SELECCIÓN
+  ========================= */
+
+  .selection-bar {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    padding:12px 4px;
+    margin:10px 0 6px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+
+  .selection-bar .divider {
+    width:1px;
+    align-self:stretch;
+    background:var(--line);
+  }
+
+  .selection-bar .count {
+    margin-left:auto;
+    font-weight:600;
+    color:var(--navy-800);
+    background:var(--navy-100);
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12.5px;
+  }
+
+  /* =========================
+     TABLAS
+  ========================= */
+
+  .table-scroll {
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+
+  table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:0;
+  }
+
+  thead th {
+    text-align:left;
+    font-size:11px;
+    letter-spacing:.3px;
+    color:var(--navy-800);
+    padding:10px;
+    border-bottom:2px solid var(--navy-800);
+    white-space:nowrap;
+    background:#fff;
+  }
+
+  tbody td {
+    padding:10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+
+  tbody tr:hover {
+    background:var(--navy-100);
+  }
+
+  .checkbox {
+    width:17px;
+    height:17px;
+    accent-color:var(--navy-800);
+    cursor:pointer;
+  }
+
+  .cod {
+    color:var(--muted);
+  }
+
+  .cliente {
+    font-weight:600;
+  }
+
+  .muted-cell {
+    color:var(--muted);
+  }
+
+  .empty-row td {
+    text-align:center;
+    color:var(--muted);
+    padding:34px 0;
+    white-space:normal;
+  }
+
+  /* =========================
+     TAGS
+  ========================= */
+
+  .tipo-tag,
+  .status-tag,
+  .destino-tag {
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:20px;
+  }
+
+  .tipo-nuevo {
+    background:#E1EFE4;
+    color:var(--green);
+  }
+
+  .tipo-recurrente {
+    background:#E4E8F7;
+    color:var(--purple);
+  }
+
+  .tipo-inactivo {
+    background:#F1D9D5;
+    color:var(--red);
+  }
+
+  .tipo-lead {
+    background:#E1F1F1;
+    color:var(--teal);
+  }
+
+  .status-pendiente {
+    background:#FFF1D8;
+    color:#A76600;
+  }
+
+  .status-proceso {
+    background:#E4E8F7;
+    color:var(--purple);
+  }
+
+  .status-completado {
+    background:#E1EFE4;
+    color:var(--green);
+  }
+
+  .status-cancelado {
+    background:#F1D9D5;
+    color:var(--red);
+  }
+
+  .destino-departamento {
+    background:#E1F1F1;
+    color:var(--teal);
+  }
+
+  .destino-usuario {
+    background:#E4E8F7;
+    color:var(--purple);
+  }
+
+  /* =========================
+     PAGINACIÓN
+  ========================= */
+
+  .pagination-bar {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+
+  .pagination-bar .info {
+    font-size:12.5px;
+    color:var(--muted);
+  }
+
+  .pagination-bar .pages {
+    display:flex;
+    gap:4px;
+    margin-left:auto;
+  }
+
+  .page-btn {
+    min-width:30px;
+    height:30px;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:var(--radius);
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--navy-800);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 8px;
+  }
+
+  .page-btn.active {
+    background:var(--navy-800);
+    color:#fff;
+    border-color:var(--navy-800);
+  }
+
+  .page-btn:disabled {
+    opacity:.4;
+    cursor:not-allowed;
+  }
+
+  /* =========================
+     ACCIONES
+  ========================= */
+
+  .action-btn {
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--navy-800);
+    border-radius:4px;
+    padding:6px 10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+  }
+
+  .action-btn:hover {
+    background:var(--navy-100);
+  }
+
+  /* =========================
+     MODAL
+  ========================= */
+
+  .modal-backdrop {
+    position:fixed;
+    inset:0;
+    background:rgba(18,48,71,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:2000;
+    padding:20px;
+  }
+
+  .modal-backdrop.open {
+    display:flex;
+  }
+
+  .modal-box {
+    background:#fff;
+    border-radius:8px;
+    width:100%;
+    max-width:620px;
+    max-height:90vh;
+    overflow:auto;
+    box-shadow:0 12px 40px rgba(0,0,0,.25);
+  }
+
+  .modal-header {
+    background:var(--navy-800);
+    color:#fff;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+  }
+
+  .modal-header h3 {
+    margin:0;
+    font-size:15px;
+  }
+
+  .modal-header button {
+    margin-left:auto;
+    background:none;
+    border:none;
+    color:#fff;
+    font-size:20px;
+    cursor:pointer;
+  }
+
+  .modal-body {
+    padding:18px 20px;
+  }
+
+  .modal-body .field {
+    margin-bottom:14px;
+  }
+
+  .modal-body label {
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--navy-800);
+    margin-bottom:6px;
+  }
+
+  .modal-body input[type=text],
+  .modal-body select,
+  .modal-body textarea {
+    width:100%;
+  }
+
+  .modal-body textarea {
+    resize:vertical;
+    min-height:70px;
+  }
+
+  .summary {
+    font-size:12.5px;
+    color:var(--muted);
+    background:var(--navy-100);
+    padding:8px 12px;
+    border-radius:var(--radius);
+    margin-bottom:14px;
+  }
+
+  .modal-footer {
+    padding:14px 20px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    border-top:1px solid var(--line);
+  }
+
+  /* =========================
+     ASIGNACIÓN
+  ========================= */
+
+  .assign-toggle {
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+  }
+
+  .assign-option {
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:9px 12px;
+    cursor:pointer;
+    font-size:12.5px;
+    font-weight:600;
+  }
+
+  .assign-option.checked {
+    border-color:var(--navy-800);
+    background:var(--navy-100);
+    color:var(--navy-800);
+  }
+
+  /* =========================
+     DETALLE DEL LOTE
+  ========================= */
+
+  .detail-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:18px;
+  }
+
+  .detail-item {
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:11px 13px;
+    background:#fafcfd;
+  }
+
+  .detail-label {
+    display:block;
+    font-size:10.5px;
+    font-weight:700;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+
+  .detail-value {
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+  }
+
+  .history {
+    border-left:2px solid var(--navy-800);
+    margin-left:7px;
+    padding-left:18px;
+  }
+
+  .history-item {
+    position:relative;
+    margin-bottom:18px;
+  }
+
+  .history-item::before {
+    content:"";
+    position:absolute;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:var(--navy-800);
+    left:-24px;
+    top:4px;
+  }
+
+  .history-date {
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:3px;
+  }
+
+  .history-title {
+    font-size:13px;
+    font-weight:700;
+    color:var(--navy-800);
+  }
+
+  .history-user {
+    font-size:12px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+
+  /* =========================
+     TOAST
+  ========================= */
+
+  .toast-container {
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:9999;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:340px;
+  }
+
+  .toast {
+    background:#fff;
+    border:1px solid rgba(0,0,0,.1);
+    border-radius:4px;
+    box-shadow:0 .25rem .75rem rgba(0,0,0,.15);
+    padding:12px 14px;
+    font-size:13px;
+  }
+
+  .toast strong {
+    display:block;
+    margin-bottom:4px;
+  }
+
+  .toast.success {
+    border-left:4px solid var(--green);
+  }
+
+  .toast.warning {
+    border-left:4px solid var(--amber);
+  }
+
+  @media(max-width:760px) {
+    .search-wrap {
+      width:100%;
+    }
+
+    .pagination-bar .pages {
+      margin-left:0;
+      width:100%;
+      justify-content:center;
+    }
+
+    .toast-container {
+      left:12px;
+      right:12px;
+      width:auto;
+    }
+
+    .detail-grid {
+      grid-template-columns:1fr;
+    }
+
+    .tabs {
+      overflow-x:auto;
+    }
   }
 </style>
 </head>
+
 <body>
 
 <div class="app">
+
+  <!-- HEADER -->
   <div class="topbar">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v14H4z" stroke="#fff" stroke-width="1.6"/><path d="M4 9h16" stroke="#fff" stroke-width="1.6"/></svg>
+
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M4 5h16v14H4z"
+            stroke="#fff"
+            stroke-width="1.6"/>
+      <path d="M4 9h16"
+            stroke="#fff"
+            stroke-width="1.6"/>
+    </svg>
+
     <h1>LISTA DE CONTACTOS</h1>
-    <span class="sub">Filtra, marca contactos y genera una lista</span>
+
+    <span class="sub">
+      Gestión y seguimiento de lotes
+    </span>
+
   </div>
 
   <div class="panel">
 
-    <div class="filters">
-      <div class="field-inline">
-        <label for="contactType">Tipo de contacto</label>
-        <select id="contactType">
-          <option value="">Todos</option>
-          <option value="nuevo">Nuevo</option>
-          <option value="recurrente">Recurrente</option>
-          <option value="inactivo">Inactivo</option>
-          <option value="lead">Lead</option>
-        </select>
-      </div>
+    <!-- =========================
+         TABS
+    ========================== -->
 
-      <div class="field-inline" id="monthField">
-        <label for="monthSelect">Mes de cumpleaños</label>
-        <select id="monthSelect">
-          <option value="">Todos</option>
-          <option value="01">Enero</option><option value="02">Febrero</option>
-          <option value="03">Marzo</option><option value="04">Abril</option>
-          <option value="05">Mayo</option><option value="06">Junio</option>
-          <option value="07">Julio</option><option value="08" selected>Agosto</option>
-          <option value="09">Septiembre</option><option value="10">Octubre</option>
-          <option value="11">Noviembre</option><option value="12">Diciembre</option>
-        </select>
-      </div>
+    <div class="tabs">
 
-      <div class="field-inline" id="dateRangeField">
-        <label>Registrado entre</label>
-        <div class="date-range">
-          <input type="date" id="dateFrom">
-          <span style="color:var(--muted);">–</span>
-          <input type="date" id="dateTo">
-        </div>
-      </div>
-
-      <div class="field-inline">
-        <label for="codeInput">Código</label>
-        <input type="text" id="codeInput" placeholder="Ej: 245">
-      </div>
-
-      <div class="field-inline">
-        <label for="vendorSelect">
-          Vendedor
-          <span class="tooltip-icon" title="Último agente de ventas que le atendió">ⓘ</span>
-        </label>
-        <select id="vendorSelect">
-          <option value="">Todos</option>
-        </select>
-      </div>
-
-      <div class="search-wrap">
-        <label for="searchInput" style="display:block;font-size:11px;font-weight:700;color:var(--navy-800);margin-bottom:5px;">Buscar por nombre</label>
-        <div style="position:relative;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="top:50%;"><circle cx="11" cy="11" r="7" stroke="#333" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#333" stroke-width="2" stroke-linecap="round"/></svg>
-          <input type="text" id="searchInput" placeholder="Nombre del contacto…">
-        </div>
-      </div>
-
-      <button class="btn btn-primary" id="buscarBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-        Buscar
+      <button
+        class="tab-btn active"
+        data-tab="crear">
+        Crear lista
       </button>
 
-      <button class="btn btn-outline" id="clearFiltersBtn" title="Restablece todos los filtros a su valor por defecto">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M3 4v5h5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Limpiar filtros
+      <button
+        class="tab-btn"
+        data-tab="seguimiento">
+        Seguimiento de lotes
       </button>
+
     </div>
 
-    <div class="active-filters" id="activeFilters"></div>
 
-    <div class="selection-bar">
-      <button class="btn btn-outline" id="selectAllBtn">Marcar todos (filtrados)</button>
-      <button class="btn btn-danger-outline" id="deselectAllBtn">Desmarcar todos</button>
-      <button class="btn btn-success" id="openModalBtn">+ Crear lista</button>
-      <span class="divider"></span>
-      <button class="btn btn-outline" id="exportCsvBtn" title="Exporta los contactos seleccionados como CSV">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/></svg>
-        Exportar CSV
-      </button>
-      <button class="btn btn-outline" id="exportPdfBtn" title="Exporta los contactos seleccionados como PDF">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16" stroke="#1B4C6E" stroke-width="2" stroke-linecap="round"/></svg>
-        Exportar PDF
-      </button>
-      <span class="count" id="selectedCount">0 seleccionados</span>
-    </div>
+    <!-- =====================================================
+         TAB 1 - CREAR LISTA
+    ====================================================== -->
 
-    <div class="table-scroll">
-      <table id="clientsTable">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
+    <div
+      id="tab-crear"
+      class="tab-content active">
 
-    <div class="pagination-bar">
-      <span class="info" id="paginationInfo">Mostrando 0 de 0</span>
-      <div class="page-size">
-        <select id="pageSizeSelect">
-          <option value="5">5 por página</option>
-          <option value="10" selected>10 por página</option>
-          <option value="20">20 por página</option>
-        </select>
-      </div>
-      <div class="pages" id="pagesContainer"></div>
-    </div>
+      <div class="filters">
 
-  </div>
-</div>
+        <div class="field-inline">
 
-<!-- Modal: Crear lista -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3>Crear lista de contactos</h3>
-      <button id="closeModalBtn" aria-label="Cerrar">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="summary" id="modalSummary">0 contactos seleccionados</div>
+          <label>Tipo de contacto</label>
 
-      <div class="field">
-        <label for="listTitle">Título de la lista</label>
-        <input type="text" id="listTitle" placeholder="Ej: Cumpleaños agosto - contacto pendiente">
-      </div>
+          <select id="contactType">
 
-      <div class="field">
-        <label for="listMotivo">Motivo</label>
-        <select id="listMotivo">
-          <option value="Seguimiento">Seguimiento</option>
-          <option value="Inactivos">Inactivos</option>
-          <option value="Cumpleaños">Cumpleaños</option>
-          <option value="Nuevos">Nuevos</option>
-          <option value="Leads">Leads</option>
-        </select>
-      </div>
+            <option value="">Todos</option>
+            <option value="nuevo">Nuevo</option>
+            <option value="recurrente">Recurrente</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="lead">Lead</option>
 
-      <div class="field">
-        <label>Asignar lista a</label>
-        <div class="assign-toggle">
-          <label class="assign-option checked" id="assignAgenteLabel">
-            <input type="radio" name="assignTipo" id="assignTipoAgente" value="agente" checked>
-            Vendedor específico
-          </label>
-          <label class="assign-option" id="assignGrupoLabel">
-            <input type="radio" name="assignTipo" id="assignTipoGrupo" value="grupo">
-            Grupo de agentes
-          </label>
-        </div>
-
-        <div class="assign-sub" id="assignAgenteField">
-          <select id="assignAgenteSelect"></select>
-        </div>
-        <div class="assign-sub" id="assignGrupoField" style="display:none;">
-          <select id="assignGrupoSelect">
-            <option value="Todos Vendedores">Todos Vendedores</option>
-            <option value="Ventas">Ventas</option>
-            <option value="SVC">Servicio al Cliente (SVC)</option>
           </select>
+
         </div>
-      
+
+
+        <div
+          class="field-inline"
+          id="monthField">
+
+          <label>Mes de cumpleaños</label>
+
+          <select id="monthSelect">
+
+            <option value="">Todos</option>
+            <option value="01">Enero</option>
+            <option value="02">Febrero</option>
+            <option value="03">Marzo</option>
+            <option value="04">Abril</option>
+            <option value="05">Mayo</option>
+            <option value="06">Junio</option>
+            <option value="07">Julio</option>
+            <option value="08" selected>Agosto</option>
+            <option value="09">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+
+          </select>
+
+        </div>
+
+
+        <div
+          class="field-inline"
+          id="dateRangeField">
+
+          <label>Registrado entre</label>
+
+          <div class="date-range">
+
+            <input
+              type="date"
+              id="dateFrom">
+
+            <span style="color:var(--muted)">
+              –
+            </span>
+
+            <input
+              type="date"
+              id="dateTo">
+
+          </div>
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Código</label>
+
+          <input
+            type="text"
+            id="codeInput"
+            placeholder="Ej: 245">
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Vendedor</label>
+
+          <select id="vendorSelect">
+
+            <option value="">
+              Todos
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="search-wrap">
+
+          <label
+            style="
+              display:block;
+              font-size:11px;
+              font-weight:700;
+              color:var(--navy-800);
+              margin-bottom:5px;
+            ">
+
+            Buscar por nombre
+
+          </label>
+
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Nombre del contacto…">
+
+        </div>
+
+
+        <button
+          class="btn btn-primary"
+          id="buscarBtn">
+
+          Buscar
+
+        </button>
+
+
+        <button
+          class="btn btn-outline"
+          id="clearFiltersBtn">
+
+          Limpiar filtros
+
+        </button>
+
       </div>
 
-      <div class="field">
-        <label for="listDesc">Descripción (opcional)</label>
-        <textarea id="listDesc" placeholder="Describe el propósito de esta lista…"></textarea>
+
+      <div
+        class="active-filters"
+        id="activeFilters">
       </div>
+
+
+      <!-- SELECCIÓN -->
+
+      <div class="selection-bar">
+
+        <button
+          class="btn btn-outline"
+          id="selectAllBtn">
+
+          Marcar todos
+
+        </button>
+
+        <button
+          class="btn btn-danger-outline"
+          id="deselectAllBtn">
+
+          Desmarcar todos
+
+        </button>
+
+        <button
+          class="btn btn-success"
+          id="openModalBtn">
+
+          + Crear lista
+
+        </button>
+
+        <span class="divider"></span>
+
+        <button
+          class="btn btn-outline"
+          id="exportCsvBtn">
+
+          Exportar CSV
+
+        </button>
+
+        <button
+          class="btn btn-outline"
+          id="exportPdfBtn">
+
+          Exportar PDF
+
+        </button>
+
+        <span
+          class="count"
+          id="selectedCount">
+
+          0 seleccionados
+
+        </span>
+
+      </div>
+
+
+      <!-- TABLA CONTACTOS -->
+
+      <div class="table-scroll">
+
+        <table id="clientsTable">
+
+          <thead id="tableHead"></thead>
+
+          <tbody id="tableBody"></tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- PAGINACIÓN -->
+
+      <div class="pagination-bar">
+
+        <span
+          class="info"
+          id="paginationInfo">
+
+          Mostrando 0 de 0
+
+        </span>
+
+        <div class="page-size">
+
+          <select id="pageSizeSelect">
+
+            <option value="5">
+              5 por página
+            </option>
+
+            <option value="10" selected>
+              10 por página
+            </option>
+
+            <option value="20">
+              20 por página
+            </option>
+
+          </select>
+
+        </div>
+
+        <div
+          class="pages"
+          id="pagesContainer">
+        </div>
+
+      </div>
+
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" id="cancelModalBtn">Cancelar</button>
-      <button class="btn btn-success" id="saveListBtn">Guardar lista</button>
+
+
+    <!-- =====================================================
+         TAB 2 - SEGUIMIENTO DE LOTES
+    ====================================================== -->
+
+    <div
+      id="tab-seguimiento"
+      class="tab-content">
+
+      <div class="filters">
+
+        <div class="field-inline">
+
+          <label>Buscar lote</label>
+
+          <input
+            type="text"
+            id="loteSearch"
+            placeholder="ID o título">
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Fecha desde</label>
+
+          <input
+            type="date"
+            id="loteDateFrom">
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Fecha hasta</label>
+
+          <input
+            type="date"
+            id="loteDateTo">
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Creado por</label>
+
+          <select id="loteCreatedBy">
+
+            <option value="">
+              Todos
+            </option>
+
+            <option>
+              Jose Caicedo
+            </option>
+
+            <option>
+              Sebastian Tovar
+            </option>
+
+            <option>
+              Hector Ordosgoita
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Motivo</label>
+
+          <select id="loteMotivo">
+
+            <option value="">
+              Todos
+            </option>
+
+            <option>
+              Seguimiento
+            </option>
+
+            <option>
+              Inactivos
+            </option>
+
+            <option>
+              Cumpleaños
+            </option>
+
+            <option>
+              Nuevos
+            </option>
+
+            <option>
+              Leads
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Destino</label>
+
+          <select id="loteDestino">
+
+            <option value="">
+              Todos
+            </option>
+
+            <option value="departamento">
+              Departamento
+            </option>
+
+            <option value="usuario">
+              Usuario específico
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field-inline">
+
+          <label>Estado</label>
+
+          <select id="loteEstado">
+
+            <option value="">
+              Todos
+            </option>
+
+            <option value="pendiente">
+              Pendiente
+            </option>
+
+            <option value="proceso">
+              En proceso
+            </option>
+
+            <option value="completado">
+              Completado
+            </option>
+
+            <option value="cancelado">
+              Cancelado
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <button
+          class="btn btn-primary"
+          id="buscarLotesBtn">
+
+          Buscar
+
+        </button>
+
+
+        <button
+          class="btn btn-outline"
+          id="clearLotesBtn">
+
+          Limpiar
+
+        </button>
+
+      </div>
+
+
+      <!-- RESUMEN -->
+
+      <div
+        style="
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+          margin:15px 0;
+        ">
+
+        <span class="chip">
+          Total lotes:
+          <strong id="totalLotes">
+            0
+          </strong>
+        </span>
+
+        <span class="chip">
+          Pendientes:
+          <strong id="totalPendientes">
+            0
+          </strong>
+        </span>
+
+        <span class="chip">
+          En proceso:
+          <strong id="totalProceso">
+            0
+          </strong>
+        </span>
+
+        <span class="chip">
+          Completados:
+          <strong id="totalCompletados">
+            0
+          </strong>
+        </span>
+
+      </div>
+
+
+      <!-- TABLA LOTES -->
+
+      <div class="table-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>ID LOTE</th>
+
+              <th>FECHA</th>
+
+              <th>CREADO POR</th>
+
+              <th>TÍTULO</th>
+
+              <th>MOTIVO</th>
+
+              <th>DESCRIPCIÓN</th>
+
+              <th>CONTACTOS</th>
+
+              <th>DESTINO</th>
+
+              <th>ASIGNADO A</th>
+
+              <th>ESTADO</th>
+
+              <th>ÚLTIMA ACTUALIZACIÓN</th>
+
+              <th>ACCIÓN</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="lotesBody"></tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="pagination-bar">
+
+        <span
+          class="info"
+          id="lotesPaginationInfo">
+
+          Mostrando 0 de 0
+
+        </span>
+
+        <div
+          class="pages"
+          id="lotesPages">
+
+        </div>
+
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
 
-<!-- Librería para exportar a PDF (jsPDF + autotable) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<!-- =====================================================
+     MODAL CREAR LISTA
+====================================================== -->
+
+<div
+  class="modal-backdrop"
+  id="modalBackdrop">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h3>
+        Crear lista de contactos
+      </h3>
+
+      <button
+        id="closeModalBtn">
+        &times;
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div
+        class="summary"
+        id="modalSummary">
+
+        0 contactos seleccionados
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Título de la lista
+        </label>
+
+        <input
+          type="text"
+          id="listTitle"
+          placeholder="Ej: Cumpleaños septiembre">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Motivo
+        </label>
+
+        <select id="listMotivo">
+
+          <option>
+            Seguimiento
+          </option>
+
+          <option>
+            Inactivos
+          </option>
+
+          <option>
+            Cumpleaños
+          </option>
+
+          <option>
+            Nuevos
+          </option>
+
+          <option>
+            Leads
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Asignar lista a
+        </label>
+
+        <div class="assign-toggle">
+
+          <label
+            class="assign-option checked"
+            id="assignAgenteLabel">
+
+            <input
+              type="radio"
+              name="assignTipo"
+              id="assignTipoAgente"
+              value="agente"
+              checked>
+
+            Usuario específico
+
+          </label>
+
+
+          <label
+            class="assign-option"
+            id="assignGrupoLabel">
+
+            <input
+              type="radio"
+              name="assignTipo"
+              id="assignTipoGrupo"
+              value="grupo">
+
+            Departamento / grupo
+
+          </label>
+
+        </div>
+
+
+        <div id="assignAgenteField">
+
+          <select id="assignAgenteSelect"></select>
+
+        </div>
+
+
+        <div
+          id="assignGrupoField"
+          style="display:none;">
+
+          <select id="assignGrupoSelect">
+
+            <option>
+              Ventas
+            </option>
+
+            <option>
+              Servicio al Cliente (SVC)
+            </option>
+
+            <option>
+              Marketing
+            </option>
+
+            <option>
+              Todos Vendedores
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Descripción
+        </label>
+
+        <textarea
+          id="listDesc"
+          placeholder="Describe el propósito de esta lista…">
+        </textarea>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="btn btn-outline"
+        id="cancelModalBtn">
+
+        Cancelar
+
+      </button>
+
+      <button
+        class="btn btn-success"
+        id="saveListBtn">
+
+        Guardar lista
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     MODAL DETALLE LOTE
+====================================================== -->
+
+<div
+  class="modal-backdrop"
+  id="detailModalBackdrop">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h3>
+        Detalle y seguimiento del lote
+      </h3>
+
+      <button
+        id="closeDetailModalBtn">
+        &times;
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div
+        id="loteDetailContent">
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="btn btn-outline"
+        id="closeDetailBtn">
+
+        Cerrar
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  class="toast-container"
+  id="toastContainer">
+</div>
+
 
 <script>
-  // ---------- Dataset general (Recurrente / Inactivo / Lead / Todos) ----------
-  const rawClients = [
-    {id:120, cliente:"Lilia Aguirre",    tipo:"inactivo",   cumple:"1985-08-20", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
-    {id:242, cliente:"Tanisha Objia",    tipo:"inactivo",   cumple:"1982-08-27", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina"},
-    {id:245, cliente:"Maria Reyes",      tipo:"recurrente", cumple:"1976-08-25", registro:"2018-03-02", info:"No contesta", vendedor:"Jose Molina"},
-    {id:247, cliente:"Cecilia Sanawani", tipo:"inactivo",   cumple:"1974-08-09", registro:"2019-08-12", info:"No contesta", vendedor:"Mary Polo"},
-    {id:253, cliente:"Agustina Gabriel", tipo:"lead",       cumple:"1948-08-28", registro:"2026-08-02", info:"No contesta", vendedor:"Mary Polo"},
-    {id:274, cliente:"Diana Salgado",    tipo:"recurrente", cumple:"1988-08-14", registro:"2018-08-06", info:"No contesta", vendedor:"Mary Polo"},
-    {id:281, cliente:"Hector Ramirez",   tipo:"recurrente", cumple:"1965-08-30", registro:"2017-11-07", info:"Contactado",  vendedor:"Jose Molina"},
-    {id:290, cliente:"Jose Fernandez",   tipo:"inactivo",   cumple:"1979-05-11", registro:"2018-01-20", info:"No contesta", vendedor:"Mary Polo"},
-    {id:298, cliente:"Josefina Cruz",    tipo:"lead",       cumple:"1995-08-19", registro:"2019-08-01", info:"Interesado",  vendedor:"Jose Molina"},
-    {id:311, cliente:"Jose Ramon Diaz",  tipo:"inactivo",   cumple:"1970-08-04", registro:"2016-06-14", info:"No contesta", vendedor:"Jose Molina"},
-    {id:318, cliente:"Karen Ibarra",     tipo:"recurrente", cumple:"1983-08-22", registro:"2019-09-30", info:"Contactado",  vendedor:"Mary Polo"},
-    {id:326, cliente:"Luis Gomez",       tipo:"lead",       cumple:"1998-01-05", registro:"2019-07-28", info:"Interesado",  vendedor:"Jose Molina"},
-    {id:340, cliente:"Jose Antonio Vera",tipo:"inactivo",   cumple:"1966-08-29", registro:"2015-12-01", info:"No contesta", vendedor:"Jose Molina"},
-    {id:347, cliente:"Gabriela Ortiz",   tipo:"recurrente", cumple:"1980-08-06", registro:"2020-02-18", info:"Contactado",  vendedor:"Mary Polo"},
-    {id:355, cliente:"Marco Delgado",    tipo:"lead",       cumple:"1997-08-12", registro:"2019-08-04", info:"Interesado",  vendedor:"Jose Molina"},
-  ];
 
-  // ---------- Dataset de contactos "Nuevo" (formato del dialer / call center) ----------
-  const newLeads = [
-    {id:52301, nombres:"MANUEL MINCHALA", telefono:"+13472834496", campaniaPais:"US",
-     fechaRegistro:"2026-09-09 01:15:25", fechaPraLlamada:"", did:"13238801135", ultimaLlamada:"",
-     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
-     creadoPor:"Sebastian Tovar", quienHizoLlamada:"BILLY CASTRO", campaniaPromocional:"N/A", codigoPromocional:"N/A",
-     psiquico:"", medio:"FACEBOOK", cual:"", tipoTracking:"TRK-PB-LA-02", tipoLlamada:"outbound", llamada:""},
+/* ==========================================================
+   DATASET CONTACTOS
+========================================================== */
 
-    {id:52302, nombres:"ERYIN PARAJON BERRIOS", telefono:"13055706046", campaniaPais:"US",
-     fechaRegistro:"2026-09-09 11:19:23", fechaPraLlamada:"", did:"19723621147", ultimaLlamada:"",
-     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
-     creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
-     psiquico:"", medio:"NINGUNO", cual:"", tipoTracking:"TRK-PB-DAL-02", tipoLlamada:"outbound", llamada:""},
+const rawClients = [
 
-    {id:52303, nombres:"EVELYN SANCHEZ", telefono:"12094518543", campaniaPais:"US",
-     fechaRegistro:"2026-09-09 13:45:34", fechaPraLlamada:"2026-09-09 13:48:46", did:"13233288931", ultimaLlamada:"2026-09-09 13:48:46",
-     venMinsPraConsulta:"$25.00", minPrConsulta:"10", convertidoPor:"HECTOR ORDOSGOITA", venTotMins:"$25.00", tr:"$0.00", tiempoAsignado:"3",
-     creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
-     psiquico:"LUCERO /LILIANA FUENTES", medio:"REDES SOCIALES", cual:"", tipoTracking:"TRK-PB-LA-01", tipoLlamada:"inbound", llamada:""},
+  {
+    id:120,
+    cliente:"Lilia Aguirre",
+    tipo:"inactivo",
+    cumple:"1985-08-20",
+    registro:"2019-08-12",
+    info:"No contesta",
+    vendedor:"Jose Molina"
+  },
 
-    {id:52304, nombres:"BRAILYN MIGUEL ALMONTE HERNANDEZ", telefono:"13478392687", campaniaPais:"US",
-     fechaRegistro:"2026-09-09 14:26:50", fechaPraLlamada:"", did:"", ultimaLlamada:"",
-     venMinsPraConsulta:"0.00", minPrConsulta:"0", convertidoPor:"", venTotMins:"0", tr:"0", tiempoAsignado:"0",
-     creadoPor:"BILLY CASTRO", quienHizoLlamada:"", campaniaPromocional:"NO TIENE CÓDIGO", codigoPromocional:"NOTIENECODIGO",
-     psiquico:"", medio:"WHATSAPP MARKETING", cual:"", tipoTracking:"not_campaign", tipoLlamada:"", llamada:""},
-  ];
+  {
+    id:242,
+    cliente:"Tanisha Objia",
+    tipo:"inactivo",
+    cumple:"1982-08-27",
+    registro:"2019-08-12",
+    info:"No contesta",
+    vendedor:"Jose Molina"
+  },
 
-  // columnas de la tabla general
-  const generalColumns = [
-    {label:'COD', render:c => c.id, cls:'cod'},
-    {label:'CLIENTE', render:c => c.cliente, cls:'cliente'},
-    {label:'TIPO', render:c => `<span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo]}</span>`},
-    {label:'CUMPLE', render:c => formatDateHuman(c.cumple)},
-    {label:'FECHA REGISTRO', render:c => formatDateHuman(c.registro)},
-    {label:'INFO', render:c => `<span class="info-tag">${c.info}</span>`},
-    {label:'VENDEDOR', render:c => c.vendedor},
-  ];
+  {
+    id:245,
+    cliente:"Maria Reyes",
+    tipo:"recurrente",
+    cumple:"1976-08-25",
+    registro:"2018-03-02",
+    info:"No contesta",
+    vendedor:"Jose Molina"
+  },
 
-  // columnas de la tabla de contactos "Nuevo" (dialer / call center)
-  const nuevoColumns = [
-    {label:'Código', render:c => c.id, cls:'cod'},
-    {label:'Nombres', render:c => c.nombres, cls:'cliente'},
-    {label:'Teléfono', render:c => c.telefono},
-    {label:'Campaña País', render:c => c.campaniaPais},
-    {label:'Fecha de Registro', render:c => c.fechaRegistro},
-    {label:'Fecha de Pra Llda.', render:c => dash(c.fechaPraLlamada)},
-    {label:'DID', render:c => dash(c.did)},
-    {label:'Última Llamada', render:c => dash(c.ultimaLlamada)},
-    {label:'Ven Mins Pra Consulta', render:c => c.venMinsPraConsulta},
-    {label:'Min Pr. Consulta', render:c => c.minPrConsulta},
-    {label:'Convertido por', render:c => dash(c.convertidoPor)},
-    {label:'Ven Tot Mins.', render:c => c.venTotMins},
-    {label:'T.R', render:c => c.tr},
-    {label:'Tiempo Asignado', render:c => c.tiempoAsignado},
-    {label:'Creado Por', render:c => c.creadoPor},
-    {label:'Quién Hizo la Llamada', render:c => dash(c.quienHizoLlamada)},
-    {label:'Campaña Promocional', render:c => c.campaniaPromocional},
-    {label:'Código Promocional', render:c => c.codigoPromocional},
-    {label:'Psíquico', render:c => dash(c.psiquico)},
-    {label:'Medio', render:c => c.medio},
-    {label:'Cuál', render:c => dash(c.cual)},
-    {label:'Tipo', render:c => c.tipoTracking},
-    {label:'Tipo de Llamada', render:c => c.tipoLlamada
-      ? `<span class="dir-tag dir-${c.tipoLlamada}">${c.tipoLlamada}</span>` : '—'},
-    {label:'Llamada', render:c => dash(c.llamada)},
-  ];
+  {
+    id:247,
+    cliente:"Cecilia Sanawani",
+    tipo:"inactivo",
+    cumple:"1974-08-09",
+    registro:"2019-08-12",
+    info:"No contesta",
+    vendedor:"Mary Polo"
+  },
 
-  function dash(v){ return (v === undefined || v === null || v === '') ? '<span class="muted-cell">—</span>' : v; }
+  {
+    id:253,
+    cliente:"Agustina Gabriel",
+    tipo:"lead",
+    cumple:"1948-08-28",
+    registro:"2026-08-02",
+    info:"No contesta",
+    vendedor:"Mary Polo"
+  },
 
-  // estado: Set con los ids seleccionados (persiste aunque cambie de página o filtro)
-  const selectedIds = new Set();
-  let currentPage = 1;
-  let pageSize = 10;
-  let currentFiltered = [];
+  {
+    id:274,
+    cliente:"Diana Salgado",
+    tipo:"recurrente",
+    cumple:"1988-08-14",
+    registro:"2018-08-06",
+    info:"No contesta",
+    vendedor:"Mary Polo"
+  },
 
-  const tableHead        = document.getElementById('tableHead');
-  const tableBody        = document.getElementById('tableBody');
-  const clientsTable     = document.getElementById('clientsTable');
-  const selectedCountEl  = document.getElementById('selectedCount');
-  const searchInput      = document.getElementById('searchInput');
-  const contactType      = document.getElementById('contactType');
-  const monthField       = document.getElementById('monthField');
-  const monthSelect      = document.getElementById('monthSelect');
-  const dateFrom         = document.getElementById('dateFrom');
-  const dateTo           = document.getElementById('dateTo');
-  const codeInput        = document.getElementById('codeInput');
-  const vendorSelect     = document.getElementById('vendorSelect');
-  const activeFiltersEl  = document.getElementById('activeFilters');
-  const pagesContainer   = document.getElementById('pagesContainer');
-  const paginationInfo   = document.getElementById('paginationInfo');
-  const pageSizeSelect   = document.getElementById('pageSizeSelect');
+  {
+    id:281,
+    cliente:"Hector Ramirez",
+    tipo:"recurrente",
+    cumple:"1965-08-30",
+    registro:"2017-11-07",
+    info:"Contactado",
+    vendedor:"Jose Molina"
+  },
 
-  const modalBackdrop  = document.getElementById('modalBackdrop');
-  const modalSummary   = document.getElementById('modalSummary');
-  const listTitle      = document.getElementById('listTitle');
-  const listMotivo     = document.getElementById('listMotivo');
-  const listDesc       = document.getElementById('listDesc');
-  const toastContainer = document.getElementById('toastContainer');
+  {
+    id:290,
+    cliente:"Jose Fernandez",
+    tipo:"inactivo",
+    cumple:"1979-05-11",
+    registro:"2018-01-20",
+    info:"No contesta",
+    vendedor:"Mary Polo"
+  },
 
-  const assignTipoAgente  = document.getElementById('assignTipoAgente');
-  const assignTipoGrupo   = document.getElementById('assignTipoGrupo');
-  const assignAgenteLabel = document.getElementById('assignAgenteLabel');
-  const assignGrupoLabel  = document.getElementById('assignGrupoLabel');
-  const assignAgenteField = document.getElementById('assignAgenteField');
-  const assignGrupoField  = document.getElementById('assignGrupoField');
-  const assignAgenteSelect= document.getElementById('assignAgenteSelect');
-  const assignGrupoSelect = document.getElementById('assignGrupoSelect');
+  {
+    id:298,
+    cliente:"Josefina Cruz",
+    tipo:"lead",
+    cumple:"1995-08-19",
+    registro:"2019-08-01",
+    info:"Interesado",
+    vendedor:"Jose Molina"
+  },
 
-  const savedLists = []; // mock de "base de datos" de listas guardadas
+  {
+    id:311,
+    cliente:"Jose Ramon Diaz",
+    tipo:"inactivo",
+    cumple:"1970-08-04",
+    registro:"2016-06-14",
+    info:"No contesta",
+    vendedor:"Jose Molina"
+  },
 
-  const tipoLabel = {nuevo:'Nuevo', recurrente:'Recurrente', inactivo:'Inactivo', lead:'Lead'};
+  {
+    id:318,
+    cliente:"Karen Ibarra",
+    tipo:"recurrente",
+    cumple:"1983-08-22",
+    registro:"2019-09-30",
+    info:"Contactado",
+    vendedor:"Mary Polo"
+  },
 
-  function formatDateHuman(dateStr){
-    const [y,m,d] = dateStr.split('-');
-    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    return `${d} ${meses[parseInt(m,10)-1]} ${y}`;
+  {
+    id:326,
+    cliente:"Luis Gomez",
+    tipo:"lead",
+    cumple:"1998-01-05",
+    registro:"2019-07-28",
+    info:"Interesado",
+    vendedor:"Jose Molina"
+  },
+
+  {
+    id:340,
+    cliente:"Jose Antonio Vera",
+    tipo:"inactivo",
+    cumple:"1966-08-29",
+    registro:"2015-12-01",
+    info:"No contesta",
+    vendedor:"Jose Molina"
+  },
+
+  {
+    id:347,
+    cliente:"Gabriela Ortiz",
+    tipo:"recurrente",
+    cumple:"1980-08-06",
+    registro:"2020-02-18",
+    info:"Contactado",
+    vendedor:"Mary Polo"
+  },
+
+  {
+    id:355,
+    cliente:"Marco Delgado",
+    tipo:"lead",
+    cumple:"1997-08-12",
+    registro:"2019-08-04",
+    info:"Interesado",
+    vendedor:"Jose Molina"
   }
 
-  function isNuevoMode(){ return contactType.value === 'nuevo'; }
-  function activeDataset(){ return isNuevoMode() ? newLeads : rawClients; }
-  function activeColumns(){ return isNuevoMode() ? nuevoColumns : generalColumns; }
-  function displayName(item){ return isNuevoMode() ? item.nombres : item.cliente; }
-  function agenteAtendio(item){
-    // "vendedor" en el dataset de Nuevo se interpreta como el último agente que atendió la llamada
-    return isNuevoMode() ? (item.quienHizoLlamada || item.creadoPor) : item.vendedor;
+];
+
+
+/* ==========================================================
+   DATASET NUEVOS
+========================================================== */
+
+const newLeads = [
+
+  {
+    id:52301,
+    nombres:"MANUEL MINCHALA",
+    telefono:"+13472834496",
+    campaniaPais:"US",
+    fechaRegistro:"2026-09-09 01:15:25",
+    creadoPor:"Sebastian Tovar",
+    quienHizoLlamada:"BILLY CASTRO",
+    medio:"FACEBOOK",
+    tipoTracking:"TRK-PB-LA-02",
+    tipoLlamada:"outbound"
+  },
+
+  {
+    id:52302,
+    nombres:"ERYIN PARAJON BERRIOS",
+    telefono:"13055706046",
+    campaniaPais:"US",
+    fechaRegistro:"2026-09-09 11:19:23",
+    creadoPor:"HECTOR ORDOSGOITA",
+    quienHizoLlamada:"HECTOR ORDOSGOITA",
+    medio:"NINGUNO",
+    tipoTracking:"TRK-PB-DAL-02",
+    tipoLlamada:"outbound"
+  },
+
+  {
+    id:52303,
+    nombres:"EVELYN SANCHEZ",
+    telefono:"12094518543",
+    campaniaPais:"US",
+    fechaRegistro:"2026-09-09 13:45:34",
+    creadoPor:"HECTOR ORDOSGOITA",
+    quienHizoLlamada:"HECTOR ORDOSGOITA",
+    medio:"REDES SOCIALES",
+    tipoTracking:"TRK-PB-LA-01",
+    tipoLlamada:"inbound"
+  },
+
+  {
+    id:52304,
+    nombres:"BRAILYN MIGUEL ALMONTE HERNANDEZ",
+    telefono:"13478392687",
+    campaniaPais:"US",
+    fechaRegistro:"2026-09-09 14:26:50",
+    creadoPor:"BILLY CASTRO",
+    medio:"WHATSAPP MARKETING",
+    tipoTracking:"not_campaign",
+    tipoLlamada:""
   }
 
-  // ---------- Poblar select de Vendedor según el dataset activo ----------
-  function populateVendorOptions(){
-    const source = activeDataset();
-    const vendors = [...new Set(source.map(c => agenteAtendio(c)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
-    const previous = vendorSelect.value;
-    vendorSelect.innerHTML = '<option value="">Todos</option>' +
-      vendors.map(v => `<option value="${v}">${v}</option>`).join('');
-    if(vendors.includes(previous)) vendorSelect.value = previous;
+];
+
+
+/* ==========================================================
+   COLUMNAS
+========================================================== */
+
+const tipoLabel = {
+  nuevo:"Nuevo",
+  recurrente:"Recurrente",
+  inactivo:"Inactivo",
+  lead:"Lead"
+};
+
+
+const generalColumns = [
+
+  {
+    label:"COD",
+    render:c => c.id,
+    cls:"cod"
+  },
+
+  {
+    label:"CLIENTE",
+    render:c => c.cliente,
+    cls:"cliente"
+  },
+
+  {
+    label:"TIPO",
+    render:c =>
+      `<span class="tipo-tag tipo-${c.tipo}">
+        ${tipoLabel[c.tipo]}
+      </span>`
+  },
+
+  {
+    label:"CUMPLE",
+    render:c => formatDateHuman(c.cumple)
+  },
+
+  {
+    label:"FECHA REGISTRO",
+    render:c => formatDateHuman(c.registro)
+  },
+
+  {
+    label:"INFO",
+    render:c => c.info
+  },
+
+  {
+    label:"VENDEDOR",
+    render:c => c.vendedor
   }
 
-  // ---------- Mostrar/ocultar filtros que no aplican al dataset activo ----------
-  function syncFieldVisibility(){
-    // el dataset de "Nuevo" (dialer) no tiene fecha de cumpleaños
-    monthField.style.display = isNuevoMode() ? 'none' : '';
+];
+
+
+const nuevoColumns = [
+
+  {
+    label:"Código",
+    render:c => c.id,
+    cls:"cod"
+  },
+
+  {
+    label:"Nombres",
+    render:c => c.nombres,
+    cls:"cliente"
+  },
+
+  {
+    label:"Teléfono",
+    render:c => c.telefono
+  },
+
+  {
+    label:"Campaña País",
+    render:c => c.campaniaPais
+  },
+
+  {
+    label:"Fecha de Registro",
+    render:c => c.fechaRegistro
+  },
+
+  {
+    label:"Creado Por",
+    render:c => c.creadoPor
+  },
+
+  {
+    label:"Quién Hizo la Llamada",
+    render:c => dash(c.quienHizoLlamada)
+  },
+
+  {
+    label:"Medio",
+    render:c => c.medio
+  },
+
+  {
+    label:"Tipo",
+    render:c => c.tipoTracking
+  },
+
+  {
+    label:"Tipo de Llamada",
+    render:c =>
+      c.tipoLlamada
+        ? `<span class="tipo-tag">${c.tipoLlamada}</span>`
+        : "—"
   }
 
-  // ---------- Filtrado ----------
-  function applyFilters(){
-    const q = searchInput.value.trim().toLowerCase();
-    const tipoFiltro = contactType.value;
-    const mes = monthSelect.value;
-    const desde = dateFrom.value;
-    const hasta = dateTo.value;
-    const codigo = codeInput.value.trim();
-    const vendedor = vendorSelect.value;
-    const nuevoMode = isNuevoMode();
+];
 
-    const dataset = activeDataset();
 
-    let result = dataset.filter(c => {
-      if(!nuevoMode && tipoFiltro && c.tipo !== tipoFiltro) return false;
-      if(codigo && !String(c.id).includes(codigo)) return false;
-      if(vendedor && agenteAtendio(c) !== vendedor) return false;
+/* ==========================================================
+   ESTADO CONTACTOS
+========================================================== */
 
-      if(!nuevoMode && mes && c.cumple.split('-')[1] !== mes) return false;
+const selectedIds = new Set();
 
-      const fechaRegistro = nuevoMode ? c.fechaRegistro.slice(0, 10) : c.registro;
-      if(desde && fechaRegistro < desde) return false;
-      if(hasta && fechaRegistro > hasta) return false;
+let currentPage = 1;
+let pageSize = 10;
+let currentFiltered = [];
 
-      const nombre = displayName(c).toLowerCase();
-      if(q && !nombre.includes(q)) return false;
-      return true;
-    });
 
-    currentFiltered = result;
-    renderActiveFilters();
-    currentPage = 1;
-    renderTable();
-  }
+/* ==========================================================
+   DOM
+========================================================== */
 
-  function renderActiveFilters(){
-    const chips = [];
-    if(contactType.value) chips.push('Tipo de contacto: ' + (tipoLabel[contactType.value] || contactType.value));
-    if(!isNuevoMode() && monthSelect.value) chips.push('Mes de cumpleaños: ' + monthSelect.options[monthSelect.selectedIndex].text);
-    if(dateFrom.value || dateTo.value) chips.push(`Registro: ${dateFrom.value || '…'} a ${dateTo.value || '…'}`);
-    if(codeInput.value.trim()) chips.push('Código: ' + codeInput.value.trim());
-    if(vendorSelect.value) chips.push('Vendedor: ' + vendorSelect.value);
-    if(searchInput.value.trim()) chips.push('Nombre: "' + searchInput.value.trim() + '"');
+const tableHead =
+  document.getElementById("tableHead");
 
-    activeFiltersEl.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
-  }
+const tableBody =
+  document.getElementById("tableBody");
 
-  // ---------- Limpiar filtros ----------
-  function clearFilters(){
-    searchInput.value = '';
-    contactType.value = '';
-    monthSelect.value = '';
-    dateFrom.value = '';
-    dateTo.value = '';
-    codeInput.value = '';
-    vendorSelect.value = '';
-    syncFieldVisibility();
-    populateVendorOptions();
-    applyFilters();
-    showToast('success', 'Filtros restablecidos', 'Se muestran todos los contactos nuevamente.');
-  }
+const clientsTable =
+  document.getElementById("clientsTable");
 
-  // ---------- Paginación ----------
-  function getPageData(){
-    const start = (currentPage - 1) * pageSize;
-    return currentFiltered.slice(start, start + pageSize);
-  }
+const selectedCountEl =
+  document.getElementById("selectedCount");
 
-  function renderPagination(){
-    const totalPages = Math.max(1, Math.ceil(currentFiltered.length / pageSize));
-    if(currentPage > totalPages) currentPage = totalPages;
+const searchInput =
+  document.getElementById("searchInput");
 
-    const start = currentFiltered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-    const end = Math.min(currentPage * pageSize, currentFiltered.length);
-    paginationInfo.textContent = `Mostrando ${start}-${end} de ${currentFiltered.length}`;
+const contactType =
+  document.getElementById("contactType");
 
-    let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-    for(let p = 1; p <= totalPages; p++){
-      if(totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages){
-        if(p === 2 || p === totalPages - 1) html += `<span class="page-btn" style="border:none;">…</span>`;
-        continue;
+const monthField =
+  document.getElementById("monthField");
+
+const monthSelect =
+  document.getElementById("monthSelect");
+
+const dateFrom =
+  document.getElementById("dateFrom");
+
+const dateTo =
+  document.getElementById("dateTo");
+
+const codeInput =
+  document.getElementById("codeInput");
+
+const vendorSelect =
+  document.getElementById("vendorSelect");
+
+const activeFiltersEl =
+  document.getElementById("activeFilters");
+
+const pagesContainer =
+  document.getElementById("pagesContainer");
+
+const paginationInfo =
+  document.getElementById("paginationInfo");
+
+
+/* ==========================================================
+   LISTAS / LOTES
+========================================================== */
+
+const savedLists = [];
+
+
+/*
+ * Datos de ejemplo para mostrar cómo funcionaría
+ * el seguimiento.
+ */
+savedLists.push(
+
+  {
+    id:101,
+    titulo:"Clientes cumpleaños agosto",
+    motivo:"Cumpleaños",
+    descripcion:"Clientes con cumpleaños durante agosto para campaña de seguimiento.",
+    creadoPor:"Jose Caicedo",
+    creado:"2026-09-08 09:25",
+    contactos:34,
+    destinoTipo:"departamento",
+    destino:"Ventas",
+    estado:"completado",
+    actualizado:"2026-09-08 14:40",
+
+    historial:[
+
+      {
+        fecha:"2026-09-08 09:25",
+        titulo:"Lote creado",
+        usuario:"Jose Caicedo"
+      },
+
+      {
+        fecha:"2026-09-08 09:30",
+        titulo:"Lote enviado al departamento Ventas",
+        usuario:"Jose Caicedo"
+      },
+
+      {
+        fecha:"2026-09-08 14:40",
+        titulo:"Lote marcado como completado",
+        usuario:"María Pérez"
       }
-      html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
-    }
-    html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
-    pagesContainer.innerHTML = html;
 
-    pagesContainer.querySelectorAll('[data-page]').forEach(btn => {
-      btn.addEventListener('click', () => { currentPage = parseInt(btn.dataset.page, 10); renderTable(); });
-    });
-    const prevBtn = document.getElementById('prevPage');
-    const nextBtn = document.getElementById('nextPage');
-    if(prevBtn) prevBtn.addEventListener('click', () => { currentPage--; renderTable(); });
-    if(nextBtn) nextBtn.addEventListener('click', () => { currentPage++; renderTable(); });
+    ]
+
+  },
+
+
+  {
+    id:102,
+    titulo:"Seguimiento clientes inactivos",
+    motivo:"Inactivos",
+    descripcion:"Clientes inactivos para realizar nueva gestión comercial.",
+    creadoPor:"Sebastian Tovar",
+    creado:"2026-09-09 10:15",
+    contactos:56,
+    destinoTipo:"usuario",
+    destino:"Mary Polo",
+    estado:"proceso",
+    actualizado:"2026-09-10 08:20",
+
+    historial:[
+
+      {
+        fecha:"2026-09-09 10:15",
+        titulo:"Lote creado",
+        usuario:"Sebastian Tovar"
+      },
+
+      {
+        fecha:"2026-09-09 10:18",
+        titulo:"Lote asignado al usuario Mary Polo",
+        usuario:"Sebastian Tovar"
+      },
+
+      {
+        fecha:"2026-09-10 08:20",
+        titulo:"Lote en proceso",
+        usuario:"Mary Polo"
+      }
+
+    ]
+
+  },
+
+
+  {
+    id:103,
+    titulo:"Nuevos clientes septiembre",
+    motivo:"Nuevos",
+    descripcion:"Clientes nuevos para primera gestión.",
+    creadoPor:"Hector Ordosgoita",
+    creado:"2026-09-10 08:10",
+    contactos:82,
+    destinoTipo:"departamento",
+    destino:"Servicio al Cliente (SVC)",
+    estado:"pendiente",
+    actualizado:"2026-09-10 08:10",
+
+    historial:[
+
+      {
+        fecha:"2026-09-10 08:10",
+        titulo:"Lote creado",
+        usuario:"Hector Ordosgoita"
+      }
+
+    ]
+
   }
 
-  // ---------- Render encabezado dinámico ----------
-  function renderHead(){
-    const columns = activeColumns();
-    clientsTable.classList.toggle('table-nuevo', isNuevoMode());
-    tableHead.innerHTML = `
-      <tr>
-        <th style="width:34px;"><input type="checkbox" class="checkbox" id="headerCheckbox" title="Marcar / desmarcar página actual"></th>
-        ${columns.map(col => `<th>${col.label}</th>`).join('')}
+);
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function dash(v){
+
+  return (
+    v === undefined ||
+    v === null ||
+    v === ""
+  )
+  ? '<span class="muted-cell">—</span>'
+  : v;
+
+}
+
+
+function formatDateHuman(dateStr){
+
+  if(!dateStr) return "—";
+
+  const [y,m,d] =
+    dateStr.split("-");
+
+  const meses = [
+    "Ene","Feb","Mar","Abr",
+    "May","Jun","Jul","Ago",
+    "Sep","Oct","Nov","Dic"
+  ];
+
+  return `${d} ${meses[
+    parseInt(m,10)-1
+  ]} ${y}`;
+
+}
+
+
+function isNuevoMode(){
+
+  return contactType.value === "nuevo";
+
+}
+
+
+function activeDataset(){
+
+  return isNuevoMode()
+    ? newLeads
+    : rawClients;
+
+}
+
+
+function activeColumns(){
+
+  return isNuevoMode()
+    ? nuevoColumns
+    : generalColumns;
+
+}
+
+
+function displayName(item){
+
+  return isNuevoMode()
+    ? item.nombres
+    : item.cliente;
+
+}
+
+
+function agenteAtendio(item){
+
+  return isNuevoMode()
+    ? (
+        item.quienHizoLlamada ||
+        item.creadoPor
+      )
+    : item.vendedor;
+
+}
+
+
+/* ==========================================================
+   VENDEDORES
+========================================================== */
+
+function populateVendorOptions(){
+
+  const source =
+    activeDataset();
+
+  const vendors = [
+    ...new Set(
+      source
+        .map(c => agenteAtendio(c))
+        .filter(Boolean)
+    )
+  ].sort();
+
+  const previous =
+    vendorSelect.value;
+
+  vendorSelect.innerHTML =
+    '<option value="">Todos</option>' +
+
+    vendors
+      .map(
+        v =>
+          `<option value="${v}">
+            ${v}
+          </option>`
+      )
+      .join("");
+
+  if(vendors.includes(previous)){
+    vendorSelect.value =
+      previous;
+  }
+
+}
+
+
+/* ==========================================================
+   FILTROS CONTACTOS
+========================================================== */
+
+function syncFieldVisibility(){
+
+  monthField.style.display =
+    isNuevoMode()
+      ? "none"
+      : "";
+
+}
+
+
+function applyFilters(){
+
+  const q =
+    searchInput.value
+      .trim()
+      .toLowerCase();
+
+  const tipoFiltro =
+    contactType.value;
+
+  const mes =
+    monthSelect.value;
+
+  const desde =
+    dateFrom.value;
+
+  const hasta =
+    dateTo.value;
+
+  const codigo =
+    codeInput.value.trim();
+
+  const vendedor =
+    vendorSelect.value;
+
+  const nuevoMode =
+    isNuevoMode();
+
+  const dataset =
+    activeDataset();
+
+  let result =
+    dataset.filter(c => {
+
+      if(
+        !nuevoMode &&
+        tipoFiltro &&
+        c.tipo !== tipoFiltro
+      )
+        return false;
+
+      if(
+        codigo &&
+        !String(c.id).includes(codigo)
+      )
+        return false;
+
+      if(
+        vendedor &&
+        agenteAtendio(c) !== vendedor
+      )
+        return false;
+
+      if(
+        !nuevoMode &&
+        mes &&
+        c.cumple.split("-")[1] !== mes
+      )
+        return false;
+
+      const fechaRegistro =
+        nuevoMode
+          ? c.fechaRegistro.slice(0,10)
+          : c.registro;
+
+      if(
+        desde &&
+        fechaRegistro < desde
+      )
+        return false;
+
+      if(
+        hasta &&
+        fechaRegistro > hasta
+      )
+        return false;
+
+      const nombre =
+        displayName(c).toLowerCase();
+
+      if(
+        q &&
+        !nombre.includes(q)
+      )
+        return false;
+
+      return true;
+
+    });
+
+  currentFiltered =
+    result;
+
+  renderActiveFilters();
+
+  currentPage = 1;
+
+  renderTable();
+
+}
+
+
+function renderActiveFilters(){
+
+  const chips = [];
+
+  if(contactType.value)
+    chips.push(
+      "Tipo: " +
+      (
+        tipoLabel[
+          contactType.value
+        ] ||
+        contactType.value
+      )
+    );
+
+  if(
+    !isNuevoMode() &&
+    monthSelect.value
+  )
+    chips.push(
+      "Cumpleaños: " +
+      monthSelect.options[
+        monthSelect.selectedIndex
+      ].text
+    );
+
+  if(
+    dateFrom.value ||
+    dateTo.value
+  )
+    chips.push(
+      `Registro: ${
+        dateFrom.value || "…"
+      } a ${
+        dateTo.value || "…"
+      }`
+    );
+
+  if(codeInput.value.trim())
+    chips.push(
+      "Código: " +
+      codeInput.value.trim()
+    );
+
+  if(vendorSelect.value)
+    chips.push(
+      "Vendedor: " +
+      vendorSelect.value
+    );
+
+  if(searchInput.value.trim())
+    chips.push(
+      `Nombre: "${searchInput.value.trim()}"`
+    );
+
+  activeFiltersEl.innerHTML =
+    chips
+      .map(
+        c =>
+          `<span class="chip">
+            ${c}
+          </span>`
+      )
+      .join("");
+
+}
+
+
+/* ==========================================================
+   PAGINACIÓN CONTACTOS
+========================================================== */
+
+function getPageData(){
+
+  const start =
+    (currentPage - 1) *
+    pageSize;
+
+  return currentFiltered.slice(
+    start,
+    start + pageSize
+  );
+
+}
+
+
+function renderPagination(){
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        currentFiltered.length /
+        pageSize
+      )
+    );
+
+  if(currentPage > totalPages)
+    currentPage =
+      totalPages;
+
+  const start =
+    currentFiltered.length === 0
+      ? 0
+      : (currentPage - 1) *
+          pageSize + 1;
+
+  const end =
+    Math.min(
+      currentPage * pageSize,
+      currentFiltered.length
+    );
+
+  paginationInfo.textContent =
+    `Mostrando ${start}-${end} de ${currentFiltered.length}`;
+
+  let html =
+    `<button
+      class="page-btn"
+      id="prevPage"
+      ${
+        currentPage === 1
+          ? "disabled"
+          : ""
+      }>
+      ‹
+    </button>`;
+
+  for(
+    let p = 1;
+    p <= totalPages;
+    p++
+  ){
+
+    html +=
+      `<button
+        class="page-btn ${
+          p === currentPage
+            ? "active"
+            : ""
+        }"
+        data-page="${p}">
+        ${p}
+      </button>`;
+
+  }
+
+  html +=
+    `<button
+      class="page-btn"
+      id="nextPage"
+      ${
+        currentPage === totalPages
+          ? "disabled"
+          : ""
+      }>
+      ›
+    </button>`;
+
+  pagesContainer.innerHTML =
+    html;
+
+  pagesContainer
+    .querySelectorAll("[data-page]")
+    .forEach(btn => {
+
+      btn.addEventListener(
+        "click",
+        () => {
+
+          currentPage =
+            parseInt(
+              btn.dataset.page,
+              10
+            );
+
+          renderTable();
+
+        }
+      );
+
+    });
+
+
+  const prev =
+    document.getElementById(
+      "prevPage"
+    );
+
+  const next =
+    document.getElementById(
+      "nextPage"
+    );
+
+  if(prev)
+    prev.addEventListener(
+      "click",
+      () => {
+
+        currentPage--;
+
+        renderTable();
+
+      }
+    );
+
+  if(next)
+    next.addEventListener(
+      "click",
+      () => {
+
+        currentPage++;
+
+        renderTable();
+
+      }
+    );
+
+}
+
+
+/* ==========================================================
+   TABLA CONTACTOS
+========================================================== */
+
+function renderHead(){
+
+  const columns =
+    activeColumns();
+
+  tableHead.innerHTML = `
+
+    <tr>
+
+      <th style="width:34px;">
+
+        <input
+          type="checkbox"
+          class="checkbox"
+          id="headerCheckbox">
+
+      </th>
+
+      ${
+        columns
+          .map(
+            col =>
+              `<th>
+                ${col.label}
+              </th>`
+          )
+          .join("")
+      }
+
+    </tr>
+
+  `;
+
+
+  document
+    .getElementById("headerCheckbox")
+    .addEventListener(
+      "change",
+      e => {
+
+        getPageData()
+          .forEach(c => {
+
+            if(e.target.checked)
+              selectedIds.add(c.id);
+            else
+              selectedIds.delete(c.id);
+
+          });
+
+        renderTable();
+
+      }
+    );
+
+}
+
+
+function renderTable(){
+
+  renderHead();
+
+  const columns =
+    activeColumns();
+
+  const pageData =
+    getPageData();
+
+  tableBody.innerHTML = "";
+
+
+  if(pageData.length === 0){
+
+    tableBody.innerHTML = `
+
+      <tr class="empty-row">
+
+        <td
+          colspan="${columns.length + 1}">
+
+          No se encontraron contactos
+
+        </td>
+
       </tr>
+
     `;
-    document.getElementById('headerCheckbox').addEventListener('change', (e) => {
-      getPageData().forEach(c => {
-        if(e.target.checked) selectedIds.add(c.id); else selectedIds.delete(c.id);
-      });
-      renderTable();
-    });
-  }
 
-  // ---------- Render tabla ----------
-  function renderTable(){
-    renderHead();
-    const columns = activeColumns();
-    const pageData = getPageData();
-    tableBody.innerHTML = '';
+  }else{
 
-    if(pageData.length === 0){
-      tableBody.innerHTML = `<tr class="empty-row"><td colspan="${columns.length + 1}">No se encontraron contactos con los filtros aplicados</td></tr>`;
-    } else {
-      pageData.forEach(c => {
-        const isSelected = selectedIds.has(c.id);
-        const tr = document.createElement('tr');
-        tr.className = isSelected ? 'row-selected' : '';
-        tr.innerHTML = `
-          <td><input type="checkbox" class="checkbox row-check" data-id="${c.id}" ${isSelected ? 'checked' : ''}></td>
-          ${columns.map(col => `<td class="${col.cls || ''}">${col.render(c)}</td>`).join('')}
-        `;
-        tableBody.appendChild(tr);
-      });
+    pageData.forEach(c => {
 
-      tableBody.querySelectorAll('.row-check').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          const id = parseInt(e.target.dataset.id, 10);
-          if(e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
-          e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
-          updateSelectedCount();
-          updateHeaderCheckboxState();
-        });
-      });
-    }
+      const selected =
+        selectedIds.has(c.id);
 
-    updateHeaderCheckboxState();
-    updateSelectedCount();
-    renderPagination();
-  }
+      const tr =
+        document.createElement("tr");
 
-  function updateHeaderCheckboxState(){
-    const headerCheckbox = document.getElementById('headerCheckbox');
-    if(!headerCheckbox) return;
-    const pageData = getPageData();
-    const allChecked = pageData.length > 0 && pageData.every(c => selectedIds.has(c.id));
-    const someChecked = pageData.some(c => selectedIds.has(c.id));
-    headerCheckbox.checked = allChecked;
-    headerCheckbox.indeterminate = !allChecked && someChecked;
-  }
+      tr.innerHTML = `
 
-  function updateSelectedCount(){
-    const n = selectedIds.size;
-    selectedCountEl.textContent = `${n} seleccionado${n === 1 ? '' : 's'}`;
-  }
+        <td>
 
-  // ---------- Eventos de filtros ----------
-  document.getElementById('buscarBtn').addEventListener('click', applyFilters);
-  document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-  contactType.addEventListener('change', () => {
-    selectedIds.clear(); // los datasets son distintos, evita ids "seleccionados" que ya no existen en pantalla
-    syncFieldVisibility();
-    populateVendorOptions();
-    applyFilters();
-  });
-  monthSelect.addEventListener('change', applyFilters);
-  dateFrom.addEventListener('change', applyFilters);
-  dateTo.addEventListener('change', applyFilters);
-  codeInput.addEventListener('input', applyFilters);
-  vendorSelect.addEventListener('change', applyFilters);
-  searchInput.addEventListener('input', applyFilters);
-  pageSizeSelect.addEventListener('change', () => {
-    pageSize = parseInt(pageSizeSelect.value, 10);
-    currentPage = 1;
-    renderTable();
-  });
+          <input
+            type="checkbox"
+            class="checkbox row-check"
+            data-id="${c.id}"
+            ${
+              selected
+                ? "checked"
+                : ""
+            }>
 
-  // ---------- Selección ----------
-  document.getElementById('selectAllBtn').addEventListener('click', () => {
-    currentFiltered.forEach(c => selectedIds.add(c.id));
-    renderTable();
-  });
-  document.getElementById('deselectAllBtn').addEventListener('click', () => {
-    selectedIds.clear();
-    renderTable();
-  });
+        </td>
 
-  // ---------- Exportar selección ----------
-  function stripTags(html){
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return (div.textContent || div.innerText || '').trim();
-  }
+        ${
+          columns
+            .map(
+              col =>
+                `<td
+                  class="${
+                    col.cls || ""
+                  }">
 
-  function dateStamp(){
-    const d = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-  }
+                  ${col.render(c)}
 
-  function getSelectedRows(){
-    const dataset = activeDataset();
-    const columns = activeColumns();
-    const selected = dataset.filter(c => selectedIds.has(c.id));
-    return {
-      columns,
-      rows: selected.map(c => columns.map(col => stripTags(String(col.render(c)))))
-    };
-  }
+                </td>`
+            )
+            .join("")
+        }
 
-  function exportSelectionCSV(){
-    if(selectedIds.size === 0){
-      showToast('warning', 'Nada que exportar', 'Marca al menos un contacto antes de exportar.');
-      return;
-    }
-    const { columns, rows } = getSelectedRows();
-    const escapeCsv = (val) => {
-      const s = String(val ?? '');
-      return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-    };
-    const lines = [
-      columns.map(c => escapeCsv(c.label)).join(','),
-      ...rows.map(row => row.map(escapeCsv).join(','))
-    ];
-    const csvContent = '\uFEFF' + lines.join('\r\n'); // BOM para acentos en Excel
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lista-contactos-${dateStamp()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    showToast('success', 'CSV exportado', `${rows.length} contacto${rows.length === 1 ? '' : 's'} exportado${rows.length === 1 ? '' : 's'} a CSV.`);
-  }
+      `;
 
-  function exportSelectionPDF(){
-    if(selectedIds.size === 0){
-      showToast('warning', 'Nada que exportar', 'Marca al menos un contacto antes de exportar.');
-      return;
-    }
-    if(!window.jspdf || !window.jspdf.jsPDF){
-      showToast('warning', 'No se pudo exportar', 'No se pudo cargar el generador de PDF. Revisa tu conexión.');
-      return;
-    }
-    const { columns, rows } = getSelectedRows();
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: isNuevoMode() ? 'landscape' : 'portrait', unit: 'pt' });
+      tableBody.appendChild(tr);
 
-    doc.setFontSize(14);
-    doc.setTextColor(27, 76, 110);
-    doc.text('Lista de Contactos', 40, 40);
-    doc.setFontSize(9.5);
-    doc.setTextColor(107, 124, 136);
-    doc.text(`Generado el ${new Date().toLocaleString('es-ES')} · ${rows.length} contacto${rows.length === 1 ? '' : 's'} seleccionado${rows.length === 1 ? '' : 's'}`, 40, 56);
-
-    doc.autoTable({
-      head: [columns.map(c => c.label)],
-      body: rows,
-      startY: 68,
-      styles: { fontSize: 7.5, cellPadding: 4, overflow: 'linebreak' },
-      headStyles: { fillColor: [27, 76, 110], textColor: 255, fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [244, 247, 249] },
-      margin: { left: 40, right: 40 }
     });
 
-    doc.save(`lista-contactos-${dateStamp()}.pdf`);
-    showToast('success', 'PDF exportado', `${rows.length} contacto${rows.length === 1 ? '' : 's'} exportado${rows.length === 1 ? '' : 's'} a PDF.`);
+
+    tableBody
+      .querySelectorAll(".row-check")
+      .forEach(cb => {
+
+        cb.addEventListener(
+          "change",
+          e => {
+
+            const id =
+              parseInt(
+                e.target.dataset.id,
+                10
+              );
+
+            if(e.target.checked)
+              selectedIds.add(id);
+            else
+              selectedIds.delete(id);
+
+            updateSelectedCount();
+
+            updateHeaderCheckboxState();
+
+          }
+        );
+
+      });
+
   }
 
-  document.getElementById('exportCsvBtn').addEventListener('click', exportSelectionCSV);
-  document.getElementById('exportPdfBtn').addEventListener('click', exportSelectionPDF);
 
-  // ---------- Modal: Crear lista ----------
-  const openModalBtn  = document.getElementById('openModalBtn');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const cancelModalBtn= document.getElementById('cancelModalBtn');
-  const saveListBtn   = document.getElementById('saveListBtn');
+  updateHeaderCheckboxState();
 
-  function populateAssignAgenteOptions(){
-    const source = activeDataset();
-    const vendors = [...new Set(source.map(c => agenteAtendio(c)).filter(Boolean))].sort((a,b) => a.localeCompare(b));
-    assignAgenteSelect.innerHTML = vendors.map(v => `<option value="${v}">${v}</option>`).join('');
-  }
+  updateSelectedCount();
 
-  function setAssignMode(mode){
-    const isAgente = mode === 'agente';
-    assignTipoAgente.checked = isAgente;
-    assignTipoGrupo.checked = !isAgente;
-    assignAgenteLabel.classList.toggle('checked', isAgente);
-    assignGrupoLabel.classList.toggle('checked', !isAgente);
-    assignAgenteField.style.display = isAgente ? '' : 'none';
-    assignGrupoField.style.display = isAgente ? 'none' : '';
-  }
-  assignTipoAgente.addEventListener('change', () => setAssignMode('agente'));
-  assignTipoGrupo.addEventListener('change', () => setAssignMode('grupo'));
+  renderPagination();
 
-  function openModal(){
-    if(selectedIds.size === 0){
-      showToast('warning', 'No se pudo abrir', 'Marca al menos un contacto antes de crear la lista.');
-      return;
-    }
-    modalSummary.textContent = `${selectedIds.size} contacto${selectedIds.size === 1 ? '' : 's'} seleccionado${selectedIds.size === 1 ? '' : 's'}`;
-    populateAssignAgenteOptions();
-    setAssignMode('agente');
-    modalBackdrop.classList.add('open');
-  }
-  function closeModal(){
-    modalBackdrop.classList.remove('open');
-  }
+}
 
-  openModalBtn.addEventListener('click', openModal);
-  closeModalBtn.addEventListener('click', closeModal);
-  cancelModalBtn.addEventListener('click', closeModal);
-  modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) closeModal(); });
 
-  saveListBtn.addEventListener('click', () => {
-    if(selectedIds.size === 0){
-      showToast('warning', 'No se pudo guardar', 'Marca al menos un contacto antes de guardar la lista.');
-      closeModal();
-      return;
-    }
-    const esAgente = assignTipoAgente.checked;
-    if(esAgente && !assignAgenteSelect.value){
-      showToast('warning', 'Falta la asignación', 'Selecciona el vendedor al que se le asignará la lista.');
-      return;
-    }
-    if(!esAgente && !assignGrupoSelect.value){
-      showToast('warning', 'Falta la asignación', 'Selecciona el grupo al que se le asignará la lista.');
-      return;
-    }
+function updateHeaderCheckboxState(){
 
-    const titulo = listTitle.value.trim() || `Lista sin título (${new Date().toLocaleDateString('es-ES')})`;
-    const motivo = listMotivo.value;
-    const descripcion = listDesc.value.trim();
-    const dataset = activeDataset();
-    const contactosSeleccionados = dataset.filter(c => selectedIds.has(c.id));
-    const asignacion = esAgente
-      ? { tipo: 'agente', valor: assignAgenteSelect.value }
-      : { tipo: 'grupo', valor: assignGrupoSelect.value };
+  const checkbox =
+    document.getElementById(
+      "headerCheckbox"
+    );
 
-    const nuevaLista = {
-      id: savedLists.length + 1,
-      titulo, motivo, descripcion, asignacion,
-      contactos: contactosSeleccionados.map(c => ({id:c.id, nombre:displayName(c)})),
-      creado: new Date().toLocaleString('es-ES')
-    };
-    savedLists.push(nuevaLista);
+  if(!checkbox)
+    return;
 
-    const destino = esAgente ? `vendedor ${asignacion.valor}` : `grupo ${asignacion.valor}`;
-    showToast('success', 'Lista creada', `"${titulo}" guardada con ${contactosSeleccionados.length} contacto${contactosSeleccionados.length === 1 ? '' : 's'} y asignada a ${destino}.`);
+  const data =
+    getPageData();
 
-    selectedIds.clear();
-    listTitle.value = '';
-    listDesc.value = '';
-    setAssignMode('agente');
-    closeModal();
-    renderTable();
-  });
+  const all =
+    data.length > 0 &&
+    data.every(
+      c => selectedIds.has(c.id)
+    );
 
-  // ---------- Toast tipo Bootstrap 4.6 ----------
-  function showToast(type, title, message){
-    const isSuccess = type === 'success';
-    const toast = document.createElement('div');
-    toast.className = `toast ${isSuccess ? '' : 'warning'}`;
-    toast.innerHTML = `
-      <div class="toast-header">
-        <span class="icon-dot" style="background:${isSuccess ? '#2E9E5B' : '#D98E2B'};">
-          ${isSuccess
-            ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-            : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>'}
-        </span>
-        <strong>${title}</strong>
-        <small>ahora</small>
-        <button class="close" aria-label="Cerrar">&times;</button>
-      </div>
-      <div class="toast-body">${message}</div>
-      <div class="toast-progress"><span></span></div>
-    `;
-    toastContainer.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('showing'));
+  const some =
+    data.some(
+      c => selectedIds.has(c.id)
+    );
 
-    const remove = () => {
-      toast.classList.remove('showing');
-      setTimeout(() => toast.remove(), 250);
-    };
-    toast.querySelector('.close').addEventListener('click', remove);
-    setTimeout(remove, 4500);
-  }
+  checkbox.checked = all;
 
-  // ---------- Init ----------
+  checkbox.indeterminate =
+    !all && some;
+
+}
+
+
+function updateSelectedCount(){
+
+  const n =
+    selectedIds.size;
+
+  selectedCountEl.textContent =
+    `${n} seleccionado${
+      n === 1 ? "" : "s"
+    }`;
+
+}
+
+
+/* ==========================================================
+   LIMPIAR FILTROS
+========================================================== */
+
+function clearFilters(){
+
+  searchInput.value = "";
+
+  contactType.value = "";
+
+  monthSelect.value = "";
+
+  dateFrom.value = "";
+
+  dateTo.value = "";
+
+  codeInput.value = "";
+
+  vendorSelect.value = "";
+
+  selectedIds.clear();
+
   syncFieldVisibility();
+
   populateVendorOptions();
+
   applyFilters();
+
+}
+
+
+/* ==========================================================
+   MODAL CREAR LISTA
+========================================================== */
+
+const modalBackdrop =
+  document.getElementById(
+    "modalBackdrop"
+  );
+
+const modalSummary =
+  document.getElementById(
+    "modalSummary"
+  );
+
+const listTitle =
+  document.getElementById(
+    "listTitle"
+  );
+
+const listMotivo =
+  document.getElementById(
+    "listMotivo"
+  );
+
+const listDesc =
+  document.getElementById(
+    "listDesc"
+  );
+
+const assignTipoAgente =
+  document.getElementById(
+    "assignTipoAgente"
+  );
+
+const assignTipoGrupo =
+  document.getElementById(
+    "assignTipoGrupo"
+  );
+
+const assignAgenteLabel =
+  document.getElementById(
+    "assignAgenteLabel"
+  );
+
+const assignGrupoLabel =
+  document.getElementById(
+    "assignGrupoLabel"
+  );
+
+const assignAgenteField =
+  document.getElementById(
+    "assignAgenteField"
+  );
+
+const assignGrupoField =
+  document.getElementById(
+    "assignGrupoField"
+  );
+
+const assignAgenteSelect =
+  document.getElementById(
+    "assignAgenteSelect"
+  );
+
+const assignGrupoSelect =
+  document.getElementById(
+    "assignGrupoSelect"
+  );
+
+
+function populateAssignAgenteOptions(){
+
+  const vendors =
+    [
+      ...new Set(
+        activeDataset()
+          .map(c => agenteAtendio(c))
+          .filter(Boolean)
+      )
+    ];
+
+  assignAgenteSelect.innerHTML =
+    vendors
+      .map(
+        v =>
+          `<option value="${v}">
+            ${v}
+          </option>`
+      )
+      .join("");
+
+}
+
+
+function setAssignMode(mode){
+
+  const isAgente =
+    mode === "agente";
+
+  assignTipoAgente.checked =
+    isAgente;
+
+  assignTipoGrupo.checked =
+    !isAgente;
+
+  assignAgenteLabel
+    .classList
+    .toggle(
+      "checked",
+      isAgente
+    );
+
+  assignGrupoLabel
+    .classList
+    .toggle(
+      "checked",
+      !isAgente
+    );
+
+  assignAgenteField.style.display =
+    isAgente
+      ? ""
+      : "none";
+
+  assignGrupoField.style.display =
+    isAgente
+      ? "none"
+      : "";
+
+}
+
+
+function openModal(){
+
+  if(selectedIds.size === 0){
+
+    showToast(
+      "warning",
+      "No se pudo abrir",
+      "Selecciona al menos un contacto."
+    );
+
+    return;
+
+  }
+
+  modalSummary.textContent =
+    `${selectedIds.size} contacto${
+      selectedIds.size === 1
+        ? ""
+        : "s"
+    } seleccionado${
+      selectedIds.size === 1
+        ? ""
+        : "s"
+    }`;
+
+  populateAssignAgenteOptions();
+
+  setAssignMode("agente");
+
+  modalBackdrop
+    .classList
+    .add("open");
+
+}
+
+
+function closeModal(){
+
+  modalBackdrop
+    .classList
+    .remove("open");
+
+}
+
+
+document
+  .getElementById("openModalBtn")
+  .addEventListener(
+    "click",
+    openModal
+  );
+
+document
+  .getElementById("closeModalBtn")
+  .addEventListener(
+    "click",
+    closeModal
+  );
+
+document
+  .getElementById("cancelModalBtn")
+  .addEventListener(
+    "click",
+    closeModal
+  );
+
+
+assignTipoAgente
+  .addEventListener(
+    "change",
+    () => setAssignMode("agente")
+  );
+
+assignTipoGrupo
+  .addEventListener(
+    "change",
+    () => setAssignMode("grupo")
+  );
+
+
+/* ==========================================================
+   GUARDAR LOTE
+========================================================== */
+
+document
+  .getElementById("saveListBtn")
+  .addEventListener(
+    "click",
+    () => {
+
+      if(selectedIds.size === 0){
+
+        showToast(
+          "warning",
+          "No se pudo guardar",
+          "Selecciona contactos."
+        );
+
+        return;
+
+      }
+
+
+      const esAgente =
+        assignTipoAgente.checked;
+
+      const destino =
+        esAgente
+          ? assignAgenteSelect.value
+          : assignGrupoSelect.value;
+
+      const titulo =
+        listTitle.value.trim() ||
+        `Lista ${
+          new Date()
+            .toLocaleDateString("es-ES")
+        }`;
+
+      const nuevaLista = {
+
+        id:
+          savedLists.length
+          ? Math.max(
+              ...savedLists.map(
+                x => x.id
+              )
+            ) + 1
+          : 1,
+
+        titulo,
+
+        motivo:
+          listMotivo.value,
+
+        descripcion:
+          listDesc.value.trim(),
+
+        creadoPor:
+          "Jose Caicedo",
+
+        creado:
+          new Date()
+            .toLocaleString(
+              "es-CO"
+            ),
+
+        contactos:
+          selectedIds.size,
+
+        destinoTipo:
+          esAgente
+            ? "usuario"
+            : "departamento",
+
+        destino,
+
+        estado:
+          "pendiente",
+
+        actualizado:
+          new Date()
+            .toLocaleString(
+              "es-CO"
+            ),
+
+        historial:[
+
+          {
+            fecha:
+              new Date()
+                .toLocaleString(
+                  "es-CO"
+                ),
+
+            titulo:
+              "Lote creado",
+
+            usuario:
+              "Jose Caicedo"
+          }
+
+        ]
+
+      };
+
+
+      savedLists.unshift(
+        nuevaLista
+      );
+
+
+      selectedIds.clear();
+
+      listTitle.value = "";
+
+      listDesc.value = "";
+
+      closeModal();
+
+      renderTable();
+
+      renderLotes();
+
+      updateLoteSummary();
+
+      showToast(
+        "success",
+        "Lote creado",
+        `El lote "${titulo}" fue creado correctamente.`
+      );
+
+    }
+  );
+
+
+/* ==========================================================
+   TABS
+========================================================== */
+
+document
+  .querySelectorAll(".tab-btn")
+  .forEach(btn => {
+
+    btn.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach(b =>
+            b.classList.remove(
+              "active"
+            )
+          );
+
+        document
+          .querySelectorAll(".tab-content")
+          .forEach(c =>
+            c.classList.remove(
+              "active"
+            )
+          );
+
+        btn.classList.add(
+          "active"
+        );
+
+        document
+          .getElementById(
+            `tab-${btn.dataset.tab}`
+          )
+          .classList.add(
+            "active"
+          );
+
+        if(
+          btn.dataset.tab ===
+          "seguimiento"
+        ){
+
+          renderLotes();
+
+          updateLoteSummary();
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* ==========================================================
+   SEGUIMIENTO DE LOTES
+========================================================== */
+
+let lotesFiltered = [];
+
+let lotesPage = 1;
+
+const lotesPageSize = 10;
+
+
+function applyLoteFilters(){
+
+  const search =
+    document
+      .getElementById(
+        "loteSearch"
+      )
+      .value
+      .trim()
+      .toLowerCase();
+
+  const desde =
+    document
+      .getElementById(
+        "loteDateFrom"
+      )
+      .value;
+
+  const hasta =
+    document
+      .getElementById(
+        "loteDateTo"
+      )
+      .value;
+
+  const creadoPor =
+    document
+      .getElementById(
+        "loteCreatedBy"
+      )
+      .value;
+
+  const motivo =
+    document
+      .getElementById(
+        "loteMotivo"
+      )
+      .value;
+
+  const destino =
+    document
+      .getElementById(
+        "loteDestino"
+      )
+      .value;
+
+  const estado =
+    document
+      .getElementById(
+        "loteEstado"
+      )
+      .value;
+
+
+  lotesFiltered =
+    savedLists.filter(
+      lote => {
+
+        if(
+          search &&
+          !String(lote.id)
+            .includes(search) &&
+          !lote.titulo
+            .toLowerCase()
+            .includes(search)
+        )
+          return false;
+
+
+        const fecha =
+          lote.creado
+            .slice(0,10)
+            .split("/")
+            .reverse()
+            .join("-");
+
+
+        /*
+         * Para los datos mock con formato
+         * ISO funciona directamente.
+         */
+        if(
+          desde &&
+          lote.creado.slice(0,10) < desde
+        )
+          return false;
+
+
+        if(
+          hasta &&
+          lote.creado.slice(0,10) > hasta
+        )
+          return false;
+
+
+        if(
+          creadoPor &&
+          lote.creadoPor !== creadoPor
+        )
+          return false;
+
+
+        if(
+          motivo &&
+          lote.motivo !== motivo
+        )
+          return false;
+
+
+        if(
+          destino &&
+          lote.destinoTipo !== destino
+        )
+          return false;
+
+
+        if(
+          estado &&
+          lote.estado !== estado
+        )
+          return false;
+
+
+        return true;
+
+      }
+    );
+
+  lotesPage = 1;
+
+  renderLotes();
+
+  updateLoteSummary();
+
+}
+
+
+function estadoLabel(estado){
+
+  const labels = {
+
+    pendiente:"Pendiente",
+
+    proceso:"En proceso",
+
+    completado:"Completado",
+
+    cancelado:"Cancelado"
+
+  };
+
+  return labels[estado] || estado;
+
+}
+
+
+function renderLotes(){
+
+  const body =
+    document.getElementById(
+      "lotesBody"
+    );
+
+  if(!lotesFiltered.length){
+
+    lotesFiltered =
+      [...savedLists];
+
+  }
+
+
+  const start =
+    (lotesPage - 1) *
+    lotesPageSize;
+
+  const pageData =
+    lotesFiltered.slice(
+      start,
+      start + lotesPageSize
+    );
+
+
+  body.innerHTML = "";
+
+
+  if(!pageData.length){
+
+    body.innerHTML = `
+
+      <tr class="empty-row">
+
+        <td colspan="12">
+
+          No hay lotes registrados.
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }else{
+
+    pageData.forEach(
+      lote => {
+
+        const tr =
+          document.createElement(
+            "tr"
+          );
+
+        const destinoTag =
+          lote.destinoTipo ===
+          "departamento"
+
+            ? `
+              <span
+                class="destino-tag destino-departamento">
+
+                Departamento
+
+              </span>
+            `
+
+            : `
+              <span
+                class="destino-tag destino-usuario">
+
+                Usuario
+
+              </span>
+            `;
+
+
+        tr.innerHTML = `
+
+          <td>
+            <strong>
+              #${lote.id}
+            </strong>
+          </td>
+
+          <td>
+            ${lote.creado}
+          </td>
+
+          <td>
+            ${lote.creadoPor}
+          </td>
+
+          <td>
+            <strong>
+              ${lote.titulo}
+            </strong>
+          </td>
+
+          <td>
+            ${lote.motivo}
+          </td>
+
+          <td
+            style="
+              max-width:220px;
+              white-space:normal;
+            ">
+
+            ${lote.descripcion || "—"}
+
+          </td>
+
+          <td>
+            ${lote.contactos}
+          </td>
+
+          <td>
+            ${destinoTag}
+          </td>
+
+          <td>
+            ${lote.destino}
+          </td>
+
+          <td>
+
+            <span
+              class="
+                status-tag
+                status-${lote.estado}
+              ">
+
+              ${estadoLabel(
+                lote.estado
+              )}
+
+            </span>
+
+          </td>
+
+          <td>
+            ${lote.actualizado}
+          </td>
+
+          <td>
+
+            <button
+              class="action-btn"
+              data-lote-id="${lote.id}">
+
+              Ver detalle
+
+            </button>
+
+          </td>
+
+        `;
+
+        body.appendChild(tr);
+
+      }
+    );
+
+
+    body
+      .querySelectorAll(
+        "[data-lote-id]"
+      )
+      .forEach(
+        btn => {
+
+          btn.addEventListener(
+            "click",
+            () => {
+
+              openLoteDetail(
+                parseInt(
+                  btn.dataset.loteId,
+                  10
+                )
+              );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+
+  const total =
+    lotesFiltered.length;
+
+  const end =
+    Math.min(
+      start + lotesPageSize,
+      total
+    );
+
+
+  document
+    .getElementById(
+      "lotesPaginationInfo"
+    )
+    .textContent =
+      `Mostrando ${
+        total
+          ? start + 1
+          : 0
+      }-${end} de ${total}`;
+
+}
+
+
+/* ==========================================================
+   RESUMEN LOTES
+========================================================== */
+
+function updateLoteSummary(){
+
+  document
+    .getElementById(
+      "totalLotes"
+    )
+    .textContent =
+      savedLists.length;
+
+
+  document
+    .getElementById(
+      "totalPendientes"
+    )
+    .textContent =
+      savedLists.filter(
+        x => x.estado === "pendiente"
+      ).length;
+
+
+  document
+    .getElementById(
+      "totalProceso"
+    )
+    .textContent =
+      savedLists.filter(
+        x => x.estado === "proceso"
+      ).length;
+
+
+  document
+    .getElementById(
+      "totalCompletados"
+    )
+    .textContent =
+      savedLists.filter(
+        x => x.estado === "completado"
+      ).length;
+
+}
+
+
+/* ==========================================================
+   DETALLE LOTE
+========================================================== */
+
+const detailBackdrop =
+  document.getElementById(
+    "detailModalBackdrop"
+  );
+
+const detailContent =
+  document.getElementById(
+    "loteDetailContent"
+  );
+
+
+function openLoteDetail(id){
+
+  const lote =
+    savedLists.find(
+      x => x.id === id
+    );
+
+  if(!lote)
+    return;
+
+
+  const destinoTipo =
+    lote.destinoTipo ===
+    "departamento"
+      ? "Departamento"
+      : "Usuario específico";
+
+
+  detailContent.innerHTML = `
+
+    <h3
+      style="
+        margin-top:0;
+        color:var(--navy-800);
+      ">
+
+      #${lote.id} · ${lote.titulo}
+
+    </h3>
+
+
+    <div class="detail-grid">
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Fecha de creación
+        </span>
+
+        <span class="detail-value">
+          ${lote.creado}
+        </span>
+
+      </div>
+
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Creado por
+        </span>
+
+        <span class="detail-value">
+          ${lote.creadoPor}
+        </span>
+
+      </div>
+
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Motivo
+        </span>
+
+        <span class="detail-value">
+          ${lote.motivo}
+        </span>
+
+      </div>
+
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Contactos
+        </span>
+
+        <span class="detail-value">
+          ${lote.contactos}
+        </span>
+
+      </div>
+
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Destino
+        </span>
+
+        <span class="detail-value">
+
+          ${destinoTipo}
+          ·
+          ${lote.destino}
+
+        </span>
+
+      </div>
+
+
+      <div class="detail-item">
+
+        <span class="detail-label">
+          Estado
+        </span>
+
+        <span class="detail-value">
+
+          <span
+            class="
+              status-tag
+              status-${lote.estado}
+            ">
+
+            ${estadoLabel(
+              lote.estado
+            )}
+
+          </span>
+
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="detail-item">
+
+      <span class="detail-label">
+        Descripción
+      </span>
+
+      <div class="detail-value">
+
+        ${
+          lote.descripcion ||
+          "Sin descripción"
+        }
+
+      </div>
+
+    </div>
+
+
+    <h4
+      style="
+        color:var(--navy-800);
+        margin-top:22px;
+      ">
+
+      Historial del lote
+
+    </h4>
+
+
+    <div class="history">
+
+      ${
+        lote.historial
+          .map(
+            item => `
+
+              <div class="history-item">
+
+                <div class="history-date">
+                  ${item.fecha}
+                </div>
+
+                <div class="history-title">
+                  ${item.titulo}
+                </div>
+
+                <div class="history-user">
+                  Usuario:
+                  ${item.usuario}
+                </div>
+
+              </div>
+
+            `
+          )
+          .join("")
+      }
+
+    </div>
+
+  `;
+
+
+  detailBackdrop
+    .classList
+    .add("open");
+
+}
+
+
+function closeDetail(){
+
+  detailBackdrop
+    .classList
+    .remove("open");
+
+}
+
+
+document
+  .getElementById(
+    "closeDetailModalBtn"
+  )
+  .addEventListener(
+    "click",
+    closeDetail
+  );
+
+
+document
+  .getElementById(
+    "closeDetailBtn"
+  )
+  .addEventListener(
+    "click",
+    closeDetail
+  );
+
+
+/* ==========================================================
+   FILTROS LOTES
+========================================================== */
+
+document
+  .getElementById(
+    "buscarLotesBtn"
+  )
+  .addEventListener(
+    "click",
+    applyLoteFilters
+  );
+
+
+document
+  .getElementById(
+    "clearLotesBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "loteSearch"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteDateFrom"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteDateTo"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteCreatedBy"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteMotivo"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteDestino"
+        )
+        .value = "";
+
+      document
+        .getElementById(
+          "loteEstado"
+        )
+        .value = "";
+
+      lotesFiltered =
+        [...savedLists];
+
+      lotesPage = 1;
+
+      renderLotes();
+
+      updateLoteSummary();
+
+    }
+  );
+
+
+/* ==========================================================
+   BOTONES CONTACTOS
+========================================================== */
+
+document
+  .getElementById(
+    "buscarBtn"
+  )
+  .addEventListener(
+    "click",
+    applyFilters
+  );
+
+
+document
+  .getElementById(
+    "clearFiltersBtn"
+  )
+  .addEventListener(
+    "click",
+    clearFilters
+  );
+
+
+contactType
+  .addEventListener(
+    "change",
+    () => {
+
+      selectedIds.clear();
+
+      syncFieldVisibility();
+
+      populateVendorOptions();
+
+      applyFilters();
+
+    }
+  );
+
+
+monthSelect
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+dateFrom
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+dateTo
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+codeInput
+  .addEventListener(
+    "input",
+    applyFilters
+  );
+
+
+vendorSelect
+  .addEventListener(
+    "change",
+    applyFilters
+  );
+
+
+searchInput
+  .addEventListener(
+    "input",
+    applyFilters
+  );
+
+
+document
+  .getElementById(
+    "pageSizeSelect"
+  )
+  .addEventListener(
+    "change",
+    e => {
+
+      pageSize =
+        parseInt(
+          e.target.value,
+          10
+        );
+
+      currentPage = 1;
+
+      renderTable();
+
+    }
+  );
+
+
+/* ==========================================================
+   SELECCIÓN
+========================================================== */
+
+document
+  .getElementById(
+    "selectAllBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentFiltered.forEach(
+        c =>
+          selectedIds.add(
+            c.id
+          )
+      );
+
+      renderTable();
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "deselectAllBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      selectedIds.clear();
+
+      renderTable();
+
+    }
+  );
+
+
+/* ==========================================================
+   TOAST
+========================================================== */
+
+function showToast(
+  type,
+  title,
+  message
+){
+
+  const toast =
+    document.createElement(
+      "div"
+    );
+
+  toast.className =
+    `toast ${type}`;
+
+  toast.innerHTML = `
+
+    <strong>
+      ${title}
+    </strong>
+
+    <span>
+      ${message}
+    </span>
+
+  `;
+
+  document
+    .getElementById(
+      "toastContainer"
+    )
+    .appendChild(toast);
+
+  setTimeout(
+    () => toast.remove(),
+    4000
+  );
+
+}
+
+
+/* ==========================================================
+   INIT
+========================================================== */
+
+syncFieldVisibility();
+
+populateVendorOptions();
+
+applyFilters();
+
+lotesFiltered =
+  [...savedLists];
+
+renderLotes();
+
+updateLoteSummary();
+
 </script>
 
 </body>
 </html>
+```
