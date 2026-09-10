@@ -888,12 +888,29 @@
 
         <!-- SELECCIÓN MASIVA -->
         <div class="selection-bar">
-          <button class="btn btn-outline btn-sm" id="selectAllBtn">Marcar página</button>
-          <button class="btn btn-outline btn-sm" id="deselectAllBtn">Desmarcar todo</button>
+          <button class="btn btn-outline" id="selectAllBtn">Marcar todos</button>
+          <button class="btn btn-outline" id="deselectAllBtn">Desmarcar todo</button>
           <span class="divider"></span>
           <button class="btn btn-success" id="openModalBtn">
-            ✨ Generar Lote con Seleccionados
+          + Crear lista
           </button>
+              <span class="divider"></span>
+
+        <button
+          class="btn btn-outline"
+          id="exportCsvBtn">
+
+          Exportar CSV
+
+        </button>
+
+        <button
+          class="btn btn-outline"
+          id="exportPdfBtn">
+
+          Exportar PDF
+
+        </button>
           <span class="count" id="selectedCount">0 seleccionados</span>
         </div>
 
