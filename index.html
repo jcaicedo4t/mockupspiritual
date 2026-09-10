@@ -3,705 +3,770 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gestión de Lotes & Módulo Agentes</title>
+<title>Plataforma Pro - Gestión de Lotes & Agentes</title>
 
 <style>
   :root {
-    --navy-900:#123047;
-    --navy-800:#1B4C6E;
-    --navy-700:#265E85;
-    --navy-100:#EAF1F6;
-    --ink:#1C2B36;
-    --muted:#6B7C88;
-    --line:#DCE4EA;
-    --bg:#F4F7F9;
-    --white:#FFFFFF;
-    --amber:#D98E2B;
-    --green:#2E9E5B;
-    --red:#C0392B;
-    --purple:#6B4FA0;
-    --teal:#1E8A8A;
-    --radius:8px;
-    --shadow:0 4px 14px rgba(18,48,71,0.08);
+    --navy-900: #0f2435;
+    --navy-800: #1B4C6E;
+    --navy-700: #265E85;
+    --navy-600: #33739E;
+    --navy-100: #EAF1F6;
+    --navy-50:  #F4F8FA;
+    --ink: #1C2B36;
+    --muted: #6B7C88;
+    --line: #DCE4EA;
+    --bg: #F0F4F8;
+    --white: #FFFFFF;
+    
+    --amber: #D98E2B;
+    --amber-bg: #FFF7EB;
+    --green: #2E9E5B;
+    --green-bg: #EBF8F1;
+    --red: #D93838;
+    --red-bg: #FDF2F2;
+    --purple: #6B4FA0;
+    --purple-bg: #F3EFF9;
+    --teal: #1E8A8A;
+    --teal-bg: #E8F6F6;
+
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 6px rgba(15, 36, 53, 0.05);
+    --shadow: 0 4px 16px rgba(15, 36, 53, 0.08);
+    --shadow-lg: 0 12px 32px rgba(15, 36, 53, 0.14);
+    --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  * { box-sizing:border-box; }
+  * { box-sizing: border-box; }
 
   body {
-    margin:0;
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    font-size:14px;
-    line-height:1.45;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
   .app {
-    max-width:1380px;
-    margin:20px auto 60px;
-    padding:0 16px;
+    max-width: 1440px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
   }
 
-  /* =========================
-     TOP MAIN BAR & GLOBAL TABS
-  ========================= */
-
+  /* ===================================================================
+     TOP NAVIGATION & HEADER
+  ==================================================================== */
   .main-topbar {
-    background:linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
-    color:#fff;
-    border-radius:var(--radius) var(--radius) 0 0;
-    padding:16px 24px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    box-shadow:var(--shadow);
-    flex-wrap:wrap;
-    gap:12px;
+    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+    color: #fff;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
   .main-topbar .brand {
-    display:flex;
-    align-items:center;
-    gap:12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .main-topbar h1 {
-    font-size:18px;
-    font-weight:700;
-    letter-spacing:.3px;
-    margin:0;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    margin: 0;
   }
 
   .main-topbar .sub {
-    font-size:12px;
-    color:#BBD4E4;
+    font-size: 12px;
+    color: #BBD4E4;
   }
 
-  /* TAB PRINCIPAL SUPERIOR (Administrativo vs Agentes) */
   .main-nav-tabs {
-    display:flex;
-    background:rgba(255,255,255,0.12);
-    padding:4px;
-    border-radius:30px;
-    gap:4px;
+    display: flex;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 4px;
+    border-radius: 30px;
+    gap: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
   }
 
   .main-tab-btn {
-    border:none;
-    background:transparent;
-    color:#D5E4F0;
-    font-family:inherit;
-    font-size:13.5px;
-    font-weight:700;
-    padding:8px 20px;
-    border-radius:24px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    transition:all .2s ease;
+    border: none;
+    background: transparent;
+    color: #D5E4F0;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 9px 22px;
+    border-radius: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
   }
 
   .main-tab-btn:hover {
-    color:#fff;
-    background:rgba(255,255,255,0.15);
+    color: #fff;
+    background: rgba(255,255,255,0.12);
   }
 
   .main-tab-btn.active {
-    background:var(--white);
-    color:var(--navy-900);
-    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    background: var(--white);
+    color: var(--navy-900);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
 
   .panel-container {
-    background:var(--white);
-    border:1px solid var(--line);
-    border-top:none;
-    border-radius:0 0 var(--radius) var(--radius);
-    padding:22px 24px 30px;
-    box-shadow:var(--shadow);
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow);
   }
 
-  .main-view { display:none; }
-  .main-view.active { display:block; }
+  .main-view { display: none; }
+  .main-view.active { display: block; }
 
-  /* =========================
+  /* ===================================================================
      SUB TABS (ADMINISTRATIVO)
-  ========================= */
-
+  ==================================================================== */
   .sub-tabs {
-    display:flex;
-    border-bottom:1px solid var(--line);
-    margin:-22px -24px 20px;
-    padding:0 24px;
-    background:#fff;
+    display: flex;
+    border-bottom: 2px solid var(--navy-100);
+    margin: -24px -24px 24px;
+    padding: 0 24px;
+    background: #fff;
   }
 
   .sub-tab-btn {
-    border:none;
-    background:transparent;
-    padding:14px 22px;
-    font-family:inherit;
-    font-size:13.5px;
-    font-weight:600;
-    color:var(--muted);
-    cursor:pointer;
-    border-bottom:3px solid transparent;
-    transition:.15s ease;
+    border: none;
+    background: transparent;
+    padding: 16px 24px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .sub-tab-btn:hover {
-    color:var(--navy-800);
-    background:var(--navy-100);
+    color: var(--navy-800);
+    background: var(--navy-50);
   }
 
   .sub-tab-btn.active {
-    color:var(--navy-800);
-    border-bottom-color:var(--navy-800);
+    color: var(--navy-800);
+    border-bottom-color: var(--navy-800);
   }
 
-  .sub-tab-content { display:none; }
-  .sub-tab-content.active { display:block; }
+  .sub-tab-content { display: none; }
+  .sub-tab-content.active { display: block; }
 
-  /* =========================
-     FILTROS Y FORMULARIOS
-  ========================= */
+  /* ===================================================================
+     FILTERS & INPUTS
+  ==================================================================== */
+  .filters-card {
+    background: var(--navy-50);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
 
   .filters {
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    align-items:flex-end;
-    margin-bottom:12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: flex-end;
   }
 
   .field-inline {
-    display:flex;
-    flex-direction:column;
-    gap:5px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .field-inline label {
-    font-size:11px;
-    font-weight:700;
-    color:var(--navy-800);
-    letter-spacing:.2px;
-    text-transform:uppercase;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--navy-800);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
   }
 
   select,
   input[type=text],
   input[type=date],
   textarea {
-    font-family:inherit;
-    font-size:13.5px;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:9px 12px;
-    color:var(--ink);
-    background:#fff;
-    outline:none;
-    transition:border-color .15s ease, box-shadow .15s ease;
+    font-family: inherit;
+    font-size: 13.5px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    transition: var(--transition);
   }
 
   select:focus,
   input:focus,
   textarea:focus {
-    border-color:var(--navy-700);
-    box-shadow:0 0 0 3px rgba(38,94,133,0.15);
+    border-color: var(--navy-700);
+    box-shadow: 0 0 0 3px rgba(38,94,133,0.15);
   }
 
   .search-wrap {
-    position:relative;
-    flex:1;
-    min-width:220px;
+    position: relative;
+    flex: 1;
+    min-width: 220px;
   }
 
-  .search-wrap input { width:100%; }
+  .search-wrap input { width: 100%; }
 
-  .date-range {
-    display:flex;
-    gap:8px;
-    align-items:center;
-  }
-
-  /* =========================
-     BOTONES
-  ========================= */
-
+  /* ===================================================================
+     BUTTONS
+  ==================================================================== */
   .btn {
-    font-family:inherit;
-    font-size:13px;
-    font-weight:600;
-    border:none;
-    border-radius:var(--radius);
-    padding:9px 16px;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-    transition:all .15s ease;
-    white-space:nowrap;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 18px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+    white-space: nowrap;
+    text-decoration: none;
   }
 
-  .btn:active { transform:translateY(1px); }
-  .btn:disabled { opacity:.55; cursor:not-allowed; }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-primary { background:var(--navy-800); color:#fff; }
-  .btn-primary:hover { background:var(--navy-900); }
+  .btn-primary { background: var(--navy-800); color: #fff; }
+  .btn-primary:hover { background: var(--navy-900); box-shadow: 0 3px 8px rgba(15,36,53,0.2); }
 
-  .btn-outline { background:#fff; border:1px solid var(--line); color:var(--navy-800); }
-  .btn-outline:hover { background:var(--navy-100); }
+  .btn-outline { background: #fff; border: 1px solid var(--line); color: var(--navy-800); }
+  .btn-outline:hover { background: var(--navy-100); border-color: var(--navy-700); }
 
-  .btn-success { background:var(--green); color:#fff; }
-  .btn-success:hover { background:#25834a; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { background: #238348; box-shadow: 0 3px 8px rgba(46,158,91,0.25); }
 
-  .btn-danger-outline { background:#fff; border:1px solid #EEC9C0; color:var(--red); }
-  .btn-danger-outline:hover { background:#FDF2F0; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #b82828; }
 
-  .btn-amber { background:var(--amber); color:#fff; }
+  .btn-danger-outline { background: #fff; border: 1px solid #F5C2C2; color: var(--red); }
+  .btn-danger-outline:hover { background: var(--red-bg); border-color: var(--red); }
 
-  /* =========================
-     FILTROS ACTIVOS & CHIPS
-  ========================= */
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
 
+  /* ===================================================================
+     SELECTION BAR & CHIPS
+  ==================================================================== */
   .active-filters {
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin:10px 0 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
   }
 
   .chip {
-    font-size:11.5px;
-    font-weight:600;
-    background:var(--navy-100);
-    color:var(--navy-800);
-    padding:4px 12px;
-    border-radius:20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: var(--white);
+    border: 1px solid var(--line);
+    color: var(--navy-800);
+    padding: 4px 10px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .selection-bar {
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:10px;
-    padding:12px 4px;
-    margin:10px 0 12px;
-    border-top:1px solid var(--line);
-    border-bottom:1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    background: var(--navy-100);
+    border-radius: var(--radius);
   }
 
-  .selection-bar .divider { width:1px; height:20px; background:var(--line); }
+  .selection-bar .divider { width: 1px; height: 22px; background: #C2D5E3; }
+  
   .selection-bar .count {
-    margin-left:auto;
-    font-weight:700;
-    color:var(--navy-800);
-    background:var(--navy-100);
-    padding:6px 14px;
-    border-radius:20px;
-    font-size:12.5px;
+    margin-left: auto;
+    font-weight: 800;
+    color: var(--navy-900);
+    background: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    border: 1px solid var(--line);
   }
 
-  /* =========================
-     TABLAS Y SCROLL
-  ========================= */
-
+  /* ===================================================================
+     TABLES & LAYOUT
+  ==================================================================== */
   .table-scroll {
-    overflow-x:auto;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    background:#fff;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
   }
 
   table {
-    width:100%;
-    border-collapse:collapse;
-    margin:0;
-    text-align:left;
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    text-align: left;
   }
 
   thead th {
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.4px;
-    color:var(--navy-800);
-    padding:11px 12px;
-    border-bottom:2px solid var(--navy-800);
-    white-space:nowrap;
-    background:#FAFCFD;
-    text-transform:uppercase;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--navy-800);
+    padding: 13px 14px;
+    border-bottom: 2px solid var(--line);
+    white-space: nowrap;
+    background: var(--navy-50);
+    text-transform: uppercase;
   }
 
   tbody td {
-    padding:11px 12px;
-    border-bottom:1px solid var(--line);
-    vertical-align:middle;
-    color:var(--ink);
-    white-space:nowrap;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    color: var(--ink);
+    white-space: nowrap;
   }
 
-  tbody tr:hover { background:var(--navy-100); }
+  tbody tr:hover { background: var(--navy-50); }
 
   .checkbox {
-    width:17px;
-    height:17px;
-    accent-color:var(--navy-800);
-    cursor:pointer;
+    width: 17px;
+    height: 17px;
+    accent-color: var(--navy-800);
+    cursor: pointer;
   }
 
-  .cod { color:var(--muted); font-family:monospace; font-weight:600; }
-  .cliente { font-weight:600; color:var(--navy-900); }
+  .cod { color: var(--muted); font-family: monospace; font-weight: 700; }
+  .cliente { font-weight: 700; color: var(--navy-900); }
 
   .empty-row td {
-    text-align:center;
-    color:var(--muted);
-    padding:36px 0;
-    white-space:normal;
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    white-space: normal;
   }
 
-  /* =========================
+  /* ===================================================================
      TAGS & BADGES
-  ========================= */
-
+  ==================================================================== */
   .tipo-tag, .status-tag, .destino-tag {
-    display:inline-flex;
-    align-items:center;
-    gap:4px;
-    font-size:11px;
-    font-weight:700;
-    padding:3px 10px;
-    border-radius:20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
 
-  .tipo-nuevo { background:#E1EFE4; color:var(--green); }
-  .tipo-recurrente { background:#E4E8F7; color:var(--purple); }
-  .tipo-inactivo { background:#F1D9D5; color:var(--red); }
-  .tipo-lead { background:#E1F1F1; color:var(--teal); }
+  .tipo-nuevo { background: var(--green-bg); color: var(--green); }
+  .tipo-recurrente { background: var(--purple-bg); color: var(--purple); }
+  .tipo-inactivo { background: var(--red-bg); color: var(--red); }
+  .tipo-lead { background: var(--teal-bg); color: var(--teal); }
 
-  .status-pendiente { background:#FFF1D8; color:#A76600; }
-  .status-proceso { background:#E4E8F7; color:var(--purple); }
-  .status-completado { background:#E1EFE4; color:var(--green); }
-  .status-cancelado { background:#F1D9D5; color:var(--red); }
+  .status-pendiente { background: var(--amber-bg); color: var(--amber); border: 1px solid #FFE2B8; }
+  .status-proceso { background: var(--purple-bg); color: var(--purple); border: 1px solid #E1D5F5; }
+  .status-completado { background: var(--green-bg); color: var(--green); border: 1px solid #C4EED5; }
+  .status-cancelado { background: var(--red-bg); color: var(--red); border: 1px solid #F8C6C6; }
 
-  .destino-departamento { background:#E1F1F1; color:var(--teal); }
-  .destino-usuario { background:#E4E8F7; color:var(--purple); }
+  .destino-departamento { background: var(--teal-bg); color: var(--teal); }
+  .destino-usuario { background: var(--purple-bg); color: var(--purple); }
 
-  /* =========================
-     PAGINACIÓN
-  ========================= */
-
+  /* ===================================================================
+     PAGINATION
+  ==================================================================== */
   .pagination-bar {
-    display:flex;
-    align-items:center;
-    gap:14px;
-    flex-wrap:wrap;
-    margin-top:16px;
-    padding-top:14px;
-    border-top:1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    padding-top: 14px;
   }
 
-  .pagination-bar .info { font-size:12.5px; color:var(--muted); }
-  .pagination-bar .pages { display:flex; gap:4px; margin-left:auto; }
+  .pagination-bar .info { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .pagination-bar .pages { display: flex; gap: 4px; margin-left: auto; }
 
   .page-btn {
-    min-width:32px;
-    height:32px;
-    border:1px solid var(--line);
-    background:#fff;
-    border-radius:var(--radius);
-    font-size:12.5px;
-    font-weight:600;
-    color:var(--navy-800);
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0 8px;
-    transition:all .12s ease;
+    min-width: 34px;
+    height: 34px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy-800);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    transition: var(--transition);
   }
 
-  .page-btn:hover:not(:disabled) { background:var(--navy-100); }
-  .page-btn.active { background:var(--navy-800); color:#fff; border-color:var(--navy-800); }
-  .page-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .page-btn:hover:not(:disabled) { background: var(--navy-100); }
+  .page-btn.active { background: var(--navy-800); color: #fff; border-color: var(--navy-800); }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* =========================
-     ACCIONES / BOTON OJITO 👁️
-  ========================= */
-
+  /* ===================================================================
+     ACTION EYE BUTTON 👁️
+  ==================================================================== */
   .btn-eye {
-    border:none;
-    background:#EAF1F6;
-    color:var(--navy-800);
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    font-size:16px;
-    transition:all .15s ease;
-    box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #C8DAE7;
+    background: var(--navy-100);
+    color: var(--navy-800);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
   }
 
   .btn-eye:hover {
-    background:var(--navy-800);
-    color:#fff;
-    transform:scale(1.08);
+    background: var(--navy-800);
+    color: #fff;
+    border-color: var(--navy-800);
+    transform: scale(1.1);
   }
 
-  /* =========================
-     MÓDULO AGENTES UX CARDS / LAYOUT
-  ========================= */
-
+  /* ===================================================================
+     AGENT & LOT CARDS
+  ==================================================================== */
   .agent-header-info {
-    background:linear-gradient(90deg, #EAF1F6 0%, #FFFFFF 100%);
-    border:1px solid #D2E1ED;
-    border-radius:var(--radius);
-    padding:14px 18px;
-    margin-bottom:18px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:10px;
+    background: linear-gradient(135deg, #EAF1F6 0%, #FFFFFF 100%);
+    border: 1px solid #D2E1ED;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
   }
 
-  .agent-header-info .user-badge {
-    display:flex;
-    align-items:center;
-    gap:10px;
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   .avatar-circle {
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:var(--navy-800);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--navy-800);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    box-shadow: 0 3px 8px rgba(27,76,110,0.3);
   }
 
   .agent-lotes-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(310px, 1fr));
-    gap:16px;
-    margin-bottom:24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
   }
 
   .lote-card {
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:16px;
-    transition:all .2s ease;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    position:relative;
-    box-shadow:0 2px 8px rgba(0,0,0,0.03);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: var(--shadow-sm);
   }
 
   .lote-card:hover {
-    border-color:var(--navy-700);
-    box-shadow:0 6px 16px rgba(18,48,71,0.1);
-    transform:translateY(-2px);
+    border-color: var(--navy-700);
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
   }
 
   .lote-card.selected {
-    border:2px solid var(--navy-800);
-    background:#FAFCFD;
+    border: 2px solid var(--navy-800);
+    background: #FAFCFD;
   }
 
   .lote-card-top {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
   }
 
   .lote-card-id {
-    font-size:11px;
-    font-weight:800;
-    color:var(--muted);
-    letter-spacing:.5px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: 0.5px;
   }
 
   .lote-card-title {
-    font-size:15px;
-    font-weight:700;
-    color:var(--navy-900);
-    margin:4px 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy-900);
+    margin: 4px 0 8px;
+    line-height: 1.3;
   }
 
   .lote-card-meta {
-    font-size:12px;
-    color:var(--muted);
-    margin-bottom:12px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .lote-card-foot {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding-top:12px;
-    border-top:1px dashed var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
+  /* CLIENT DRILL DOWN SECTION */
   .clients-view-container {
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:20px;
-    margin-top:20px;
-    box-shadow:var(--shadow);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-top: 24px;
+    box-shadow: var(--shadow);
+    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .clients-view-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:16px;
-    padding-bottom:12px;
-    border-bottom:2px solid var(--navy-100);
-    flex-wrap:wrap;
-    gap:10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--navy-100);
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  /* =========================
-     MODALES Y FICHA DE CLIENTE
-  ========================= */
-
+  /* ===================================================================
+     MODALS & CUSTOMER SHEET
+  ==================================================================== */
   .modal-backdrop {
-    position:fixed;
-    inset:0;
-    background:rgba(18,48,71,.5);
-    backdrop-filter:blur(2px);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:2000;
-    padding:16px;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 36, 53, 0.6);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
   }
 
-  .modal-backdrop.open { display:flex; }
+  .modal-backdrop.open { display: flex; }
 
   .modal-box {
-    background:#fff;
-    border-radius:10px;
-    width:100%;
-    max-width:680px;
-    max-height:92vh;
-    overflow:auto;
-    box-shadow:0 16px 48px rgba(0,0,0,.28);
+    background: #fff;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   .modal-header {
-    background:linear-gradient(135deg, var(--navy-900), var(--navy-800));
-    color:#fff;
-    padding:16px 22px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    background: linear-gradient(135deg, var(--navy-900), var(--navy-800));
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .modal-header h3 { margin:0; font-size:16px; font-weight:700; }
-  .modal-header button {
-    background:none;
-    border:none;
-    color:#fff;
-    font-size:22px;
-    cursor:pointer;
-    opacity:.8;
+  .modal-header h3 { margin: 0; font-size: 17px; font-weight: 800; }
+  
+  .modal-close-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
   }
-  .modal-header button:hover { opacity:1; }
+  .modal-close-btn:hover { background: rgba(255,255,255,0.25); }
 
-  .modal-body { padding:20px 22px; }
+  .modal-body { padding: 24px; }
 
   .modal-footer {
-    padding:14px 22px;
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    border-top:1px solid var(--line);
-    background:#FAFCFD;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    background: var(--navy-50);
   }
 
   .customer-sheet-grid {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    background:var(--navy-100);
-    padding:14px;
-    border-radius:var(--radius);
-    margin-bottom:18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    background: var(--navy-100);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
   }
 
-  .sheet-item { display:flex; flex-direction:column; gap:2px; }
-  .sheet-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; }
-  .sheet-val { font-size:13.5px; font-weight:600; color:var(--navy-900); }
+  .sheet-item { display: flex; flex-direction: column; gap: 2px; }
+  .sheet-label { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+  .sheet-val { font-size: 14px; font-weight: 700; color: var(--navy-900); }
 
   .gestion-history {
-    max-height:180px;
-    overflow-y:auto;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:10px 14px;
-    background:#fafcfd;
-    margin-bottom:16px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    background: #fafcfd;
+    margin-bottom: 20px;
   }
 
   .gestion-item {
-    padding:8px 0;
-    border-bottom:1px solid var(--line);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
   }
-  .gestion-item:last-child { border-bottom:none; }
-  .gestion-item .time { font-size:11px; color:var(--muted); }
-  .gestion-item .res { font-size:12.5px; font-weight:700; color:var(--navy-800); }
+  .gestion-item:last-child { border-bottom: none; }
+  .gestion-item .time { font-size: 11px; color: var(--muted); }
+  .gestion-item .res { font-size: 13px; font-weight: 800; color: var(--navy-800); }
 
-  /* =========================
-     TOAST
-  ========================= */
-
+  /* ===================================================================
+     TOAST SYSTEM
+  ==================================================================== */
   .toast-container {
-    position:fixed;
-    top:20px;
-    right:20px;
-    z-index:9999;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    width:320px;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 340px;
   }
 
   .toast {
-    background:#fff;
-    border:1px solid rgba(0,0,0,.1);
-    border-radius:6px;
-    box-shadow:0 8px 24px rgba(0,0,0,.12);
-    padding:12px 16px;
-    font-size:13px;
-    animation:fadeIn .2s ease;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 14px 18px;
+    font-size: 13.5px;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
   }
 
-  @keyframes fadeIn { from{opacity:0; transform:translateY(-8px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
 
-  .toast.success { border-left:4px solid var(--green); }
-  .toast.warning { border-left:4px solid var(--amber); }
+  .toast.success { border-left: 5px solid var(--green); }
+  .toast.warning { border-left: 5px solid var(--amber); }
+  .toast.danger  { border-left: 5px solid var(--red); }
 
-  @media(max-width:768px) {
-    .main-topbar { flex-direction:column; align-items:flex-start; }
-    .customer-sheet-grid { grid-template-columns:1fr; }
-    .agent-lotes-grid { grid-template-columns:1fr; }
+  .toast strong { color: var(--navy-900); font-size: 14px; }
+  .toast span { color: var(--muted); font-size: 12.5px; }
+
+  @media(max-width: 768px) {
+    .main-topbar { flex-direction: column; align-items: flex-start; }
+    .customer-sheet-grid { grid-template-columns: 1fr; }
+    .agent-lotes-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -713,18 +778,20 @@
   <!-- MAIN TOPBAR WITH PRIMARY TABS -->
   <div class="main-topbar">
     <div class="brand">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M4 5h16v14H4z" stroke="#fff" stroke-width="1.8" rx="2"/>
-        <path d="M4 9h16" stroke="#fff" stroke-width="1.8"/>
-        <path d="M9 14h6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4 5h16v14H4z" stroke="#fff" stroke-width="2" rx="2"/>
+          <path d="M4 9h16" stroke="#fff" stroke-width="2"/>
+          <path d="M9 14h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div>
         <h1>LISTA DE CONTACTOS</h1>
-        <div class="sub">Sistema integral de asignación y seguimiento comercial</div>
+        <!-- <div class="sub">Sistema Integral de Asignación y Seguimiento Comercial</div> -->
       </div>
     </div>
 
-    <!-- MAIN TABS: ADMINISTRATIVO VS AGENTES -->
+    <!-- MAIN NAVIGATION TABS: ADMINISTRATIVO VS AGENTES -->
     <div class="main-nav-tabs">
       <button class="main-tab-btn active" data-main-tab="admin">
         🏢 Administrativo
@@ -738,89 +805,95 @@
   <div class="panel-container">
 
     <!-- ===================================================================
-         VIEW 1: ADMINISTRATIVO (COMPLETO)
+         VIEW 1: ADMINISTRATIVO
     ==================================================================== -->
     <div id="view-admin" class="main-view active">
 
       <!-- SUB TABS ADMINISTRATIVO -->
       <div class="sub-tabs">
-        <button class="sub-tab-btn active" data-sub-tab="crear">Crear lista</button>
-        <button class="sub-tab-btn" data-sub-tab="seguimiento">Seguimiento de lotes</button>
+        <button class="sub-tab-btn active" data-sub-tab="crear">
+          ➕ Crear lista / Lote
+        </button>
+        <button class="sub-tab-btn" data-sub-tab="seguimiento">
+          📊 Seguimiento de lotes
+        </button>
       </div>
 
       <!-- SUB TAB 1: CREAR LISTA -->
       <div id="subtab-crear" class="sub-tab-content active">
-        <div class="filters">
-          <div class="field-inline">
-            <label>Tipo de contacto</label>
-            <select id="contactType">
-              <option value="">Todos</option>
-              <option value="nuevo">Nuevo</option>
-              <option value="recurrente">Recurrente</option>
-              <option value="inactivo">Inactivo</option>
-              <option value="lead">Lead</option>
-            </select>
-          </div>
-
-          <div class="field-inline" id="monthField">
-            <label>Mes de cumpleaños</label>
-            <select id="monthSelect">
-              <option value="">Todos</option>
-              <option value="01">Enero</option>
-              <option value="02">Febrero</option>
-              <option value="03">Marzo</option>
-              <option value="04">Abril</option>
-              <option value="05">Mayo</option>
-              <option value="06">Junio</option>
-              <option value="07">Julio</option>
-              <option value="08" selected>Agosto</option>
-              <option value="09">Septiembre</option>
-              <option value="10">Octubre</option>
-              <option value="11">Noviembre</option>
-              <option value="12">Diciembre</option>
-            </select>
-          </div>
-
-          <div class="field-inline" id="dateRangeField">
-            <label>Registrado entre</label>
-            <div class="date-range">
-              <input type="date" id="dateFrom">
-              <span style="color:var(--muted)">–</span>
-              <input type="date" id="dateTo">
+        <div class="filters-card">
+          <div class="filters">
+            <div class="field-inline">
+              <label>Tipo de contacto</label>
+              <select id="contactType">
+                <option value="">Todos</option>
+                <option value="nuevo">Nuevos / Leads</option>
+                <option value="recurrente">Recurrente</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="lead">Lead Antiguo</option>
+              </select>
             </div>
+
+            <div class="field-inline" id="monthField">
+              <label>Mes de cumpleaños</label>
+              <select id="monthSelect">
+                <option value="">Todos</option>
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03">Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08" selected>Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+            </div>
+
+            <div class="field-inline">
+              <label>Registrado desde / hasta</label>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <input type="date" id="dateFrom">
+                <span style="color:var(--muted)">–</span>
+                <input type="date" id="dateTo">
+              </div>
+            </div>
+
+            <div class="field-inline">
+              <label>Código</label>
+              <input type="text" id="codeInput" placeholder="Ej: 245" style="width:100px;">
+            </div>
+
+            <div class="field-inline">
+              <label>Vendedor / Asesor</label>
+              <select id="vendorSelect">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="search-wrap">
+              <label style="display:block; font-size:11px; font-weight:800; color:var(--navy-800); margin-bottom:6px; text-transform:uppercase;">Buscar nombre</label>
+              <input type="text" id="searchInput" placeholder="Nombre o apellido…">
+            </div>
+
+            <button class="btn btn-primary" id="buscarBtn">Buscar</button>
+            <button class="btn btn-outline" id="clearFiltersBtn">Limpiar filtros</button>
           </div>
 
-          <div class="field-inline">
-            <label>Código</label>
-            <input type="text" id="codeInput" placeholder="Ej: 245" style="width:110px;">
-          </div>
-
-          <div class="field-inline">
-            <label>Vendedor</label>
-            <select id="vendorSelect">
-              <option value="">Todos</option>
-            </select>
-          </div>
-
-          <div class="search-wrap">
-            <label style="display:block; font-size:11px; font-weight:700; color:var(--navy-800); margin-bottom:5px; text-transform:uppercase;">Buscar por nombre</label>
-            <input type="text" id="searchInput" placeholder="Nombre del contacto…">
-          </div>
-
-          <button class="btn btn-primary" id="buscarBtn">Buscar</button>
-          <button class="btn btn-outline" id="clearFiltersBtn">Limpiar filtros</button>
+          <div class="active-filters" id="activeFilters"></div>
         </div>
-
-        <div class="active-filters" id="activeFilters"></div>
 
         <!-- SELECCIÓN MASIVA -->
         <div class="selection-bar">
-          <button class="btn btn-outline" id="selectAllBtn">Marcar todos</button>
-          <button class="btn btn-danger-outline" id="deselectAllBtn">Desmarcar todos</button>
-          <button class="btn btn-success" id="openModalBtn">+ Crear lista</button>
+          <button class="btn btn-outline btn-sm" id="selectAllBtn">Marcar página</button>
+          <button class="btn btn-outline btn-sm" id="deselectAllBtn">Desmarcar todo</button>
           <span class="divider"></span>
-          <button class="btn btn-outline" id="exportCsvBtn">Exportar CSV</button>
-          <button class="btn btn-outline" id="exportPdfBtn">Exportar PDF</button>
+          <button class="btn btn-success" id="openModalBtn">
+            ✨ Generar Lote con Seleccionados
+          </button>
           <span class="count" id="selectedCount">0 seleccionados</span>
         </div>
 
@@ -835,97 +908,75 @@
         <!-- PAGINACIÓN -->
         <div class="pagination-bar">
           <span class="info" id="paginationInfo">Mostrando 0 de 0</span>
-          <div class="page-size">
-            <select id="pageSizeSelect">
-              <option value="5">5 por página</option>
-              <option value="10" selected>10 por página</option>
-              <option value="20">20 por página</option>
+          <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+            <select id="pageSizeSelect" style="padding:6px 10px;">
+              <option value="5">5 por pág.</option>
+              <option value="10" selected>10 por pág.</option>
+              <option value="20">20 por pág.</option>
             </select>
+            <div class="pages" id="pagesContainer"></div>
           </div>
-          <div class="pages" id="pagesContainer"></div>
         </div>
       </div>
 
       <!-- SUB TAB 2: SEGUIMIENTO DE LOTES (ADMIN) -->
       <div id="subtab-seguimiento" class="sub-tab-content">
-        <div class="filters">
-          <div class="field-inline">
-            <label>Buscar lote</label>
-            <input type="text" id="loteSearch" placeholder="ID o título">
+        <div class="filters-card">
+          <div class="filters">
+            <div class="search-wrap">
+              <label style="display:block; font-size:11px; font-weight:800; color:var(--navy-800); margin-bottom:6px; text-transform:uppercase;">Buscar lote</label>
+              <input type="text" id="loteSearch" placeholder="Título, ID o Asignado a…">
+            </div>
+
+            <div class="field-inline">
+              <label>Estado</label>
+              <select id="loteEstado">
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="proceso">En proceso</option>
+                <option value="completado">Completado</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <div class="field-inline">
+              <label>Motivo</label>
+              <select id="loteMotivo">
+                <option value="">Todos</option>
+                <option value="Cumpleaños">Cumpleaños</option>
+                <option value="Inactivos">Inactivos</option>
+                <option value="Nuevos">Nuevos</option>
+                <option value="Seguimiento">Seguimiento</option>
+              </select>
+            </div>
+
+            <button class="btn btn-primary" id="buscarLotesBtn">Filtrar</button>
+            <button class="btn btn-outline" id="clearLotesBtn">Limpiar</button>
           </div>
-          <div class="field-inline">
-            <label>Fecha desde</label>
-            <input type="date" id="loteDateFrom">
-          </div>
-          <div class="field-inline">
-            <label>Fecha hasta</label>
-            <input type="date" id="loteDateTo">
-          </div>
-          <div class="field-inline">
-            <label>Creado por</label>
-            <select id="loteCreatedBy">
-              <option value="">Todos</option>
-              <option>Jose Caicedo</option>
-              <option>Sebastian Tovar</option>
-              <option>Hector Ordosgoita</option>
-            </select>
-          </div>
-          <div class="field-inline">
-            <label>Motivo</label>
-            <select id="loteMotivo">
-              <option value="">Todos</option>
-              <option>Seguimiento</option>
-              <option>Inactivos</option>
-              <option>Cumpleaños</option>
-              <option>Nuevos</option>
-              <option>Leads</option>
-            </select>
-          </div>
-          <div class="field-inline">
-            <label>Destino</label>
-            <select id="loteDestino">
-              <option value="">Todos</option>
-              <option value="departamento">Departamento</option>
-              <option value="usuario">Usuario específico</option>
-            </select>
-          </div>
-          <div class="field-inline">
-            <label>Estado</label>
-            <select id="loteEstado">
-              <option value="">Todos</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="proceso">En proceso</option>
-              <option value="completado">Completado</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" id="buscarLotesBtn">Buscar</button>
-          <button class="btn btn-outline" id="clearLotesBtn">Limpiar</button>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin:15px 0;">
+        <!-- INDICADORES RESUMEN -->
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px;">
           <span class="chip">Total lotes: <strong id="totalLotes">0</strong></span>
           <span class="chip">Pendientes: <strong id="totalPendientes">0</strong></span>
           <span class="chip">En proceso: <strong id="totalProceso">0</strong></span>
           <span class="chip">Completados: <strong id="totalCompletados">0</strong></span>
         </div>
 
+        <!-- TABLA DE LOTES (ADMIN) CON ACCIONES AVANZADAS -->
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
                 <th>ID LOTE</th>
-                <th>FECHA</th>
+                <th>TÍTULO Y MOTIVO</th>
                 <th>CREADO POR</th>
-                <th>TÍTULO</th>
-                <th>MOTIVO</th>
-                <th>DESCRIPCIÓN</th>
+                <th>FECHA</th>
                 <th>CONTACTOS</th>
-                <th>DESTINO</th>
-                <th>ASIGNADO A</th>
+                <th>DESTINO / ASIGNADO A</th>
                 <th>ESTADO</th>
                 <th>ÚLTIMA ACT.</th>
-                <th>ACCIÓN</th>
+                <th style="text-align:right;">ACCIONES</th>
               </tr>
             </thead>
             <tbody id="lotesBody"></tbody>
@@ -934,84 +985,121 @@
 
         <div class="pagination-bar">
           <span class="info" id="lotesPaginationInfo">Mostrando 0 de 0</span>
-          <div class="pages" id="lotesPages"></div>
         </div>
+
+        <!-- SECCIÓN DESPLEGABLE INTERNA: CLIENTES DEL LOTE SELECCIONADO (ADMIN DRILL-DOWN) -->
+        <div class="clients-view-container" id="adminLoteClientsContainer" style="display:none;">
+          <div class="clients-view-header">
+            <div>
+              <span class="tipo-tag tipo-lead" id="adminActiveLoteBadge">LOTE SELECCIONADO</span>
+              <h2 style="margin:6px 0 0; font-size:18px; color:var(--navy-900);" id="adminActiveLoteTitle">Clientes del Lote</h2>
+            </div>
+            <button class="btn btn-outline btn-sm" id="adminCloseClientsBtn">✖ Cerrar Vista</button>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>CÓDIGO</th>
+                  <th>CLIENTE</th>
+                  <th>TELÉFONO</th>
+                  <th>TIPO</th>
+                  <th>VENDEDOR / ORIGEN</th>
+                  <th>ESTADO GESTIÓN</th>
+                  <th>ÚLTIMA INTERACCIÓN</th>
+                </tr>
+              </thead>
+              <tbody id="adminLoteClientsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
     </div>
 
 
     <!-- ===================================================================
-         VIEW 2: MÓDULO AGENTES (UX/UI LIMPIO, SOLO LECTURA LOTE + TABLA CLIENTES)
+         VIEW 2: MÓDULO AGENTES
     ==================================================================== -->
     <div id="view-agentes" class="main-view">
 
+      <!-- AGENT SELECTOR HEADER -->
       <div class="agent-header-info">
         <div class="user-badge">
-          <div class="avatar-circle">MP</div>
+          <div class="avatar-circle" id="agentAvatar">MP</div>
           <div>
-            <div style="font-weight:700; color:var(--navy-900); font-size:15px;">Mary Polo (Agente)</div>
-            <div style="font-size:12px; color:var(--muted);">Vista de Lotes Asignados · Módulo de Trabajo Diario</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:800; color:var(--navy-900); font-size:16px;">Modo Agente Activo:</span>
+              <select id="agentSwitchSelect" style="font-weight:700; color:var(--navy-800); padding:4px 10px; border-radius:6px; border:1px solid #BBD4E4;">
+                <option value="Mary Polo">Mary Polo (Agente)</option>
+                <option value="Jose Molina">Jose Molina (Agente)</option>
+                <option value="BILLY CASTRO">Billy Castro (Agente)</option>
+                <option value="Ventas">Depto. Ventas (Grupo)</option>
+              </select>
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Vista de lotes asignados y consola de trabajo diario de llamadas</div>
           </div>
         </div>
-        <div style="font-size:12px; font-weight:600; color:var(--navy-700); background:#fff; padding:6px 14px; border-radius:20px; border:1px solid var(--line);">
-          🔒 Modo Solo Lectura de Lotes
+
+        <div style="font-size:12px; font-weight:700; color:var(--navy-800); background:#fff; padding:6px 14px; border-radius:20px; border:1px solid var(--line);">
+          🔒 Módulo de Gestión Asignada
         </div>
       </div>
 
       <!-- FILTROS RÁPIDOS AGENTE -->
-      <div class="filters" style="background:#FAFCFD; padding:14px; border-radius:var(--radius); border:1px solid var(--line); margin-bottom:18px;">
-        <div class="search-wrap">
-          <label style="display:block; font-size:11px; font-weight:700; color:var(--navy-800); margin-bottom:4px; text-transform:uppercase;">Buscar Lote Asignado</label>
-          <input type="text" id="agentLoteSearch" placeholder="Nombre o ID del lote…">
-        </div>
+      <div class="filters-card">
+        <div class="filters">
+          <div class="search-wrap">
+            <label style="display:block; font-size:11px; font-weight:800; color:var(--navy-800); margin-bottom:6px; text-transform:uppercase;">Buscar mis lotes</label>
+            <input type="text" id="agentLoteSearch" placeholder="Nombre o ID del lote…">
+          </div>
 
-        <div class="field-inline">
-          <label>Estado del Lote</label>
-          <select id="agentLoteEstadoFilter">
-            <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="proceso">En proceso</option>
-            <option value="completado">Completado</option>
-          </select>
-        </div>
+          <div class="field-inline">
+            <label>Estado</label>
+            <select id="agentLoteEstadoFilter">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="proceso">En proceso</option>
+              <option value="completado">Completado</option>
+            </select>
+          </div>
 
-        <div class="field-inline">
-          <label>Motivo</label>
-          <select id="agentLoteMotivoFilter">
-            <option value="">Todos</option>
-            <option value="Cumpleaños">Cumpleaños</option>
-            <option value="Inactivos">Inactivos</option>
-            <option value="Nuevos">Nuevos</option>
-            <option value="Seguimiento">Seguimiento</option>
-          </select>
-        </div>
+          <div class="field-inline">
+            <label>Motivo</label>
+            <select id="agentLoteMotivoFilter">
+              <option value="">Todos</option>
+              <option value="Cumpleaños">Cumpleaños</option>
+              <option value="Inactivos">Inactivos</option>
+              <option value="Nuevos">Nuevos</option>
+              <option value="Seguimiento">Seguimiento</option>
+            </select>
+          </div>
 
-        <button class="btn btn-primary" id="agentFilterBtn">Filtrar</button>
-        <button class="btn btn-outline" id="agentClearBtn">Resetear</button>
+          <button class="btn btn-primary" id="agentFilterBtn">Filtrar</button>
+          <button class="btn btn-outline" id="agentClearBtn">Resetear</button>
+        </div>
       </div>
 
-      <div style="margin-bottom:10px; font-size:13px; font-weight:700; color:var(--navy-800);">
-        📋 MIS LOTES ASIGNADOS:
+      <div style="margin-bottom:14px; font-size:14px; font-weight:800; color:var(--navy-900);">
+        📋 CARDS DE LOTES ASIGNADOS:
       </div>
 
       <!-- CARDS DE LOTES PARA EL AGENTE -->
-      <div class="agent-lotes-grid" id="agentLotesContainer">
-        <!-- Renderizado dinámicamente -->
-      </div>
+      <div class="agent-lotes-grid" id="agentLotesContainer"></div>
 
-
-      <!-- SECCIÓN DE CLIENTES DEL LOTE SELECCIONADO -->
+      <!-- SECCIÓN DE CLIENTES DEL LOTE SELECCIONADO PARA AGENTE -->
       <div class="clients-view-container" id="agentClientsSection" style="display:none;">
         <div class="clients-view-header">
           <div>
-            <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;" id="agentActiveLoteBadge">LOTE SELECCIONADO</div>
-            <h2 style="margin:2px 0 0; font-size:17px; color:var(--navy-900);" id="agentActiveLoteTitle">Clientes del Lote</h2>
+            <span class="tipo-tag tipo-lead" id="agentActiveLoteBadge">LOTE SELECCIONADO</span>
+            <h2 style="margin:4px 0 0; font-size:18px; color:var(--navy-900);" id="agentActiveLoteTitle">Clientes del Lote</h2>
           </div>
 
           <div style="display:flex; gap:10px; align-items:center;">
             <input type="text" id="agentClientSearchInput" placeholder="🔍 Buscar cliente en este lote…" style="padding:7px 12px; width:220px;">
-            <button class="btn btn-outline" id="agentCloseClientsBtn" style="font-size:12px;">Cerrar Vista</button>
+            <button class="btn btn-outline btn-sm" id="agentCloseClientsBtn">✖ Cerrar Vista</button>
           </div>
         </div>
 
@@ -1020,36 +1108,32 @@
           <table>
             <thead>
               <tr>
-                <th style="width:50px; text-align:center;">VER 👁️</th>
+                <th style="width:60px; text-align:center;">VER 👁️</th>
                 <th>CÓDIGO</th>
                 <th>NOMBRE COMPLETO</th>
                 <th>TELÉFONO</th>
                 <th>TIPO</th>
-                <th>ORIGEN / VENDEDOR</th>
+                <th>VENDEDOR / ORIGEN</th>
                 <th>ESTADO GESTIÓN</th>
                 <th>ÚLTIMA INTERACCIÓN</th>
               </tr>
             </thead>
-            <tbody id="agentClientsBody">
-              <!-- Carga dinámica -->
-            </tbody>
+            <tbody id="agentClientsBody"></tbody>
           </table>
         </div>
 
-        <!-- PAGINADO ROBUSTO ESTÁNDAR PARA CLIENTES -->
+        <!-- PAGINADO ROBUSTO PARA CLIENTES DE AGENTE -->
         <div class="pagination-bar">
           <span class="info" id="agentClientsPaginationInfo">Mostrando 0 de 0</span>
           
-          <div class="page-size">
-            <select id="agentClientsPageSizeSelect">
-              <option value="5">5 clientes por pág.</option>
-              <option value="10" selected>10 clientes por pág.</option>
-              <option value="20">20 clientes por pág.</option>
-              <option value="50">50 clientes por pág.</option>
+          <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+            <select id="agentClientsPageSizeSelect" style="padding:6px 10px;">
+              <option value="5">5 por pág.</option>
+              <option value="10" selected>10 por pág.</option>
+              <option value="20">20 por pág.</option>
             </select>
+            <div class="pages" id="agentClientsPages"></div>
           </div>
-
-          <div class="pages" id="agentClientsPages"></div>
         </div>
       </div>
 
@@ -1059,26 +1143,27 @@
 
 </div>
 
-
 <!-- ===================================================================
      MODAL CREAR LISTA (ADMIN)
 ==================================================================== -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>Crear lista de contactos</h3>
-      <button id="closeModalBtn">&times;</button>
+      <h3>✨ Crear Nuevo Lote de Contactos</h3>
+      <button class="modal-close-btn" id="closeModalBtn">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="summary" id="modalSummary">0 contactos seleccionados</div>
-
-      <div class="field" style="margin-bottom:14px;">
-        <label style="display:block; font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">Título de la lista</label>
-        <input type="text" id="listTitle" placeholder="Ej: Cumpleaños septiembre" style="width:100%;">
+      <div style="background:var(--navy-100); padding:10px 14px; border-radius:var(--radius-sm); font-weight:700; color:var(--navy-900); margin-bottom:16px;" id="modalSummary">
+        0 contactos seleccionados
       </div>
 
-      <div class="field" style="margin-bottom:14px;">
-        <label style="display:block; font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">Motivo</label>
+      <div style="margin-bottom:14px;">
+        <label style="display:block; font-size:12px; font-weight:800; color:var(--navy-800); margin-bottom:4px;">Título del Lote</label>
+        <input type="text" id="listTitle" placeholder="Ej: Cumpleaños Septiembre - Grupo 1" style="width:100%;">
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block; font-size:12px; font-weight:800; color:var(--navy-800); margin-bottom:4px;">Motivo Comercial</label>
         <select id="listMotivo" style="width:100%;">
           <option>Seguimiento</option>
           <option>Inactivos</option>
@@ -1088,13 +1173,13 @@
         </select>
       </div>
 
-      <div class="field" style="margin-bottom:14px;">
-        <label style="display:block; font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">Asignar lista a</label>
+      <div style="margin-bottom:14px;">
+        <label style="display:block; font-size:12px; font-weight:800; color:var(--navy-800); margin-bottom:6px;">Asignar Lote A</label>
         <div style="display:flex; gap:10px; margin-bottom:10px;">
-          <label style="flex:1; border:1px solid var(--line); border-radius:var(--radius); padding:8px 12px; cursor:pointer; font-weight:600; font-size:12.5px;" id="assignAgenteLabel" class="checked">
-            <input type="radio" name="assignTipo" id="assignTipoAgente" value="agente" checked> Usuario específico
+          <label style="flex:1; border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px; cursor:pointer; font-weight:700; font-size:12.5px; background:#fff;">
+            <input type="radio" name="assignTipo" id="assignTipoAgente" value="agente" checked> Usuario Específico
           </label>
-          <label style="flex:1; border:1px solid var(--line); border-radius:var(--radius); padding:8px 12px; cursor:pointer; font-weight:600; font-size:12.5px;" id="assignGrupoLabel">
+          <label style="flex:1; border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px; cursor:pointer; font-weight:700; font-size:12.5px; background:#fff;">
             <input type="radio" name="assignTipo" id="assignTipoGrupo" value="grupo"> Departamento / Grupo
           </label>
         </div>
@@ -1112,25 +1197,25 @@
         </div>
       </div>
 
-      <div class="field">
-        <label style="display:block; font-size:12px; font-weight:700; color:var(--navy-800); margin-bottom:4px;">Descripción</label>
-        <textarea id="listDesc" placeholder="Describe el propósito de este lote…" style="width:100%; min-height:70px;"></textarea>
+      <div>
+        <label style="display:block; font-size:12px; font-weight:800; color:var(--navy-800); margin-bottom:4px;">Instrucciones / Descripción</label>
+        <textarea id="listDesc" placeholder="Detalla las instrucciones para el agente que trabajará este lote…" style="width:100%; min-height:70px;"></textarea>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" id="cancelModalBtn">Cancelar</button>
-      <button class="btn btn-success" id="saveListBtn">Guardar lista</button>
+      <button class="btn btn-success" id="saveListBtn">Guardar y Asignar Lote</button>
     </div>
   </div>
 </div>
 
 
-<!-- MODAL DETALLE LOTE (ADMIN) -->
+<!-- MODAL DETALLE / HISTORIAL LOTE (ADMIN) -->
 <div class="modal-backdrop" id="detailModalBackdrop">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>Detalle y seguimiento del lote</h3>
-      <button id="closeDetailModalBtn">&times;</button>
+      <h3>📜 Historial y Bitácora del Lote</h3>
+      <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
     </div>
     <div class="modal-body" id="loteDetailContent"></div>
     <div class="modal-footer">
@@ -1140,31 +1225,47 @@
 </div>
 
 
+<!-- MODAL CONFIRMACIÓN ELIMINAR LOTE -->
+<div class="modal-backdrop" id="deleteConfirmModal">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-header" style="background:var(--red);">
+      <h3>⚠️ Confirmar Eliminación</h3>
+      <button class="modal-close-btn" id="closeDeleteModalBtn">&times;</button>
+    </div>
+    <div class="modal-body" style="text-align:center; padding:30px 20px;">
+      <div style="font-size:40px; margin-bottom:10px;">🗑️</div>
+      <h4 style="margin:0 0 10px; color:var(--navy-900); font-size:16px;">¿Eliminar este lote permanentemente?</h4>
+      <p style="margin:0; color:var(--muted); font-size:13px;" id="deleteModalText">Esta acción removerá el lote y sus asignaciones actuales.</p>
+    </div>
+    <div class="modal-footer" style="justify-content:center;">
+      <button class="btn btn-outline" id="cancelDeleteBtn">Cancelar</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">Sí, Eliminar Lote</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- MODAL FICHA DEL CLIENTE / HOJA DE PRIMER LUGAR (AGENTE 👁️) -->
 <div class="modal-backdrop" id="customerSheetModal">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>📋 Hoja / Ficha del Cliente</h3>
-      <button id="closeCustomerSheetBtn">&times;</button>
+      <h3>📋 Ficha del Cliente / Hoja de Primer Lugar</h3>
+      <button class="modal-close-btn" id="closeCustomerSheetBtn">&times;</button>
     </div>
     <div class="modal-body">
       
-      <div class="customer-sheet-grid" id="customerSheetDetails">
-        <!-- Rellenado dinámicamente -->
-      </div>
+      <div class="customer-sheet-grid" id="customerSheetDetails"></div>
 
-      <h4 style="margin:16px 0 8px; color:var(--navy-900); font-size:13.5px;">Historial de Gestiones</h4>
-      <div class="gestion-history" id="customerGestionHistory">
-        <!-- Registros previos -->
-      </div>
+      <h4 style="margin:16px 0 8px; color:var(--navy-900); font-size:14px; font-weight:800;">📖 Historial de Interacciones</h4>
+      <div class="gestion-history" id="customerGestionHistory"></div>
 
       <!-- FORMULARIO RÁPIDO DE REGISTRO PARA AGENTE -->
-      <div style="background:#FAFCFD; border:1px solid var(--line); padding:14px; border-radius:var(--radius);">
-        <h4 style="margin:0 0 10px; color:var(--navy-800); font-size:13px;">📞 Registrar Nueva Gestión</h4>
+      <div style="background:var(--navy-50); border:1px solid var(--line); padding:16px; border-radius:var(--radius);">
+        <h4 style="margin:0 0 12px; color:var(--navy-800); font-size:13.5px; font-weight:800;">📞 Registrar Nueva Gestión Telefónica</h4>
         
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
           <div>
-            <label style="font-size:11px; font-weight:700; color:var(--navy-800); display:block; margin-bottom:4px;">Resultado de llamada</label>
+            <label style="font-size:11px; font-weight:800; color:var(--navy-800); display:block; margin-bottom:4px;">Resultado Llamada</label>
             <select id="agentCallResult" style="width:100%;">
               <option value="Contactado - Interesado">Contactado - Interesado</option>
               <option value="No contesta">No contesta</option>
@@ -1175,7 +1276,7 @@
           </div>
 
           <div>
-            <label style="font-size:11px; font-weight:700; color:var(--navy-800); display:block; margin-bottom:4px;">Nuevo Estado del Cliente</label>
+            <label style="font-size:11px; font-weight:800; color:var(--navy-800); display:block; margin-bottom:4px;">Nuevo Estado Cliente</label>
             <select id="agentClientStatus" style="width:100%;">
               <option value="En Gestión">En Gestión</option>
               <option value="Completado">Completado</option>
@@ -1185,8 +1286,8 @@
         </div>
 
         <div>
-          <label style="font-size:11px; font-weight:700; color:var(--navy-800); display:block; margin-bottom:4px;">Comentarios / Notas</label>
-          <textarea id="agentCallNotes" placeholder="Escribe detalles relevantes de la conversación..." style="width:100%; min-height:60px;"></textarea>
+          <label style="font-size:11px; font-weight:800; color:var(--navy-800); display:block; margin-bottom:4px;">Notas y Observaciones</label>
+          <textarea id="agentCallNotes" placeholder="Escribe detalles clave de la llamada..." style="width:100%; min-height:65px;"></textarea>
         </div>
       </div>
 
@@ -1198,124 +1299,121 @@
   </div>
 </div>
 
-
 <div class="toast-container" id="toastContainer"></div>
 
 
-<!-- ===================================================================
-     JAVASCRIPT LOGIC
-==================================================================== -->
 <script>
 
 /* DATASET CONTACTOS STANDARD */
-const rawClients = [
+let rawClients = [
   { id:120, cliente:"Lilia Aguirre", tipo:"inactivo", cumple:"1985-08-20", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina", telefono:"+57 300 123 4567", loteId:102, estadoGestion:"Pendiente", ultimaInteraccion:"2026-08-12 10:00" },
   { id:242, cliente:"Tanisha Objia", tipo:"inactivo", cumple:"1982-08-27", registro:"2019-08-12", info:"No contesta", vendedor:"Jose Molina", telefono:"+57 301 987 6543", loteId:102, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:245, cliente:"Maria Reyes", tipo:"recurrente", cumple:"1976-08-25", registro:"2018-03-02", info:"No contesta", vendedor:"Jose Molina", telefono:"+57 315 444 5566", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 14:40" },
-  { id:247, cliente:"Cecilia Sanawani", tipo:"inactivo", cumple:"1974-08-09", registro:"2019-08-12", info:"No contesta", vendedor:"Mary Polo", telefono:"+57 312 888 9900", loteId:102, estadoGestion:"En Gestión", ultimaInteraccion:"2026-09-10 08:20" },
-  { id:253, cliente:"Agustina Gabriel", tipo:"lead", cumple:"1948-08-28", registro:"2026-08-02", info:"No contesta", vendedor:"Mary Polo", telefono:"+57 320 111 2233", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 12:15" },
-  { id:274, cliente:"Diana Salgado", tipo:"recurrente", cumple:"1988-08-14", registro:"2018-08-06", info:"No contesta", vendedor:"Mary Polo", telefono:"+57 300 777 8899", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 11:30" },
+  { id:245, cliente:"Maria Reyes", tipo:"recurrente", cumple:"1976-08-25", registro:"2018-03-02", info:"Contactado", vendedor:"Jose Molina", telefono:"+57 315 444 5566", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 14:40" },
+  { id:247, cliente:"Cecilia Sanawani", tipo:"inactivo", cumple:"1974-08-09", registro:"2019-08-12", info:"Interesado", vendedor:"Mary Polo", telefono:"+57 312 888 9900", loteId:102, estadoGestion:"En Gestión", ultimaInteraccion:"2026-09-10 08:20" },
+  { id:253, cliente:"Agustina Gabriel", tipo:"lead", cumple:"1948-08-28", registro:"2026-08-02", info:"Venta Realizada", vendedor:"Mary Polo", telefono:"+57 320 111 2233", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 12:15" },
+  { id:274, cliente:"Diana Salgado", tipo:"recurrente", cumple:"1988-08-14", registro:"2018-08-06", info:"Contactado", vendedor:"Mary Polo", telefono:"+57 300 777 8899", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 11:30" },
   { id:281, cliente:"Hector Ramirez", tipo:"recurrente", cumple:"1965-08-30", registro:"2017-11-07", info:"Contactado", vendedor:"Jose Molina", telefono:"+57 311 333 2211", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 10:05" },
-  { id:290, cliente:"Jose Fernandez", tipo:"inactivo", cumple:"1979-05-11", registro:"2018-01-20", info:"No contesta", vendedor:"Mary Polo", telefono:"+57 314 222 3344", loteId:102, estadoGestion:"En Gestión", ultimaInteraccion:"2026-09-10 09:12" },
+  { id:290, cliente:"Jose Fernandez", tipo:"inactivo", cumple:"1979-05-11", registro:"2018-01-20", info:"Interesado", vendedor:"Mary Polo", telefono:"+57 314 222 3344", loteId:102, estadoGestion:"En Gestión", ultimaInteraccion:"2026-09-10 09:12" },
   { id:298, cliente:"Josefina Cruz", tipo:"lead", cumple:"1995-08-19", registro:"2019-08-01", info:"Interesado", vendedor:"Jose Molina", telefono:"+57 301 555 6677", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 09:50" },
   { id:311, cliente:"Jose Ramon Diaz", tipo:"inactivo", cumple:"1970-08-04", registro:"2016-06-14", info:"No contesta", vendedor:"Jose Molina", telefono:"+57 310 999 0011", loteId:102, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
   { id:318, cliente:"Karen Ibarra", tipo:"recurrente", cumple:"1983-08-22", registro:"2019-09-30", info:"Contactado", vendedor:"Mary Polo", telefono:"+57 300 444 1122", loteId:102, estadoGestion:"En Gestión", ultimaInteraccion:"2026-09-10 11:00" },
-  { id:326, cliente:"Luis Gomez", tipo:"lead", cumple:"1998-01-05", registro:"2019-07-28", info:"Interesado", vendedor:"Jose Molina", telefono:"+57 318 666 5544", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:340, cliente:"Jose Antonio Vera", tipo:"inactivo", cumple:"1966-08-29", registro:"2015-12-01", info:"No contesta", vendedor:"Jose Molina", telefono:"+57 316 777 2211", loteId:102, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:347, cliente:"Gabriela Ortiz", tipo:"recurrente", cumple:"1980-08-06", registro:"2020-02-18", info:"Contactado", vendedor:"Mary Polo", telefono:"+57 315 888 3322", loteId:101, estadoGestion:"Completado", ultimaInteraccion:"2026-09-08 14:00" },
-  { id:355, cliente:"Marco Delgado", tipo:"lead", cumple:"1997-08-12", registro:"2019-08-04", info:"Interesado", vendedor:"Jose Molina", telefono:"+57 302 123 9988", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" }
+  { id:326, cliente:"Luis Gomez", tipo:"lead", cumple:"1998-01-05", registro:"2019-07-28", info:"Interesado", vendedor:"BILLY CASTRO", telefono:"+57 318 666 5544", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" }
 ];
 
 /* DATASET LEADS NUEVOS */
-const newLeads = [
-  { id:52301, nombres:"MANUEL MINCHALA", telefono:"+13472834496", campaniaPais:"US", fechaRegistro:"2026-09-09 01:15:25", creadoPor:"Sebastian Tovar", quienHizoLlamada:"BILLY CASTRO", medio:"FACEBOOK", tipoTracking:"TRK-PB-LA-02", tipoLlamada:"outbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:52302, nombres:"ERYIN PARAJON BERRIOS", telefono:"13055706046", campaniaPais:"US", fechaRegistro:"2026-09-09 11:19:23", creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", medio:"NINGUNO", tipoTracking:"TRK-PB-DAL-02", tipoLlamada:"outbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:52303, nombres:"EVELYN SANCHEZ", telefono:"12094518543", campaniaPais:"US", fechaRegistro:"2026-09-09 13:45:34", creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", medio:"REDES SOCIALES", tipoTracking:"TRK-PB-LA-01", tipoLlamada:"inbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
-  { id:52304, nombres:"BRAILYN MIGUEL ALMONTE HERNANDEZ", telefono:"13478392687", campaniaPais:"US", fechaRegistro:"2026-09-09 14:26:50", creadoPor:"BILLY CASTRO", medio:"WHATSAPP MARKETING", tipoTracking:"not_campaign", tipoLlamada:"", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" }
+let newLeads = [
+  { id:52301, nombres:"MANUEL MINCHALA", telefono:"+1 347 283 4496", campaniaPais:"US", fechaRegistro:"2026-09-09 01:15:25", creadoPor:"Sebastian Tovar", quienHizoLlamada:"BILLY CASTRO", medio:"FACEBOOK", tipoTracking:"TRK-PB-LA-02", tipoLlamada:"outbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
+  { id:52302, nombres:"ERYIN PARAJON BERRIOS", telefono:"+1 305 570 6046", campaniaPais:"US", fechaRegistro:"2026-09-09 11:19:23", creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", medio:"NINGUNO", tipoTracking:"TRK-PB-DAL-02", tipoLlamada:"outbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
+  { id:52303, nombres:"EVELYN SANCHEZ", telefono:"+1 209 451 8543", campaniaPais:"US", fechaRegistro:"2026-09-09 13:45:34", creadoPor:"HECTOR ORDOSGOITA", quienHizoLlamada:"HECTOR ORDOSGOITA", medio:"REDES SOCIALES", tipoTracking:"TRK-PB-LA-01", tipoLlamada:"inbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" },
+  { id:52304, nombres:"BRAILYN MIGUEL ALMONTE", telefono:"+1 347 839 2687", campaniaPais:"US", fechaRegistro:"2026-09-09 14:26:50", creadoPor:"BILLY CASTRO", medio:"WHATSAPP MARKETING", tipoTracking:"not_campaign", tipoLlamada:"inbound", loteId:103, estadoGestion:"Pendiente", ultimaInteraccion:"—" }
 ];
 
-/* HISTORIAL DE GESTIONES POR CLIENTE MOCK */
+/* HISTORIAL DE GESTIONES POR CLIENTE */
 const clientHistories = {
   247: [
     { fecha:"2026-09-10 08:20", resultado:"No contesta", nota:"Se dejó mensaje de voz en buzón.", usuario:"Mary Polo" },
-    { fecha:"2026-09-09 16:10", resultado:"Agendar Cita", nota:"Cliente pide que se le llame mañana por la mañana.", usuario:"Mary Polo" }
+    { fecha:"2026-09-09 16:10", resultado:"Agendar Cita", nota:"Cliente pide que se le llame por la mañana.", usuario:"Mary Polo" }
   ],
   290: [
-    { fecha:"2026-09-10 09:12", resultado:"Contactado - Interesado", nota:"Interesado en la propuesta de renovación.", usuario:"Mary Polo" }
+    { fecha:"2026-09-10 09:12", resultado:"Contactado - Interesado", nota:"Interesado en propuesta comercial.", usuario:"Mary Polo" }
   ]
 };
 
 /* DATASET DE LOTES REGISTRADOS */
-const savedLists = [
+let savedLists = [
   {
-    id:101,
-    titulo:"Clientes cumpleaños agosto",
-    motivo:"Cumpleaños",
-    descripcion:"Clientes con cumpleaños durante agosto para campaña de seguimiento.",
-    creadoPor:"Jose Caicedo",
-    creado:"2026-09-08 09:25",
-    contactos:34,
-    destinoTipo:"departamento",
-    destino:"Ventas",
-    estado:"completado",
-    actualizado:"2026-09-08 14:40",
-    historial:[
-      { fecha:"2026-09-08 09:25", titulo:"Lote creado", usuario:"Jose Caicedo" },
-      { fecha:"2026-09-08 09:30", titulo:"Lote enviado al departamento Ventas", usuario:"Jose Caicedo" },
-      { fecha:"2026-09-08 14:40", titulo:"Lote marcado como completado", usuario:"Mary Polo" }
+    id: 101,
+    titulo: "Clientes cumpleaños agosto",
+    motivo: "Cumpleaños",
+    descripcion: "Clientes con cumpleaños durante el mes de agosto para felicitación y oferta especial.",
+    creadoPor: "Jose Caicedo",
+    creado: "2026-09-08 09:25",
+    contactos: 5,
+    destinoTipo: "departamento",
+    destino: "Ventas",
+    estado: "completado",
+    actualizado: "2026-09-08 14:40",
+    clientIds: [245, 253, 274, 281, 298],
+    historial: [
+      { fecha: "2026-09-08 09:25", titulo: "Lote creado", usuario: "Jose Caicedo" },
+      { fecha: "2026-09-08 09:30", titulo: "Lote asignado a Depto. Ventas", usuario: "Jose Caicedo" },
+      { fecha: "2026-09-08 14:40", titulo: "Todas las llamadas completadas", usuario: "Mary Polo" }
     ]
   },
   {
-    id:102,
-    titulo:"Seguimiento clientes inactivos",
-    motivo:"Inactivos",
-    descripcion:"Clientes inactivos para realizar nueva gestión comercial.",
-    creadoPor:"Sebastian Tovar",
-    creado:"2026-09-09 10:15",
-    contactos:56,
-    destinoTipo:"usuario",
-    destino:"Mary Polo",
-    estado:"proceso",
-    actualizado:"2026-09-10 08:20",
-    historial:[
-      { fecha:"2026-09-09 10:15", titulo:"Lote creado", usuario:"Sebastian Tovar" },
-      { fecha:"2026-09-09 10:18", titulo:"Lote asignado al usuario Mary Polo", usuario:"Sebastian Tovar" },
-      { fecha:"2026-09-10 08:20", titulo:"Lote en proceso de llamadas", usuario:"Mary Polo" }
+    id: 102,
+    titulo: "Seguimiento clientes inactivos",
+    motivo: "Inactivos",
+    descripcion: "Re-contactar clientes sin compras en los últimos 6 meses.",
+    creadoPor: "Sebastian Tovar",
+    creado: "2026-09-09 10:15",
+    contactos: 5,
+    destinoTipo: "usuario",
+    destino: "Mary Polo",
+    estado: "proceso",
+    actualizado: "2026-09-10 08:20",
+    clientIds: [120, 242, 247, 290, 311, 318],
+    historial: [
+      { fecha: "2026-09-09 10:15", titulo: "Lote creado", usuario: "Sebastian Tovar" },
+      { fecha: "2026-09-09 10:18", titulo: "Asignado a Mary Polo", usuario: "Sebastian Tovar" },
+      { fecha: "2026-09-10 08:20", titulo: "Primeras llamadas registradas", usuario: "Mary Polo" }
     ]
   },
   {
-    id:103,
-    titulo:"Nuevos clientes septiembre",
-    motivo:"Nuevos",
-    descripcion:"Clientes nuevos para primera gestión.",
-    creadoPor:"Hector Ordosgoita",
-    creado:"2026-09-10 08:10",
-    contactos:82,
-    destinoTipo:"departamento",
-    destino:"Servicio al Cliente (SVC)",
-    estado:"pendiente",
-    actualizado:"2026-09-10 08:10",
-    historial:[
-      { fecha:"2026-09-10 08:10", titulo:"Lote creado", usuario:"Hector Ordosgoita" }
+    id: 103,
+    titulo: "Nuevos clientes septiembre",
+    motivo: "Nuevos",
+    descripcion: "Contacto inicial con prospectos recibidos desde campañas web.",
+    creadoPor: "Hector Ordosgoita",
+    creado: "2026-09-10 08:10",
+    contactos: 5,
+    destinoTipo: "usuario",
+    destino: "BILLY CASTRO",
+    estado: "pendiente",
+    actualizado: "2026-09-10 08:10",
+    clientIds: [326, 52301, 52302, 52303, 52304],
+    historial: [
+      { fecha: "2026-09-10 08:10", titulo: "Lote creado", usuario: "Hector Ordosgoita" }
     ]
   }
 ];
 
-
-// Estado Global
+// ESTADOS GLOBALES
 const selectedIds = new Set();
 let currentPage = 1;
 let pageSize = 10;
 let currentFiltered = [];
 
-// Estado Agente
+// ESTADO AGENTE
+let currentAgentUser = "Mary Polo";
 let currentAgentLoteId = null;
 let agentClientsPage = 1;
 let agentClientsPageSize = 10;
 let agentClientsFiltered = [];
 let activeEditingClient = null;
+let pendingDeleteLoteId = null;
 
-// MAIN TAB SWITCHER (Administrativo vs Agentes)
+/* MAIN TABS SWITCHER (ADMIN vs AGENTES) */
 document.querySelectorAll('.main-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1331,7 +1429,7 @@ document.querySelectorAll('.main-tab-btn').forEach(btn => {
   });
 });
 
-// SUB TAB SWITCHER (ADMIN)
+/* SUB TABS SWITCHER (ADMINISTRATIVO) */
 document.querySelectorAll('.sub-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1342,43 +1440,41 @@ document.querySelectorAll('.sub-tab-btn').forEach(btn => {
     document.getElementById(`subtab-${target}`).classList.add('active');
 
     if(target === 'seguimiento') {
-      renderLotes();
+      renderLotesAdmin();
       updateLoteSummary();
     }
   });
 });
 
-
-const tipoLabel = { nuevo:"Nuevo", recurrente:"Recurrente", inactivo:"Inactivo", lead:"Lead" };
+const tipoLabel = { nuevo: "Nuevo / Lead", recurrente: "Recurrente", inactivo: "Inactivo", lead: "Lead Antiguo" };
 
 const generalColumns = [
-  { label:"COD", render:c => c.id, cls:"cod" },
-  { label:"CLIENTE", render:c => c.cliente, cls:"cliente" },
-  { label:"TIPO", render:c => `<span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo]}</span>` },
-  { label:"CUMPLE", render:c => formatDateHuman(c.cumple) },
-  { label:"FECHA REGISTRO", render:c => formatDateHuman(c.registro) },
-  { label:"INFO", render:c => c.info },
-  { label:"VENDEDOR", render:c => c.vendedor }
+  { label: "COD", render: c => c.id, cls: "cod" },
+  { label: "CLIENTE", render: c => c.cliente, cls: "cliente" },
+  { label: "TIPO", render: c => `<span class="tipo-tag tipo-${c.tipo}">${tipoLabel[c.tipo] || c.tipo}</span>` },
+  { label: "CUMPLE", render: c => formatDateHuman(c.cumple) },
+  { label: "REGISTRO", render: c => formatDateHuman(c.registro) },
+  { label: "ESTADO / INFO", render: c => c.info },
+  { label: "VENDEDOR", render: c => c.vendedor }
 ];
 
 const nuevoColumns = [
-  { label:"Código", render:c => c.id, cls:"cod" },
-  { label:"Nombres", render:c => c.nombres, cls:"cliente" },
-  { label:"Teléfono", render:c => c.telefono },
-  { label:"Campaña País", render:c => c.campaniaPais },
-  { label:"Fecha Registro", render:c => c.fechaRegistro },
-  { label:"Creado Por", render:c => c.creadoPor },
-  { label:"Quién Llamó", render:c => c.quienHizoLlamada || "—" },
-  { label:"Medio", render:c => c.medio },
-  { label:"Tipo Tracking", render:c => c.tipoTracking },
-  { label:"Tipo Llamada", render:c => c.tipoLlamada ? `<span class="tipo-tag">${c.tipoLlamada}</span>` : "—" }
+  { label: "Código", render: c => c.id, cls: "cod" },
+  { label: "Nombres", render: c => c.nombres, cls: "cliente" },
+  { label: "Teléfono", render: c => c.telefono },
+  { label: "Campaña", render: c => c.campaniaPais },
+  { label: "Fecha Registro", render: c => c.fechaRegistro },
+  { label: "Creado Por", render: c => c.creadoPor },
+  { label: "Atendió", render: c => c.quienHizoLlamada || "—" },
+  { label: "Medio", render: c => c.medio }
 ];
 
 function formatDateHuman(dateStr){
-  if(!dateStr) return "—";
-  const [y,m,d] = dateStr.split("-");
+  if(!dateStr || dateStr === "—") return "—";
+  const parts = dateStr.split("-");
+  if(parts.length < 3) return dateStr;
   const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-  return `${d} ${meses[parseInt(m,10)-1]} ${y}`;
+  return `${parts[2]} ${meses[parseInt(parts[1],10)-1]} ${parts[0]}`;
 }
 
 function isNuevoMode(){ return document.getElementById('contactType').value === "nuevo"; }
@@ -1408,13 +1504,12 @@ function applyFilters(){
   const codigo = document.getElementById('codeInput').value.trim();
   const vendedor = document.getElementById('vendorSelect').value;
   const nuevoMode = isNuevoMode();
-  const dataset = activeDataset();
 
-  currentFiltered = dataset.filter(c => {
+  currentFiltered = activeDataset().filter(c => {
     if(!nuevoMode && tipoFiltro && c.tipo !== tipoFiltro) return false;
     if(codigo && !String(c.id).includes(codigo)) return false;
     if(vendedor && agenteAtendio(c) !== vendedor) return false;
-    if(!nuevoMode && mes && c.cumple.split("-")[1] !== mes) return false;
+    if(!nuevoMode && mes && c.cumple && c.cumple.split("-")[1] !== mes) return false;
 
     const fechaReg = nuevoMode ? c.fechaRegistro.slice(0,10) : c.registro;
     if(desde && fechaReg < desde) return false;
@@ -1445,7 +1540,7 @@ function renderActiveFilters(){
   if(!isNuevoMode() && mSelect.value) chips.push("Cumpleaños: " + mSelect.options[mSelect.selectedIndex].text);
   if(dFrom || dTo) chips.push(`Registro: ${dFrom || "…"} a ${dTo || "…"}`);
   if(cod) chips.push("Código: " + cod);
-  if(vend) chips.push("Vendedor: " + vend);
+  if(vend) chips.push("Asesor: " + vend);
   if(search) chips.push(`Nombre: "${search}"`);
 
   document.getElementById('activeFilters').innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join("");
@@ -1456,42 +1551,11 @@ function getPageData(){
   return currentFiltered.slice(start, start + pageSize);
 }
 
-function renderPagination(){
-  const totalPages = Math.max(1, Math.ceil(currentFiltered.length / pageSize));
-  if(currentPage > totalPages) currentPage = totalPages;
-
-  const start = currentFiltered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const end = Math.min(currentPage * pageSize, currentFiltered.length);
-
-  document.getElementById('paginationInfo').textContent = `Mostrando ${start}-${end} de ${currentFiltered.length}`;
-
-  let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
-  for(let p = 1; p <= totalPages; p++){
-    html += `<button class="page-btn ${p === currentPage ? "active" : ""}" data-page="${p}">${p}</button>`;
-  }
-  html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? "disabled" : ""}>›</button>`;
-
-  const container = document.getElementById('pagesContainer');
-  container.innerHTML = html;
-
-  container.querySelectorAll("[data-page]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      currentPage = parseInt(btn.dataset.page, 10);
-      renderTable();
-    });
-  });
-
-  const prev = document.getElementById("prevPage");
-  const next = document.getElementById("nextPage");
-  if(prev) prev.addEventListener("click", () => { currentPage--; renderTable(); });
-  if(next) next.addEventListener("click", () => { currentPage++; renderTable(); });
-}
-
 function renderHead(){
   const cols = activeColumns();
   document.getElementById('tableHead').innerHTML = `
     <tr>
-      <th style="width:34px;"><input type="checkbox" class="checkbox" id="headerCheckbox"></th>
+      <th style="width:36px;"><input type="checkbox" class="checkbox" id="headerCheckbox"></th>
       ${cols.map(c => `<th>${c.label}</th>`).join("")}
     </tr>
   `;
@@ -1513,7 +1577,7 @@ function renderTable(){
   tbody.innerHTML = "";
 
   if(pageData.length === 0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="${cols.length + 1}">No se encontraron contactos</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="${cols.length + 1}">No se encontraron contactos con los criterios seleccionados.</td></tr>`;
   } else {
     pageData.forEach(c => {
       const selected = selectedIds.has(c.id);
@@ -1556,7 +1620,51 @@ function updateSelectedCount(){
   document.getElementById('selectedCount').textContent = `${n} seleccionado${n === 1 ? "" : "s"}`;
 }
 
-function clearFilters(){
+function renderPagination(){
+  const totalPages = Math.max(1, Math.ceil(currentFiltered.length / pageSize));
+  if(currentPage > totalPages) currentPage = totalPages;
+
+  const start = currentFiltered.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const end = Math.min(currentPage * pageSize, currentFiltered.length);
+
+  document.getElementById('paginationInfo').textContent = `Mostrando ${start}-${end} de ${currentFiltered.length} contactos`;
+
+  let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? "disabled" : ""}>‹</button>`;
+  for(let p = 1; p <= totalPages; p++){
+    html += `<button class="page-btn ${p === currentPage ? "active" : ""}" data-page="${p}">${p}</button>`;
+  }
+  html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? "disabled" : ""}>›</button>`;
+
+  const container = document.getElementById('pagesContainer');
+  container.innerHTML = html;
+
+  container.querySelectorAll("[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentPage = parseInt(btn.dataset.page, 10);
+      renderTable();
+    });
+  });
+
+  const prev = document.getElementById("prevPage");
+  const next = document.getElementById("nextPage");
+  if(prev) prev.addEventListener("click", () => { currentPage--; renderTable(); });
+  if(next) next.addEventListener("click", () => { currentPage++; renderTable(); });
+}
+
+/* EVENT LISTENERS FILTROS CREAR LISTA */
+document.getElementById('contactType').addEventListener('change', () => {
+  syncFieldVisibility();
+  populateVendorOptions();
+  applyFilters();
+});
+document.getElementById('monthSelect').addEventListener('change', applyFilters);
+document.getElementById('dateFrom').addEventListener('change', applyFilters);
+document.getElementById('dateTo').addEventListener('change', applyFilters);
+document.getElementById('vendorSelect').addEventListener('change', applyFilters);
+document.getElementById('buscarBtn').addEventListener('click', applyFilters);
+document.getElementById('searchInput').addEventListener('keyup', (e) => { if(e.key === 'Enter') applyFilters(); });
+
+document.getElementById('clearFiltersBtn').addEventListener('click', () => {
   document.getElementById('searchInput').value = "";
   document.getElementById('contactType').value = "";
   document.getElementById('monthSelect').value = "";
@@ -1568,17 +1676,33 @@ function clearFilters(){
   syncFieldVisibility();
   populateVendorOptions();
   applyFilters();
-}
+});
 
+document.getElementById('selectAllBtn').addEventListener('click', () => {
+  getPageData().forEach(c => selectedIds.add(c.id));
+  renderTable();
+});
 
+document.getElementById('deselectAllBtn').addEventListener('click', () => {
+  selectedIds.clear();
+  renderTable();
+});
+
+document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
+  pageSize = parseInt(e.target.value, 10);
+  currentPage = 1;
+  renderTable();
+});
+
+/* MODAL CREAR LISTA */
 function openModal(){
   if(selectedIds.size === 0){
-    showToast("warning", "Selección requerida", "Selecciona al menos un contacto.");
+    showToast("warning", "Selección Requerida", "Selecciona al menos un contacto para generar el lote.");
     return;
   }
-  document.getElementById('modalSummary').textContent = `${selectedIds.size} contacto${selectedIds.size === 1 ? "" : "s"} seleccionado${selectedIds.size === 1 ? "" : "s"}`;
+  document.getElementById('modalSummary').textContent = `${selectedIds.size} contacto${selectedIds.size === 1 ? "" : "s"} seleccionado${selectedIds.size === 1 ? "" : "s"} para esta asignación`;
   
-  const vendors = [...new Set(activeDataset().map(c => agenteAtendio(c)).filter(Boolean))];
+  const vendors = ["Mary Polo", "Jose Molina", "BILLY CASTRO", "Hector Ordosgoita", "Sebastian Tovar"];
   document.getElementById('assignAgenteSelect').innerHTML = vendors.map(v => `<option value="${v}">${v}</option>`).join("");
   
   document.getElementById('modalBackdrop').classList.add("open");
@@ -1593,15 +1717,11 @@ document.getElementById("cancelModalBtn").addEventListener("click", closeModal);
 document.getElementById('assignTipoAgente').addEventListener("change", () => {
   document.getElementById('assignAgenteField').style.display = "";
   document.getElementById('assignGrupoField').style.display = "none";
-  document.getElementById('assignAgenteLabel').classList.add("checked");
-  document.getElementById('assignGrupoLabel').classList.remove("checked");
 });
 
 document.getElementById('assignTipoGrupo').addEventListener("change", () => {
   document.getElementById('assignAgenteField').style.display = "none";
   document.getElementById('assignGrupoField').style.display = "";
-  document.getElementById('assignGrupoLabel').classList.add("checked");
-  document.getElementById('assignAgenteLabel').classList.remove("checked");
 });
 
 document.getElementById("saveListBtn").addEventListener("click", () => {
@@ -1622,7 +1742,8 @@ document.getElementById("saveListBtn").addEventListener("click", () => {
     destino,
     estado: "pendiente",
     actualizado: new Date().toLocaleString("es-CO"),
-    historial: [{ fecha: new Date().toLocaleString("es-CO"), titulo: "Lote creado", usuario: "Jose Caicedo" }]
+    clientIds: Array.from(selectedIds),
+    historial: [{ fecha: new Date().toLocaleString("es-CO"), titulo: "Lote creado y asignado", usuario: "Jose Caicedo" }]
   };
 
   savedLists.unshift(nuevoLote);
@@ -1631,43 +1752,74 @@ document.getElementById("saveListBtn").addEventListener("click", () => {
   document.getElementById('listDesc').value = "";
   closeModal();
   renderTable();
-  renderLotes();
+  renderLotesAdmin();
   updateLoteSummary();
-  showToast("success", "Lote creado", `El lote "${titulo}" fue guardado exitosamente.`);
+  showToast("success", "Lote Creado con Éxito", `El lote "${titulo}" ha sido creado y asignado a ${destino}.`);
 });
 
 
-function renderLotes(){
+/* SEGUIMIENTO DE LOTES EN ADMINISTRATIVO (CON ELIMINAR Y VER CLIENTES) */
+function renderLotesAdmin(){
   const body = document.getElementById("lotesBody");
   body.innerHTML = "";
 
-  savedLists.forEach(lote => {
-    const tr = document.createElement("tr");
-    const destinoTag = lote.destinoTipo === "departamento"
-      ? `<span class="destino-tag destino-departamento">Departamento</span>`
-      : `<span class="destino-tag destino-usuario">Usuario</span>`;
+  const qSearch = document.getElementById('loteSearch').value.trim().toLowerCase();
+  const fEstado = document.getElementById('loteEstado').value;
+  const fMotivo = document.getElementById('loteMotivo').value;
 
-    tr.innerHTML = `
-      <td><strong>#${lote.id}</strong></td>
-      <td>${lote.creado}</td>
-      <td>${lote.creadoPor}</td>
-      <td><strong>${lote.titulo}</strong></td>
-      <td>${lote.motivo}</td>
-      <td style="max-width:200px; white-space:normal;">${lote.descripcion || "—"}</td>
-      <td><strong>${lote.contactos}</strong></td>
-      <td>${destinoTag}</td>
-      <td>${lote.destino}</td>
-      <td><span class="status-tag status-${lote.estado}">${estadoLabel(lote.estado)}</span></td>
-      <td>${lote.actualizado}</td>
-      <td><button class="btn btn-outline" style="font-size:12px; padding:4px 8px;" onclick="openLoteDetail(${lote.id})">Ver detalle</button></td>
-    `;
-    body.appendChild(tr);
+  const filtered = savedLists.filter(lote => {
+    if(qSearch && !lote.titulo.toLowerCase().includes(qSearch) && !String(lote.id).includes(qSearch) && !lote.destino.toLowerCase().includes(qSearch)) return false;
+    if(fEstado && lote.estado !== fEstado) return false;
+    if(fMotivo && lote.motivo !== fMotivo) return false;
+    return true;
   });
-  document.getElementById('lotesPaginationInfo').textContent = `Mostrando ${savedLists.length} de ${savedLists.length}`;
+
+  if(filtered.length === 0){
+    body.innerHTML = `<tr class="empty-row"><td colspan="9">No se encontraron lotes registrados.</td></tr>`;
+  } else {
+    filtered.forEach(lote => {
+      const tr = document.createElement("tr");
+      const destinoTag = lote.destinoTipo === "departamento"
+        ? `<span class="destino-tag destino-departamento">🏢 ${lote.destino}</span>`
+        : `<span class="destino-tag destino-usuario">👤 ${lote.destino}</span>`;
+
+      tr.innerHTML = `
+        <td><strong class="cod">#${lote.id}</strong></td>
+        <td>
+          <div style="font-weight:800; color:var(--navy-900);">${lote.titulo}</div>
+          <div style="font-size:11px; color:var(--muted);">Motivo: ${lote.motivo}</div>
+        </td>
+        <td>${lote.creadoPor}</td>
+        <td>${lote.creado}</td>
+        <td><strong style="font-size:14px;">${lote.contactos}</strong></td>
+        <td>${destinoTag}</td>
+        <td><span class="status-tag status-${lote.estado}">${estadoLabel(lote.estado)}</span></td>
+        <td>${lote.actualizado}</td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex; gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="viewLoteClientsAdmin(${lote.id})">👁️ Ver Lote</button>
+            <button class="btn btn-outline btn-sm" onclick="openLoteDetail(${lote.id})">📜 Historial</button>
+            <button class="btn btn-danger-outline btn-sm" onclick="promptDeleteLote(${lote.id})">🗑️</button>
+          </div>
+        </td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  document.getElementById('lotesPaginationInfo').textContent = `Mostrando ${filtered.length} de ${savedLists.length} lotes`;
 }
 
+document.getElementById('buscarLotesBtn').addEventListener('click', renderLotesAdmin);
+document.getElementById('clearLotesBtn').addEventListener('click', () => {
+  document.getElementById('loteSearch').value = "";
+  document.getElementById('loteEstado').value = "";
+  document.getElementById('loteMotivo').value = "";
+  renderLotesAdmin();
+});
+
 function estadoLabel(st){
-  const l = { pendiente:"Pendiente", proceso:"En proceso", completado:"Completado", cancelado:"Cancelado" };
+  const l = { pendiente: "Pendiente", proceso: "En Proceso", completado: "Completado", cancelado: "Cancelado" };
   return l[st] || st;
 }
 
@@ -1678,13 +1830,77 @@ function updateLoteSummary(){
   document.getElementById("totalCompletados").textContent = savedLists.filter(x => x.estado === "completado").length;
 }
 
+/* DESPLEGAR CLIENTES DE UN LOTE EN ADMIN (VER LOTE) */
+function viewLoteClientsAdmin(loteId){
+  const lote = savedLists.find(x => x.id === loteId);
+  if(!lote) return;
+
+  const container = document.getElementById('adminLoteClientsContainer');
+  document.getElementById('adminActiveLoteBadge').textContent = `LOTE #${lote.id} · ${lote.motivo.toUpperCase()}`;
+  document.getElementById('adminActiveLoteTitle').textContent = `Clientes Asignados a "${lote.titulo}"`;
+
+  const tbody = document.getElementById('adminLoteClientsBody');
+  tbody.innerHTML = "";
+
+  const allClients = [...rawClients, ...newLeads];
+  const list = allClients.filter(c => lote.clientIds && lote.clientIds.includes(c.id));
+
+  if(list.length === 0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No hay detalles de clientes para este lote.</td></tr>`;
+  } else {
+    list.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="cod">#${c.id}</td>
+        <td class="cliente">${c.cliente || c.nombres}</td>
+        <td>${c.telefono || "+57 300 000 0000"}</td>
+        <td><span class="tipo-tag tipo-lead">${c.tipo || "Lead"}</span></td>
+        <td>${c.vendedor || c.creadoPor || "Sin asignar"}</td>
+        <td><span class="status-tag status-proceso">${c.estadoGestion || "Pendiente"}</span></td>
+        <td>${c.ultimaInteraccion || "—"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  container.style.display = "block";
+  container.scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('adminCloseClientsBtn').addEventListener('click', () => {
+  document.getElementById('adminLoteClientsContainer').style.display = "none";
+});
+
+/* ELIMINAR LOTE CON MODAL DE CONFIRMACIÓN */
+function promptDeleteLote(id){
+  const lote = savedLists.find(x => x.id === id);
+  if(!lote) return;
+  pendingDeleteLoteId = id;
+  document.getElementById('deleteModalText').textContent = `¿Estás seguro de eliminar el Lote #${lote.id} ("${lote.titulo}")? Esta acción no se puede deshacer.`;
+  document.getElementById('deleteConfirmModal').classList.add('open');
+}
+
+document.getElementById('closeDeleteModalBtn').addEventListener('click', () => document.getElementById('deleteConfirmModal').classList.remove('open'));
+document.getElementById('cancelDeleteBtn').addEventListener('click', () => document.getElementById('deleteConfirmModal').classList.remove('open'));
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+  if(!pendingDeleteLoteId) return;
+  savedLists = savedLists.filter(x => x.id !== pendingDeleteLoteId);
+  pendingDeleteLoteId = null;
+  document.getElementById('deleteConfirmModal').classList.remove('open');
+  document.getElementById('adminLoteClientsContainer').style.display = "none";
+  renderLotesAdmin();
+  updateLoteSummary();
+  showToast("danger", "Lote Eliminado", "El lote ha sido eliminado correctamente del sistema.");
+});
+
 function openLoteDetail(id){
   const lote = savedLists.find(x => x.id === id);
   if(!lote) return;
   const content = document.getElementById("loteDetailContent");
   content.innerHTML = `
-    <h3 style="margin-top:0; color:var(--navy-800);">#${lote.id} · ${lote.titulo}</h3>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; background:var(--navy-100); padding:12px; border-radius:6px;">
+    <h3 style="margin-top:0; color:var(--navy-900);">#${lote.id} · ${lote.titulo}</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; background:var(--navy-100); padding:14px; border-radius:8px;">
       <div><strong>Creado por:</strong> ${lote.creadoPor}</div>
       <div><strong>Fecha:</strong> ${lote.creado}</div>
       <div><strong>Motivo:</strong> ${lote.motivo}</div>
@@ -1692,10 +1908,10 @@ function openLoteDetail(id){
       <div><strong>Asignado a:</strong> ${lote.destino} (${lote.destinoTipo})</div>
       <div><strong>Estado:</strong> <span class="status-tag status-${lote.estado}">${estadoLabel(lote.estado)}</span></div>
     </div>
-    <div style="margin-bottom:14px;"><strong>Descripción:</strong> ${lote.descripcion || "Sin descripción"}</div>
-    <h4 style="color:var(--navy-800); margin:14px 0 8px;">Historial del lote</h4>
-    <div style="border-left:2px solid var(--navy-800); padding-left:14px;">
-      ${lote.historial.map(h => `<div style="margin-bottom:10px;"><div style="font-size:11px; color:var(--muted);">${h.fecha}</div><div style="font-weight:700;">${h.titulo}</div><div style="font-size:12px;">Por: ${h.usuario}</div></div>`).join("")}
+    <div style="margin-bottom:16px;"><strong>Instrucciones:</strong> ${lote.descripcion || "Sin observaciones adicionadas."}</div>
+    <h4 style="color:var(--navy-800); margin:16px 0 8px; font-weight:800;">Historial y Bitácora</h4>
+    <div style="border-left:3px solid var(--navy-800); padding-left:14px;">
+      ${lote.historial.map(h => `<div style="margin-bottom:12px;"><div style="font-size:11px; color:var(--muted);">${h.fecha}</div><div style="font-weight:700; color:var(--navy-900);">${h.titulo}</div><div style="font-size:12px; color:var(--muted);">Realizado por: ${h.usuario}</div></div>`).join("")}
     </div>
   `;
   document.getElementById("detailModalBackdrop").classList.add("open");
@@ -1705,7 +1921,21 @@ document.getElementById("closeDetailModalBtn").addEventListener("click", () => d
 document.getElementById("closeDetailBtn").addEventListener("click", () => document.getElementById("detailModalBackdrop").classList.remove("open"));
 
 
-// RENDERIZAR CARDS DE LOTES ASIGNADOS AL AGENTE
+/* ===================================================================
+   MÓDULO DE AGENTES
+==================================================================== */
+
+// CAMBIO DINÁMICO DE AGENTE
+document.getElementById('agentSwitchSelect').addEventListener('change', (e) => {
+  currentAgentUser = e.target.value;
+  const initials = currentAgentUser.split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase();
+  document.getElementById('agentAvatar').textContent = initials;
+  document.getElementById('agentClientsSection').style.display = "none";
+  currentAgentLoteId = null;
+  renderAgentLotes();
+  showToast("warning", "Agente Cambiado", `Ahora estás en el panel de trabajo de ${currentAgentUser}.`);
+});
+
 function renderAgentLotes(){
   const container = document.getElementById('agentLotesContainer');
   container.innerHTML = "";
@@ -1714,8 +1944,14 @@ function renderAgentLotes(){
   const fEstado = document.getElementById('agentLoteEstadoFilter').value;
   const fMotivo = document.getElementById('agentLoteMotivoFilter').value;
 
-  // Filtrar lotes
-  const filtered = savedLists.filter(lote => {
+  // Filtrar lotes pertenecientes al agente actual o a su grupo
+  const assigned = savedLists.filter(lote => {
+    const isDirectUser = lote.destinoTipo === "usuario" && lote.destino.toLowerCase() === currentAgentUser.toLowerCase();
+    const isGroupMatch = lote.destinoTipo === "departamento" && (lote.destino === "Ventas" || currentAgentUser === "Ventas");
+    return isDirectUser || isGroupMatch;
+  });
+
+  const filtered = assigned.filter(lote => {
     if(qSearch && !lote.titulo.toLowerCase().includes(qSearch) && !String(lote.id).includes(qSearch)) return false;
     if(fEstado && lote.estado !== fEstado) return false;
     if(fMotivo && lote.motivo !== fMotivo) return false;
@@ -1723,7 +1959,7 @@ function renderAgentLotes(){
   });
 
   if(filtered.length === 0){
-    container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:30px; color:var(--muted); background:#fff; border-radius:var(--radius); border:1px solid var(--line);">No tienes lotes asignados con los filtros aplicados.</div>`;
+    container.innerHTML = `<div style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--muted); background:#fff; border-radius:var(--radius); border:1px solid var(--line);">No hay lotes asignados para ${currentAgentUser} con los filtros aplicados.</div>`;
     return;
   }
 
@@ -1740,13 +1976,13 @@ function renderAgentLotes(){
         <div class="lote-card-title">${lote.titulo}</div>
         <div class="lote-card-meta">
           <span>🎯 Motivo: <strong>${lote.motivo}</strong></span>
-          <span>👥 Contactos: <strong>${lote.contactos}</strong></span>
+          <span>👥 Total Contactos: <strong>${lote.contactos}</strong></span>
         </div>
       </div>
       <div class="lote-card-foot">
-        <span style="font-size:11px; color:var(--muted);">Asignado: ${lote.creado.slice(0,10)}</span>
-        <button class="btn btn-primary" style="font-size:12px; padding:6px 12px;" onclick="loadAgentLoteClients(${lote.id})">
-          👁️ Ver lote
+        <span style="font-size:11.5px; color:var(--muted);">Creado: ${lote.creado.slice(0,10)}</span>
+        <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="loadAgentLoteClients(${lote.id})">
+          👁️ Ver Lote
         </button>
       </div>
     `;
@@ -1762,24 +1998,21 @@ document.getElementById('agentClearBtn').addEventListener('click', () => {
   renderAgentLotes();
 });
 
-// CARGAR CLIENTES DE UN LOTE ESPECÍFICO (AL DAR CLIC EN "VER LOTE")
+// CARGAR CLIENTES DE UN LOTE EN VISTA DE AGENTE
 function loadAgentLoteClients(loteId){
   currentAgentLoteId = loteId;
   const lote = savedLists.find(x => x.id === loteId);
 
-  renderAgentLotes(); // Para resaltar la tarjeta seleccionada
+  renderAgentLotes();
 
-  document.getElementById('agentActiveLoteBadge').textContent = `LOTE #${lote.id} · ASIGNADO A: ${lote.destino.toUpperCase()}`;
+  document.getElementById('agentActiveLoteBadge').textContent = `LOTE #${lote.id} · MOTIVO: ${lote.motivo.toUpperCase()}`;
   document.getElementById('agentActiveLoteTitle').textContent = `Clientes de "${lote.titulo}"`;
   document.getElementById('agentClientsSection').style.display = "block";
 
-  // Desplazar suavemente hacia la tabla
   document.getElementById('agentClientsSection').scrollIntoView({ behavior: 'smooth' });
 
-  // Unificar clientes para el lote
   const allPossible = [...rawClients, ...newLeads];
-  // Simulamos asociar clientes al lote seleccionando algunos
-  agentClientsFiltered = allPossible.filter((c, idx) => (c.loteId === loteId) || (idx % (loteId === 101 ? 2 : 3) === 0));
+  agentClientsFiltered = allPossible.filter(c => lote.clientIds && lote.clientIds.includes(c.id));
 
   agentClientsPage = 1;
   renderAgentClientsTable();
@@ -1791,12 +2024,11 @@ document.getElementById('agentCloseClientsBtn').addEventListener('click', () => 
   renderAgentLotes();
 });
 
-// BÚSQUEDA Y PAGINACIÓN EN LA TABLA DE CLIENTES DEL AGENTE
 document.getElementById('agentClientSearchInput').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase().trim();
   const lote = savedLists.find(x => x.id === currentAgentLoteId);
   const allPossible = [...rawClients, ...newLeads];
-  const baseList = allPossible.filter((c, idx) => (c.loteId === currentAgentLoteId) || (idx % (currentAgentLoteId === 101 ? 2 : 3) === 0));
+  const baseList = allPossible.filter(c => lote.clientIds && lote.clientIds.includes(c.id));
 
   agentClientsFiltered = baseList.filter(c => {
     const name = (c.cliente || c.nombres || "").toLowerCase();
@@ -1814,7 +2046,7 @@ document.getElementById('agentClientsPageSizeSelect').addEventListener('change',
   renderAgentClientsTable();
 });
 
-// RENDER TABLA DE CLIENTES PARA AGENTE (OJITO EN COLUMNA 1)
+// RENDER TABLA AGENTE (CON OJITO EN PRIMERA COLUMNA 👁️)
 function renderAgentClientsTable(){
   const tbody = document.getElementById('agentClientsBody');
   tbody.innerHTML = "";
@@ -1823,20 +2055,20 @@ function renderAgentClientsTable(){
   const pageData = agentClientsFiltered.slice(start, start + agentClientsPageSize);
 
   if(pageData.length === 0){
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No hay clientes asignados en este lote.</td></tr>`;
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No hay contactos asignados en este lote.</td></tr>`;
   } else {
     pageData.forEach(c => {
       const tr = document.createElement('tr');
       const nombre = c.cliente || c.nombres;
       const tel = c.telefono || "+57 300 000 0000";
-      const tipo = c.tipo || c.tipoTracking || "Lead";
+      const tipo = c.tipo || "Lead";
       const vendedor = c.vendedor || c.creadoPor || "Asignado";
       const estadoGestion = c.estadoGestion || "Pendiente";
       const ultima = c.ultimaInteraccion || "—";
 
       tr.innerHTML = `
         <td style="text-align:center;">
-          <button class="btn-eye" title="Abrir Hoja de Primer Lugar" onclick="openCustomerSheet(${c.id})">
+          <button class="btn-eye" title="Abrir Ficha de Cliente" onclick="openCustomerSheet(${c.id})">
             👁️
           </button>
         </td>
@@ -1856,7 +2088,7 @@ function renderAgentClientsTable(){
     });
   }
 
-  // Paginación del Agente
+  // Paginación Agente
   const total = agentClientsFiltered.length;
   const totalPages = Math.max(1, Math.ceil(total / agentClientsPageSize));
   const end = Math.min(start + agentClientsPageSize, total);
@@ -1882,7 +2114,7 @@ function setAgentPage(p){
   renderAgentClientsTable();
 }
 
-// HOJA / FICHA DEL CLIENTE (MODAL DETALLE AL DAR CLIC EN EL OJITO 👁️)
+/* MODAL FICHA DEL CLIENTE (OJITO 👁️) */
 function openCustomerSheet(clientId){
   const allPossible = [...rawClients, ...newLeads];
   const client = allPossible.find(c => c.id === clientId);
@@ -1896,30 +2128,28 @@ function openCustomerSheet(clientId){
   const reg = client.registro || client.fechaRegistro || "—";
   const vend = client.vendedor || client.creadoPor || "Sin asignar";
 
-  // Datos principales de la hoja
   document.getElementById('customerSheetDetails').innerHTML = `
     <div class="sheet-item"><span class="sheet-label">Código Cliente</span><span class="sheet-val">#${client.id}</span></div>
     <div class="sheet-item"><span class="sheet-label">Nombre Completo</span><span class="sheet-val">${name}</span></div>
     <div class="sheet-item"><span class="sheet-label">Teléfono / WhatsApp</span><span class="sheet-val">${tel}</span></div>
     <div class="sheet-item"><span class="sheet-label">Cumpleaños</span><span class="sheet-val">${cumple}</span></div>
     <div class="sheet-item"><span class="sheet-label">Fecha de Registro</span><span class="sheet-val">${reg}</span></div>
-    <div class="sheet-item"><span class="sheet-label">Vendedor / Origen</span><span class="sheet-val">${vend}</span></div>
+    <div class="sheet-item"><span class="sheet-label">Origen / Asesor</span><span class="sheet-val">${vend}</span></div>
   `;
 
-  // Cargar Historial
   const history = clientHistories[client.id] || [];
   const histContainer = document.getElementById('customerGestionHistory');
   if(history.length === 0){
-    histContainer.innerHTML = `<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">Sin historial de llamadas registrado para este cliente.</div>`;
+    histContainer.innerHTML = `<div style="font-size:12.5px; color:var(--muted); text-align:center; padding:12px;">Sin registros previos de llamadas.</div>`;
   } else {
     histContainer.innerHTML = history.map(h => `
       <div class="gestion-item">
-        <div style="display:flex; justify-shadow:space-between; justify-content:space-between;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
           <span class="res">${h.resultado}</span>
           <span class="time">${h.fecha}</span>
         </div>
-        <div style="font-size:12px; color:var(--ink); margin-top:2px;">"${h.nota}"</div>
-        <div style="font-size:11px; color:var(--muted);">Agente: ${h.usuario}</div>
+        <div style="font-size:12.5px; color:var(--ink); margin-top:2px;">"${h.nota}"</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">Agente: ${h.usuario}</div>
       </div>
     `).join("");
   }
@@ -1931,13 +2161,12 @@ function openCustomerSheet(clientId){
 document.getElementById('closeCustomerSheetBtn').addEventListener('click', () => document.getElementById('customerSheetModal').classList.remove('open'));
 document.getElementById('closeCustomerSheetFooterBtn').addEventListener('click', () => document.getElementById('customerSheetModal').classList.remove('open'));
 
-// GUARDAR NUEVA GESTIÓN DESDE EL OJITO
 document.getElementById('saveCustomerGestionBtn').addEventListener('click', () => {
   if(!activeEditingClient) return;
 
   const result = document.getElementById('agentCallResult').value;
   const status = document.getElementById('agentClientStatus').value;
-  const notes = document.getElementById('agentCallNotes').value.trim() || "Sin observaciones";
+  const notes = document.getElementById('agentCallNotes').value.trim() || "Sin observaciones adicionadas.";
   const now = new Date().toLocaleString("es-CO");
 
   if(!clientHistories[activeEditingClient.id]) {
@@ -1948,18 +2177,16 @@ document.getElementById('saveCustomerGestionBtn').addEventListener('click', () =
     fecha: now,
     resultado: result,
     nota: notes,
-    usuario: "Mary Polo"
+    usuario: currentAgentUser
   });
 
-  // Actualizar estado en el cliente
   activeEditingClient.estadoGestion = status;
   activeEditingClient.ultimaInteraccion = now;
 
   document.getElementById('customerSheetModal').classList.remove('open');
   renderAgentClientsTable();
-  showToast("success", "Gestión Guardada", `La gestión para ${activeEditingClient.cliente || activeEditingClient.nombres} ha sido registrada.`);
+  showToast("success", "Gestión Registrada", `Se actualizó la ficha de ${activeEditingClient.cliente || activeEditingClient.nombres}.`);
 });
-
 
 function showToast(type, title, message){
   const toast = document.createElement("div");
@@ -1969,11 +2196,11 @@ function showToast(type, title, message){
   setTimeout(() => toast.remove(), 4000);
 }
 
-// INICIALIZACIÓN
+/* INICIALIZACIÓN */
 syncFieldVisibility();
 populateVendorOptions();
 applyFilters();
-renderLotes();
+renderLotesAdmin();
 updateLoteSummary();
 </script>
 
