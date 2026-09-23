@@ -208,6 +208,44 @@
     align-items: flex-end;
   }
 
+  .filter-fields-group { display: contents; }
+
+  .filter-field {
+    min-width: 180px;
+  }
+
+  .filter-field.filter-field-wide {
+    min-width: 260px;
+  }
+
+  .filter-field > div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-field input[type=number] {
+    font-family: inherit;
+    font-size: 13.5px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    width: 150px;
+  }
+
+  .filter-remove,
+  .chip-remove {
+    border: 0;
+    background: transparent;
+    color: var(--navy-600);
+    font-weight: 800;
+    cursor: pointer;
+    padding: 0 0 0 4px;
+  }
+
   .field-inline {
     display: flex;
     flex-direction: column;
@@ -827,57 +865,27 @@
               <label>Tipo de contacto</label>
               <select id="contactType">
                 <option value="">Todos</option>
-                <option value="nuevo">Nuevos / Leads</option>
+                <option value="nuevo">Nuevos</option>
+                <option value="leads">Leads</option>
                 <option value="recurrente">Recurrente</option>
                 <option value="inactivo">Inactivo</option>
-                <option value="lead">Lead Antiguo</option>
               </select>
             </div>
 
-            <div class="field-inline" id="monthField">
-              <label>Mes de cumpleaños</label>
-              <select id="monthSelect">
-                <option value="">Todos</option>
-                <option value="01">Enero</option>
-                <option value="02">Febrero</option>
-                <option value="03">Marzo</option>
-                <option value="04">Abril</option>
-                <option value="05">Mayo</option>
-                <option value="06">Junio</option>
-                <option value="07">Julio</option>
-                <option value="08" selected>Agosto</option>
-                <option value="09">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
+            <div class="field-inline" id="fixedDateField"></div>
+            <div class="field-inline" id="monthField"></div>
+            <div class="field-inline" id="inactiveDaysField"></div>
+            <div class="field-inline" id="previousStatusField"></div>
+            <div class="field-inline" id="codeField"></div>
+
+            <div class="field-inline">
+              <label>Agregar filtro</label>
+              <select id="optionalFilterSelect">
+                <option value="">Seleccionar filtros</option>
               </select>
             </div>
 
-            <div class="field-inline">
-              <label>Registrado desde / hasta</label>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <input type="date" id="dateFrom">
-                <span style="color:var(--muted)">–</span>
-                <input type="date" id="dateTo">
-              </div>
-            </div>
-
-            <div class="field-inline">
-              <label>Código</label>
-              <input type="text" id="codeInput" placeholder="Ej: 245" style="width:100px;">
-            </div>
-
-            <div class="field-inline">
-              <label>Vendedor / Asesor</label>
-              <select id="vendorSelect">
-                <option value="">Todos</option>
-              </select>
-            </div>
-
-            <div class="search-wrap">
-              <label style="display:block; font-size:11px; font-weight:500; color:var(--navy-800); margin-bottom:6px; text-transform:uppercase;">Buscar nombre</label>
-              <input type="text" id="searchInput" placeholder="Nombre o apellido…">
-            </div>
+            <div id="selectedOptionalFilters" class="filter-fields-group"></div>
 
             <button class="btn btn-primary" id="buscarBtn">Buscar</button>
             <button class="btn btn-outline" id="clearFiltersBtn">Limpiar filtros</button>
@@ -1463,7 +1471,91 @@ document.querySelectorAll('.sub-tab-btn').forEach(btn => {
   });
 });
 
-const tipoLabel = { nuevo: "Nuevo / Lead", recurrente: "Recurrente", inactivo: "Inactivo", lead: "Lead Antiguo" };
+const tipoLabel = { nuevo: "Nuevo", leads: "Lead", recurrente: "Recurrente", inactivo: "Inactivo", lead: "Lead" };
+
+const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+const defaultOptionalFilters = ["registered_date", "codigo", "campaign_package", "vendedor", "psiquico", "search", "pais", "estado", "expired_minutes", "courtesy_minutes"];
+const typeSpecificOptionalFilters = ["campaign_package", "vendedor", "psiquico", "search", "pais", "estado", "expired_minutes", "courtesy_minutes"];
+const allContactOptionalFilters = [...defaultOptionalFilters, "all"];
+const optionalFilterDefinitions = {
+  registered_date: "Cliente registrado desde / hasta",
+  codigo: "Código de cliente",
+  mes: "Mes de cumpleaños",
+  campaign_package: "Campaña y tipo de paquete",
+  vendedor: "Vendedor / Asesor",
+  psiquico: "Psiquico / Astrologo",
+  search: "Buscar nombre",
+  pais: "País",
+  estado: "Estado",
+  all: "Convertido / Todos",
+  expired_minutes: "Minutos expirados",
+  courtesy_minutes: "Minutos cortesía"
+};
+
+const clientTypeFilters = {
+  "": {
+    label: "Todos",
+    supportsAll: false,
+    fixedDate: { label: "Cliente registrado desde / hasta", from: "desde", to: "hasta" },
+    visibleFilters: ["mes", "codigo"],
+    optionalFilters: typeSpecificOptionalFilters
+  },
+  nuevo: {
+    label: "Nuevos",
+    supportsAll: true,
+    fixedDate: { label: "Cliente nuevo desde / hasta", from: "nuevo_desde", to: "nuevo_hasta" },
+    visibleFilters: ["mes"],
+    optionalFilters: allContactOptionalFilters
+  },
+  leads: {
+    label: "Leads",
+    supportsAll: false,
+    visibleFilters: ["mes"],
+    optionalFilters: defaultOptionalFilters
+  },
+  recurrente: {
+    label: "Recurrente",
+    supportsAll: false,
+    fixedDate: { label: "Recurrente desde / hasta", from: "recurrente_desde", to: "recurrente_hasta" },
+    visibleFilters: ["status_anterior"],
+    optionalFilters: [...defaultOptionalFilters, "mes"]
+  },
+  inactivo: {
+    label: "Inactivo",
+    supportsAll: false,
+    fixedDate: { label: "Inactivo desde / hasta", from: "inactivo_desde", to: "inactivo_hasta" },
+    visibleFilters: ["mes", "dias_inactividad"],
+    optionalFilters: defaultOptionalFilters
+  }
+};
+
+const filterState = {
+  tipo: "",
+  mes: "",
+  desde: "",
+  hasta: "",
+  nuevo_desde: "",
+  nuevo_hasta: "",
+  recurrente_desde: "",
+  recurrente_hasta: "",
+  inactivo_desde: "",
+  inactivo_hasta: "",
+  dias_inactividad: "",
+  status_anterior: "",
+  codigo: "",
+  vendedor: "",
+  pais: "",
+  estado: "",
+  psiquico: "",
+  search: "",
+  all: false,
+  expired_minutes: false,
+  courtesy_minutes: false,
+  campana: "",
+  package_type: ""
+};
+
+let selectedOptionalFilters = [];
 
 const generalColumns = [
   { label: "COD", render: c => c.id, cls: "cod" },
@@ -1494,46 +1586,205 @@ function formatDateHuman(dateStr){
   return `${parts[2]} ${meses[parseInt(parts[1],10)-1]} ${parts[0]}`;
 }
 
-function isNuevoMode(){ return document.getElementById('contactType').value === "nuevo"; }
-function activeDataset(){ return isNuevoMode() ? newLeads : rawClients; }
+function activeTypeConfig(){ return clientTypeFilters[filterState.tipo] || clientTypeFilters[""]; }
+function isNuevoMode(){ return filterState.tipo === "nuevo"; }
+function activeDataset(){
+  if (filterState.tipo === "nuevo") return newLeads;
+  if (filterState.tipo === "leads") return rawClients.filter(client => client.tipo === "lead");
+  return rawClients;
+}
 function activeColumns(){ return isNuevoMode() ? nuevoColumns : generalColumns; }
 function displayName(item){ return isNuevoMode() ? item.nombres : item.cliente; }
 function agenteAtendio(item){ return isNuevoMode() ? (item.quienHizoLlamada || item.creadoPor) : item.vendedor; }
 
+function escapeHtml(value){
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function renderMonthOptions(){
+  return '<option value="">Todos</option>' + months.map((month, index) =>
+    `<option value="${String(index + 1).padStart(2, "0")}">${month}</option>`
+  ).join("");
+}
+
+function renderTypeFilterFields(){
+  const config = activeTypeConfig();
+  const fixedDate = config.fixedDate;
+  const fixedDateField = document.getElementById("fixedDateField");
+  const monthField = document.getElementById("monthField");
+  const inactiveDaysField = document.getElementById("inactiveDaysField");
+  const previousStatusField = document.getElementById("previousStatusField");
+  const codeField = document.getElementById("codeField");
+
+  fixedDateField.innerHTML = fixedDate ? `
+    <label>${fixedDate.label}</label>
+    <div>
+      <input type="date" id="fixedDateFrom" value="${filterState[fixedDate.from] || ""}">
+      <span style="color:var(--muted)">–</span>
+      <input type="date" id="fixedDateTo" value="${filterState[fixedDate.to] || ""}">
+    </div>` : "";
+  monthField.innerHTML = config.visibleFilters.includes("mes") ? `
+    <label>Mes de cumpleaños</label>
+    <select id="monthSelect">${renderMonthOptions()}</select>` : "";
+  inactiveDaysField.innerHTML = config.visibleFilters.includes("dias_inactividad") ? `
+    <label>Días de inactividad</label>
+    <input type="number" min="0" id="inactiveDaysInput" placeholder="Ej: 30" value="${filterState.dias_inactividad || ""}">` : "";
+  previousStatusField.innerHTML = config.visibleFilters.includes("status_anterior") ? `
+    <label>Status anterior</label>
+    <select id="previousStatusSelect">
+      <option value="">Todos</option>
+      <option value="nuevo">Nuevos</option>
+      <option value="leads">Leads</option>
+      <option value="recurrente">Recurrente</option>
+      <option value="inactivo">Inactivo</option>
+    </select>` : "";
+  codeField.innerHTML = config.visibleFilters.includes("codigo") ? `
+    <label>Código</label>
+    <input type="text" id="codeInput" placeholder="Ej: 245" style="width:100px;">` : "";
+
+  if (document.getElementById("monthSelect")) document.getElementById("monthSelect").value = filterState.mes;
+  if (document.getElementById("previousStatusSelect")) document.getElementById("previousStatusSelect").value = filterState.status_anterior;
+  if (document.getElementById("codeInput")) document.getElementById("codeInput").value = filterState.codigo;
+  renderOptionalFilterOptions();
+  renderOptionalFilterFields();
+  bindDynamicFilterEvents();
+}
+
+function renderOptionalFilterOptions(){
+  const select = document.getElementById("optionalFilterSelect");
+  const available = activeTypeConfig().optionalFilters.filter(key => !selectedOptionalFilters.includes(key));
+  select.innerHTML = '<option value="">Seleccionar filtros</option>' + available.map(key =>
+    `<option value="${key}">${optionalFilterDefinitions[key]}</option>`
+  ).join("");
+}
+
+function renderOptionalFilterFields(){
+  const container = document.getElementById("selectedOptionalFilters");
+  container.innerHTML = selectedOptionalFilters.map(key => {
+    const remove = `<button type="button" class="filter-remove" data-remove-filter="${key}" title="Quitar filtro">×</button>`;
+    if (key === "registered_date") return `<div class="field-inline filter-field filter-field-wide"><label>${optionalFilterDefinitions[key]} ${remove}</label><div><input type="date" id="registeredFrom"><span style="color:var(--muted)">–</span><input type="date" id="registeredTo"></div></div>`;
+    if (key === "mes") return `<div class="field-inline filter-field"><label>Mes de cumpleaños ${remove}</label><select id="optionalMonthSelect">${renderMonthOptions()}</select></div>`;
+    if (key === "codigo") return `<div class="field-inline filter-field"><label>Código ${remove}</label><input type="text" id="optionalCodeInput" placeholder="Ej: 245"></div>`;
+    if (key === "vendedor") return `<div class="field-inline filter-field"><label>Vendedor / Asesor ${remove}</label><select id="vendorSelect"><option value="">Todos</option></select></div>`;
+    if (key === "search") return `<div class="field-inline filter-field"><label>Buscar nombre ${remove}</label><input type="text" id="searchInput" placeholder="Nombre o apellido…"></div>`;
+    if (["pais", "estado", "psiquico"].includes(key)) return `<div class="field-inline filter-field"><label>${optionalFilterDefinitions[key]} ${remove}</label><select id="${key}Select"><option value="">Todos</option></select></div>`;
+    if (key === "campaign_package") return `<div class="field-inline filter-field filter-field-wide"><label>Campaña y tipo de paquete ${remove}</label><div><select id="campaignSelect"><option value="">Campaña</option><option value="FACEBOOK">Facebook</option><option value="WHATSAPP">WhatsApp</option><option value="REDES SOCIALES">Redes sociales</option></select><select id="packageSelect"><option value="">Tipo de paquete</option><option value="BASICO">Básico</option><option value="PREMIUM">Premium</option></select></div></div>`;
+    return `<div class="field-inline filter-field optional-check"><label>${optionalFilterDefinitions[key]} ${remove}</label><label class="mb-0"><input type="checkbox" id="${key}Input"> Sí</label></div>`;
+  }).join("");
+
+  if (document.getElementById("registeredFrom")) document.getElementById("registeredFrom").value = filterState.desde;
+  if (document.getElementById("registeredTo")) document.getElementById("registeredTo").value = filterState.hasta;
+  if (document.getElementById("optionalMonthSelect")) document.getElementById("optionalMonthSelect").value = filterState.mes;
+  if (document.getElementById("optionalCodeInput")) document.getElementById("optionalCodeInput").value = filterState.codigo;
+  if (document.getElementById("searchInput")) document.getElementById("searchInput").value = filterState.search;
+  if (document.getElementById("campaignSelect")) document.getElementById("campaignSelect").value = filterState.campana;
+  if (document.getElementById("packageSelect")) document.getElementById("packageSelect").value = filterState.package_type;
+  ["all", "expired_minutes", "courtesy_minutes"].forEach(key => {
+    const input = document.getElementById(`${key}Input`);
+    if (input) input.checked = filterState[key];
+  });
+  populateVendorOptions();
+}
+
+function bindDynamicFilterEvents(){
+  ["fixedDateFrom", "fixedDateTo", "monthSelect", "inactiveDaysInput", "previousStatusSelect", "codeInput"].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.addEventListener("change", syncFilterStateFromDom);
+  });
+}
+
+function syncFilterStateFromDom(){
+  const config = activeTypeConfig();
+  if (config.fixedDate) {
+    filterState[config.fixedDate.from] = document.getElementById("fixedDateFrom")?.value || "";
+    filterState[config.fixedDate.to] = document.getElementById("fixedDateTo")?.value || "";
+  }
+  filterState.mes = document.getElementById("monthSelect")?.value || document.getElementById("optionalMonthSelect")?.value || filterState.mes;
+  filterState.dias_inactividad = document.getElementById("inactiveDaysInput")?.value || filterState.dias_inactividad;
+  filterState.status_anterior = document.getElementById("previousStatusSelect")?.value || filterState.status_anterior;
+  filterState.codigo = document.getElementById("codeInput")?.value.trim() || document.getElementById("optionalCodeInput")?.value.trim() || filterState.codigo;
+  filterState.desde = document.getElementById("registeredFrom")?.value || filterState.desde;
+  filterState.hasta = document.getElementById("registeredTo")?.value || filterState.hasta;
+  filterState.search = document.getElementById("searchInput")?.value.trim() || filterState.search;
+  filterState.vendedor = document.getElementById("vendorSelect")?.value || filterState.vendedor;
+  filterState.campana = document.getElementById("campaignSelect")?.value || filterState.campana;
+  filterState.package_type = document.getElementById("packageSelect")?.value || filterState.package_type;
+  ["all", "expired_minutes", "courtesy_minutes"].forEach(key => {
+    const input = document.getElementById(`${key}Input`);
+    if (input) filterState[key] = input.checked;
+  });
+}
+
+function addOptionalFilter(key){
+  if (!key || selectedOptionalFilters.includes(key)) return;
+  syncFilterStateFromDom();
+  selectedOptionalFilters.push(key);
+  document.getElementById("optionalFilterSelect").value = "";
+  renderOptionalFilterOptions();
+  renderOptionalFilterFields();
+}
+
+function removeOptionalFilter(key){
+  syncFilterStateFromDom();
+  selectedOptionalFilters = selectedOptionalFilters.filter(item => item !== key);
+  if (key === "registered_date") { filterState.desde = ""; filterState.hasta = ""; }
+  if (key === "campaign_package") { filterState.campana = ""; filterState.package_type = ""; }
+  if (key === "vendedor") filterState.vendedor = "";
+  if (key === "search") filterState.search = "";
+  renderOptionalFilterOptions();
+  renderOptionalFilterFields();
+  applyFilters();
+}
+
 function populateVendorOptions(){
   const vendors = [...new Set(activeDataset().map(c => agenteAtendio(c)).filter(Boolean))].sort();
   const vendorSelect = document.getElementById('vendorSelect');
-  const prev = vendorSelect.value;
+  if (!vendorSelect) return;
+  const prev = filterState.vendedor || vendorSelect.value;
   vendorSelect.innerHTML = '<option value="">Todos</option>' + vendors.map(v => `<option value="${v}">${v}</option>`).join("");
   if(vendors.includes(prev)) vendorSelect.value = prev;
 }
 
 function syncFieldVisibility(){
-  document.getElementById('monthField').style.display = isNuevoMode() ? "none" : "";
+  renderTypeFilterFields();
 }
 
 function applyFilters(){
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const tipoFiltro = document.getElementById('contactType').value;
-  const mes = document.getElementById('monthSelect').value;
-  const desde = document.getElementById('dateFrom').value;
-  const hasta = document.getElementById('dateTo').value;
-  const codigo = document.getElementById('codeInput').value.trim();
-  const vendedor = document.getElementById('vendorSelect').value;
+  syncFilterStateFromDom();
+  const q = filterState.search.toLowerCase();
+  const tipoFiltro = filterState.tipo;
+  const mes = filterState.mes;
+  const codigo = filterState.codigo;
+  const vendedor = filterState.vendedor;
   const nuevoMode = isNuevoMode();
+  const config = activeTypeConfig();
+  const dateFrom = config.fixedDate ? filterState[config.fixedDate.from] : "";
+  const dateTo = config.fixedDate ? filterState[config.fixedDate.to] : "";
+  const registeredFrom = selectedOptionalFilters.includes("registered_date") ? filterState.desde : "";
+  const registeredTo = selectedOptionalFilters.includes("registered_date") ? filterState.hasta : "";
 
   currentFiltered = activeDataset().filter(c => {
-    if(!nuevoMode && tipoFiltro && c.tipo !== tipoFiltro) return false;
-    if(codigo && !String(c.id).includes(codigo)) return false;
-    if(vendedor && agenteAtendio(c) !== vendedor) return false;
-    if(!nuevoMode && mes && c.cumple && c.cumple.split("-")[1] !== mes) return false;
+    if (tipoFiltro === "recurrente" && c.tipo !== "recurrente") return false;
+    if (tipoFiltro === "inactivo" && c.tipo !== "inactivo") return false;
+    if (codigo && !String(c.id).includes(codigo)) return false;
+    if (vendedor && agenteAtendio(c) !== vendedor) return false;
+    if (mes && c.cumple && c.cumple.split("-")[1] !== mes) return false;
 
-    const fechaReg = nuevoMode ? c.fechaRegistro.slice(0,10) : c.registro;
-    if(desde && fechaReg < desde) return false;
-    if(hasta && fechaReg > hasta) return false;
+    const dateValue = nuevoMode ? (c.fechaRegistro || "").slice(0, 10) : c.registro;
+    if (dateFrom && dateValue < dateFrom) return false;
+    if (dateTo && dateValue > dateTo) return false;
+    if (registeredFrom && dateValue < registeredFrom) return false;
+    if (registeredTo && dateValue > registeredTo) return false;
+    if (filterState.status_anterior && c.tipo !== filterState.status_anterior) return false;
+    if (filterState.campana && c.campaniaPais !== filterState.campana) return false;
 
-    const nombre = displayName(c).toLowerCase();
-    if(q && !nombre.includes(q)) return false;
+    const nombre = String(displayName(c) || "").toLowerCase();
+    if (q && !nombre.includes(q)) return false;
 
     return true;
   });
@@ -1545,22 +1796,39 @@ function applyFilters(){
 
 function renderActiveFilters(){
   const chips = [];
-  const cType = document.getElementById('contactType').value;
-  const mSelect = document.getElementById('monthSelect');
-  const dFrom = document.getElementById('dateFrom').value;
-  const dTo = document.getElementById('dateTo').value;
-  const cod = document.getElementById('codeInput').value.trim();
-  const vend = document.getElementById('vendorSelect').value;
-  const search = document.getElementById('searchInput').value.trim();
+  const config = activeTypeConfig();
+  if (filterState.tipo) chips.push({ key: "tipo", label: "Tipo: " + config.label });
+  if (filterState.mes) chips.push({ key: "mes", label: "Cumpleaños: " + months[parseInt(filterState.mes, 10) - 1] });
+  if (config.fixedDate && filterState[config.fixedDate.from]) chips.push({ key: config.fixedDate.from, label: `${config.fixedDate.label.split(" / ")[0]}: ${filterState[config.fixedDate.from]}` });
+  if (config.fixedDate && filterState[config.fixedDate.to]) chips.push({ key: config.fixedDate.to, label: `${config.fixedDate.label.split(" / ")[1]}: ${filterState[config.fixedDate.to]}` });
+  if (selectedOptionalFilters.includes("registered_date") && (filterState.desde || filterState.hasta)) chips.push({ key: "registered_date", label: `Registrado: ${filterState.desde || "…"} a ${filterState.hasta || "…"}` });
+  if (filterState.codigo) chips.push({ key: "codigo", label: "Código: " + filterState.codigo });
+  if (filterState.status_anterior) chips.push({ key: "status_anterior", label: "Status anterior: " + tipoLabel[filterState.status_anterior] });
+  if (filterState.dias_inactividad) chips.push({ key: "dias_inactividad", label: "Días inactividad: " + filterState.dias_inactividad });
+  if (filterState.vendedor) chips.push({ key: "vendedor", label: "Asesor: " + filterState.vendedor });
+  if (filterState.search) chips.push({ key: "search", label: `Nombre: "${filterState.search}"` });
+  if (filterState.campana) chips.push({ key: "campaign_package", label: "Campaña: " + filterState.campana });
+  if (filterState.all) chips.push({ key: "all", label: "Convertido" });
+  if (filterState.expired_minutes) chips.push({ key: "expired_minutes", label: "Minutos expirados: Sí" });
+  if (filterState.courtesy_minutes) chips.push({ key: "courtesy_minutes", label: "Minutos cortesía: Sí" });
 
-  if(cType) chips.push("Tipo: " + (tipoLabel[cType] || cType));
-  if(!isNuevoMode() && mSelect.value) chips.push("Cumpleaños: " + mSelect.options[mSelect.selectedIndex].text);
-  if(dFrom || dTo) chips.push(`Registro: ${dFrom || "…"} a ${dTo || "…"}`);
-  if(cod) chips.push("Código: " + cod);
-  if(vend) chips.push("Asesor: " + vend);
-  if(search) chips.push(`Nombre: "${search}"`);
+  document.getElementById('activeFilters').innerHTML = chips.map(chip => `<span class="chip">${escapeHtml(chip.label)} <button type="button" class="chip-remove" data-clear-filter="${chip.key}" title="Eliminar filtro">×</button></span>`).join("");
+  document.querySelectorAll("[data-clear-filter]").forEach(button => button.addEventListener("click", () => clearFilterValue(button.dataset.clearFilter)));
+}
 
-  document.getElementById('activeFilters').innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join("");
+function clearFilterValue(key){
+  if (key === "tipo") {
+    filterState.tipo = "";
+    document.getElementById("contactType").value = "";
+    selectedOptionalFilters = [];
+    renderTypeFilterFields();
+  } else if (key === "registered_date") removeOptionalFilter(key);
+  else if (["vendedor", "search", "campana", "package_type", "all", "expired_minutes", "courtesy_minutes"].includes(key)) {
+    filterState[key] = typeof filterState[key] === "boolean" ? false : "";
+    if (key === "campana" || key === "package_type") filterState.package_type = "";
+    renderOptionalFilterFields();
+  } else filterState[key] = "";
+  applyFilters();
 }
 
 function getPageData(){
@@ -1670,28 +1938,33 @@ function renderPagination(){
 
 /* EVENT LISTENERS FILTROS CREAR LISTA */
 document.getElementById('contactType').addEventListener('change', () => {
+  filterState.tipo = document.getElementById('contactType').value;
+  selectedOptionalFilters = selectedOptionalFilters.filter(key => activeTypeConfig().optionalFilters.includes(key));
+  ["mes", "codigo", "status_anterior", "dias_inactividad"].forEach(key => {
+    if (!activeTypeConfig().visibleFilters.includes(key) && !activeTypeConfig().optionalFilters.includes(key)) filterState[key] = "";
+  });
   syncFieldVisibility();
-  populateVendorOptions();
   applyFilters();
 });
-document.getElementById('monthSelect').addEventListener('change', applyFilters);
-document.getElementById('dateFrom').addEventListener('change', applyFilters);
-document.getElementById('dateTo').addEventListener('change', applyFilters);
-document.getElementById('vendorSelect').addEventListener('change', applyFilters);
+document.getElementById('optionalFilterSelect').addEventListener('change', event => {
+  addOptionalFilter(event.target.value);
+});
 document.getElementById('buscarBtn').addEventListener('click', applyFilters);
-document.getElementById('searchInput').addEventListener('keyup', (e) => { if(e.key === 'Enter') applyFilters(); });
+document.getElementById('selectedOptionalFilters').addEventListener('click', event => {
+  const button = event.target.closest('[data-remove-filter]');
+  if (button) removeOptionalFilter(button.dataset.removeFilter);
+});
+document.getElementById('selectedOptionalFilters').addEventListener('change', syncFilterStateFromDom);
+document.getElementById('selectedOptionalFilters').addEventListener('keyup', event => {
+  if (event.key === 'Enter') applyFilters();
+});
 
 document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-  document.getElementById('searchInput').value = "";
+  Object.keys(filterState).forEach(key => filterState[key] = typeof filterState[key] === "boolean" ? false : "");
   document.getElementById('contactType').value = "";
-  document.getElementById('monthSelect').value = "";
-  document.getElementById('dateFrom').value = "";
-  document.getElementById('dateTo').value = "";
-  document.getElementById('codeInput').value = "";
-  document.getElementById('vendorSelect').value = "";
+  selectedOptionalFilters = [];
   selectedIds.clear();
   syncFieldVisibility();
-  populateVendorOptions();
   applyFilters();
 });
 
@@ -1710,6 +1983,27 @@ document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
   currentPage = 1;
   renderTable();
 });
+
+function exportCsv(){
+  if (selectedIds.size === 0) {
+    showToast("warning", "Selección Requerida", "Selecciona al menos un contacto para exportar.");
+    return;
+  }
+  const columns = activeColumns();
+  const rows = activeDataset().filter(client => selectedIds.has(client.id));
+  const escapeCsv = value => `"${String(value == null ? "" : value).replace(/"/g, '""').replace(/\r?\n|\r/g, " ")}"`;
+  const csv = "\uFEFF" + [columns.map(column => escapeCsv(column.label)).join(",")]
+    .concat(rows.map(client => columns.map(column => escapeCsv(String(column.render(client)).replace(/<[^>]*>/g, ""))).join(",")))
+    .join("\n");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+  link.download = "contactos.csv";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+document.getElementById('exportCsvBtn').addEventListener('click', exportCsv);
+document.getElementById('exportPdfBtn').addEventListener('click', () => window.print());
 
 /* MODAL CREAR LISTA */
 function openModal(){
