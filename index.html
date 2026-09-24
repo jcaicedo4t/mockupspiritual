@@ -409,13 +409,14 @@
     width: 100%;
     justify-content: space-between;
     min-height: 38px;
-    background: #fff;
-    border: 1px solid var(--line);
-    color: var(--ink);
+    background: var(--green);
+    border: 1px solid var(--green);
+    color: #fff;
     text-align: left;
+    box-shadow: 0 2px 5px rgba(15, 36, 53, 0.16);
   }
-  .custom-filter-trigger::after { content: "▾"; color: var(--navy-800); font-size: 14px; }
-  .custom-filter-dropdown.open .custom-filter-trigger { border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(38,94,133,0.15); }
+  .custom-filter-trigger:hover { background: #238348; border-color: #238348; }
+  .custom-filter-dropdown.open .custom-filter-trigger { background: #238348; border-color: #238348; box-shadow: 0 0 0 3px rgba(46,158,91,0.2); }
   .custom-filter-menu {
     position: absolute;
     top: calc(100% + 6px);
@@ -1021,7 +1022,7 @@
             </div>
 
             <div class="field-inline optional-filter-design" data-optional-design="3">
-              <label>Agregar filtro · Dropdown</label>
+              <label>Agregar filtro</label>
               <div id="optionalFilterDropdown" class="custom-filter-dropdown">
                 <button type="button" class="btn custom-filter-trigger" id="optionalFilterDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">Seleccionar filtros</button>
                 <div id="optionalFilterDropdownMenu" class="custom-filter-menu" role="listbox"></div>
