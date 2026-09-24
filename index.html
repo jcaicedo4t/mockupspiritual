@@ -403,6 +403,47 @@
   .optional-filter-design.active { display: flex; }
   .optional-filter-design[data-optional-design="2"] { flex: 1 1 100%; min-width: 100%; }
 
+  .optional-filter-design[data-optional-design="3"] { position: relative; }
+  .custom-filter-dropdown { position: relative; min-width: 230px; }
+  .custom-filter-trigger {
+    width: 100%;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .custom-filter-trigger::after { content: "▾"; color: var(--navy-800); font-size: 14px; }
+  .custom-filter-dropdown.open .custom-filter-trigger { border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(38,94,133,0.15); }
+  .custom-filter-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    display: none;
+    width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+  }
+  .custom-filter-dropdown.open .custom-filter-menu { display: grid; gap: 3px; }
+  .custom-filter-option {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    padding: 9px 10px;
+    text-align: left;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .custom-filter-option:hover { background: var(--navy-100); color: var(--navy-900); }
+
   .quick-filter-layout {
     display: grid;
     grid-template-columns: minmax(220px, 1fr) 1.4fr 1.4fr auto;
@@ -936,6 +977,7 @@
           <select id="loteDesignSelect" aria-label="Seleccionar diseño de filtros">
             <option value="1">Diseño 1 · Filtros</option>
             <option value="2">Diseño 2 · Atajos</option>
+            <option value="3">Diseño 3 · Dropdown</option>
           </select>
         </div>
       </div>
@@ -971,6 +1013,14 @@
             <div class="field-inline optional-filter-design" data-optional-design="2">
               <label>Agregar filtro · Atajos</label>
               <div id="optionalFilterShortcuts" class="quick-filter-group"></div>
+            </div>
+
+            <div class="field-inline optional-filter-design" data-optional-design="3">
+              <label>Agregar filtro · Dropdown</label>
+              <div id="optionalFilterDropdown" class="custom-filter-dropdown">
+                <button type="button" class="btn custom-filter-trigger" id="optionalFilterDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">Seleccionar filtros</button>
+                <div id="optionalFilterDropdownMenu" class="custom-filter-menu" role="listbox"></div>
+              </div>
             </div>
 
             <div id="selectedOptionalFilters" class="filter-fields-group"></div>
@@ -1562,8 +1612,8 @@ document.querySelectorAll('.sub-tab-btn').forEach(btn => {
 const tipoLabel = { nuevo: "Nuevo", leads: "Lead", recurrente: "Recurrente", inactivo: "Inactivo", lead: "Lead" };
 
 const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-const defaultOptionalFilters = ["registered_date", "codigo", "campaign_package", "vendedor", "psiquico", "search", "pais", "estado", "expired_minutes", "courtesy_minutes"];
-const typeSpecificOptionalFilters = ["campaign_package", "vendedor", "psiquico", "search", "pais", "estado", "expired_minutes", "courtesy_minutes"];
+const defaultOptionalFilters = ["registered_date", "codigo", "campaign_package", "vendedor", "psiquico", "search", "pais_estado", "expired_minutes", "courtesy_minutes"];
+const typeSpecificOptionalFilters = ["campaign_package", "vendedor", "psiquico", "search", "pais_estado", "expired_minutes", "courtesy_minutes"];
 const allContactOptionalFilters = [...defaultOptionalFilters, "all"];
 const optionalFilterDefinitions = {
   registered_date: "Cliente registrado desde / hasta",
@@ -1573,8 +1623,7 @@ const optionalFilterDefinitions = {
   vendedor: "Vendedor / Asesor",
   psiquico: "Psiquico / Astrologo",
   search: "Buscar nombre",
-  pais: "País",
-  estado: "Estado",
+  pais_estado: "País y Estado",
   all: "Convertido / Todos",
   expired_minutes: "Minutos expirados",
   courtesy_minutes: "Minutos cortesía"
@@ -1755,6 +1804,11 @@ function renderOptionalFilterOptions(){
   ).join("");
   document.getElementById("optionalFilterShortcuts").innerHTML = shortcutButtons || '<span style="color:var(--muted); font-size:12px;">No hay más filtros disponibles</span>';
 
+  const dropdownOptions = available.map(key =>
+    `<button type="button" class="custom-filter-option" role="option" data-add-optional-filter="${key}">${optionalFilterDefinitions[key]}</button>`
+  ).join("");
+  document.getElementById("optionalFilterDropdownMenu").innerHTML = dropdownOptions || '<span style="padding:9px 10px; color:var(--muted); font-size:12px;">No hay más filtros disponibles</span>';
+
 }
 
 document.getElementById('loteDesignSelect').addEventListener('change', event => {
@@ -1763,11 +1817,29 @@ document.getElementById('loteDesignSelect').addEventListener('change', event => 
   });
 });
 
-document.querySelectorAll('#optionalFilterShortcuts').forEach(container => {
+document.querySelectorAll('#optionalFilterShortcuts, #optionalFilterDropdownMenu').forEach(container => {
   container.addEventListener('click', event => {
     const button = event.target.closest('[data-add-optional-filter]');
-    if (button) addOptionalFilter(button.dataset.addOptionalFilter);
+    if (button) {
+      addOptionalFilter(button.dataset.addOptionalFilter);
+      document.getElementById('optionalFilterDropdown').classList.remove('open');
+      document.getElementById('optionalFilterDropdownTrigger').setAttribute('aria-expanded', 'false');
+    }
   });
+});
+
+document.getElementById('optionalFilterDropdownTrigger').addEventListener('click', () => {
+  const dropdown = document.getElementById('optionalFilterDropdown');
+  const isOpen = dropdown.classList.toggle('open');
+  document.getElementById('optionalFilterDropdownTrigger').setAttribute('aria-expanded', String(isOpen));
+});
+
+document.addEventListener('click', event => {
+  const dropdown = document.getElementById('optionalFilterDropdown');
+  if (!dropdown.contains(event.target)) {
+    dropdown.classList.remove('open');
+    document.getElementById('optionalFilterDropdownTrigger').setAttribute('aria-expanded', 'false');
+  }
 });
 
 function renderOptionalFilterFields(){
@@ -1779,7 +1851,8 @@ function renderOptionalFilterFields(){
     if (key === "codigo") return `<div class="field-inline filter-field"><label>Código ${remove}</label><input type="text" id="optionalCodeInput" placeholder="Ej: 245"></div>`;
     if (key === "vendedor") return `<div class="field-inline filter-field"><label>Vendedor / Asesor ${remove}</label><select id="vendorSelect"><option value="">Todos</option></select></div>`;
     if (key === "search") return `<div class="field-inline filter-field"><label>Buscar nombre ${remove}</label><input type="text" id="searchInput" placeholder="Nombre o apellido…"></div>`;
-    if (["pais", "estado", "psiquico"].includes(key)) return `<div class="field-inline filter-field"><label>${optionalFilterDefinitions[key]} ${remove}</label><select id="${key}Select"><option value="">Todos</option></select></div>`;
+    if (key === "pais_estado") return `<div class="field-inline filter-field filter-field-wide"><label>País y Estado ${remove}</label><div><select id="paisSelect"><option value="">País</option></select><select id="estadoSelect"><option value="">Estado</option></select></div></div>`;
+    if (key === "psiquico") return `<div class="field-inline filter-field"><label>${optionalFilterDefinitions[key]} ${remove}</label><select id="psiquicoSelect"><option value="">Todos</option></select></div>`;
     if (key === "campaign_package") return `<div class="field-inline filter-field filter-field-wide"><label>Campaña y tipo de paquete ${remove}</label><div><select id="campaignSelect"><option value="">Campaña</option><option value="FACEBOOK">Facebook</option><option value="WHATSAPP">WhatsApp</option><option value="REDES SOCIALES">Redes sociales</option></select><select id="packageSelect"><option value="">Tipo de paquete</option><option value="BASICO">Básico</option><option value="PREMIUM">Premium</option></select></div></div>`;
     return `<div class="field-inline filter-field optional-check"><label>${optionalFilterDefinitions[key]} ${remove}</label><label class="mb-0"><input type="checkbox" id="${key}Input"> Sí</label></div>`;
   }).join("");
@@ -1789,6 +1862,9 @@ function renderOptionalFilterFields(){
   if (document.getElementById("optionalMonthSelect")) document.getElementById("optionalMonthSelect").value = filterState.mes;
   if (document.getElementById("optionalCodeInput")) document.getElementById("optionalCodeInput").value = filterState.codigo;
   if (document.getElementById("searchInput")) document.getElementById("searchInput").value = filterState.search;
+  if (document.getElementById("paisSelect")) document.getElementById("paisSelect").value = filterState.pais;
+  if (document.getElementById("estadoSelect")) document.getElementById("estadoSelect").value = filterState.estado;
+  if (document.getElementById("psiquicoSelect")) document.getElementById("psiquicoSelect").value = filterState.psiquico;
   if (document.getElementById("campaignSelect")) document.getElementById("campaignSelect").value = filterState.campana;
   if (document.getElementById("packageSelect")) document.getElementById("packageSelect").value = filterState.package_type;
   ["all", "expired_minutes", "courtesy_minutes"].forEach(key => {
@@ -1819,6 +1895,9 @@ function syncFilterStateFromDom(){
   filterState.hasta = document.getElementById("registeredTo")?.value || filterState.hasta;
   filterState.search = document.getElementById("searchInput")?.value.trim() || filterState.search;
   filterState.vendedor = document.getElementById("vendorSelect")?.value || filterState.vendedor;
+  filterState.pais = document.getElementById("paisSelect")?.value || filterState.pais;
+  filterState.estado = document.getElementById("estadoSelect")?.value || filterState.estado;
+  filterState.psiquico = document.getElementById("psiquicoSelect")?.value || filterState.psiquico;
   filterState.campana = document.getElementById("campaignSelect")?.value || filterState.campana;
   filterState.package_type = document.getElementById("packageSelect")?.value || filterState.package_type;
   ["all", "expired_minutes", "courtesy_minutes"].forEach(key => {
@@ -1841,6 +1920,7 @@ function removeOptionalFilter(key){
   selectedOptionalFilters = selectedOptionalFilters.filter(item => item !== key);
   if (key === "registered_date") { filterState.desde = ""; filterState.hasta = ""; }
   if (key === "campaign_package") { filterState.campana = ""; filterState.package_type = ""; }
+  if (key === "pais_estado") { filterState.pais = ""; filterState.estado = ""; }
   if (key === "vendedor") filterState.vendedor = "";
   if (key === "search") filterState.search = "";
   renderOptionalFilterOptions();
