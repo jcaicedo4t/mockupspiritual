@@ -161,6 +161,26 @@
     background: #fff;
   }
 
+  .sub-tabs-spacer { flex: 1; }
+
+  .design-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding: 8px 0;
+  }
+
+  .design-switcher label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .design-switcher select { padding: 7px 30px 7px 10px; }
+
   .sub-tab-btn {
     border: none;
     background: transparent;
@@ -375,6 +395,61 @@
     border-radius: 20px;
     font-size: 12.5px;
     border: 1px solid var(--line);
+  }
+
+  .filter-design { display: none; }
+  .filter-design.active { display: block; }
+  .optional-filter-design { display: none; }
+  .optional-filter-design.active { display: flex; }
+  .optional-filter-design[data-optional-design="2"] { flex: 1 1 100%; min-width: 100%; }
+
+  .quick-filter-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 1.4fr 1.4fr auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .quick-filter-group { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .quick-filter-btn {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--navy-800);
+    border-radius: 18px;
+    padding: 7px 11px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .quick-filter-btn:hover,
+  .quick-filter-btn.active { background: var(--navy-800); color: #fff; border-color: var(--navy-800); }
+
+
+  .filter-design-label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--navy-800);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .command-filter-layout { display: flex; align-items: end; gap: 14px; flex-wrap: wrap; }
+  .command-filter-layout .search-wrap { flex: 1 1 280px; }
+  .status-segmented { display: flex; gap: 3px; padding: 3px; background: var(--navy-100); border-radius: var(--radius-sm); }
+  .status-segmented button { border: 0; background: transparent; color: var(--navy-800); padding: 8px 11px; border-radius: 4px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .status-segmented button.active { background: #fff; box-shadow: var(--shadow-sm); color: var(--navy-900); }
+
+  @media(max-width: 900px) {
+    .quick-filter-layout { grid-template-columns: 1fr; }
+    .sub-tabs { flex-wrap: wrap; }
+    .sub-tabs-spacer { display: none; }
+    .design-switcher { width: 100%; justify-content: flex-end; }
   }
 
   /* ===================================================================
@@ -855,6 +930,14 @@
         <button class="sub-tab-btn" data-sub-tab="seguimiento">
           📊 Seguimiento de lotes
         </button>
+        <span class="sub-tabs-spacer"></span>
+        <div class="design-switcher">
+          <label for="loteDesignSelect">Diseño</label>
+          <select id="loteDesignSelect" aria-label="Seleccionar diseño de filtros">
+            <option value="1">Diseño 1 · Filtros</option>
+            <option value="2">Diseño 2 · Atajos</option>
+          </select>
+        </div>
       </div>
 
       <!-- SUB TAB 1: CREAR LISTA -->
@@ -878,11 +961,16 @@
             <div class="field-inline" id="previousStatusField"></div>
             <div class="field-inline" id="codeField"></div>
 
-            <div class="field-inline">
+            <div class="field-inline optional-filter-design active" data-optional-design="1">
               <label>Agregar filtro</label>
               <select id="optionalFilterSelect">
                 <option value="">Seleccionar filtros</option>
               </select>
+            </div>
+
+            <div class="field-inline optional-filter-design" data-optional-design="2">
+              <label>Agregar filtro · Atajos</label>
+              <div id="optionalFilterShortcuts" class="quick-filter-group"></div>
             </div>
 
             <div id="selectedOptionalFilters" class="filter-fields-group"></div>
@@ -1661,7 +1749,26 @@ function renderOptionalFilterOptions(){
   select.innerHTML = '<option value="">Seleccionar filtros</option>' + available.map(key =>
     `<option value="${key}">${optionalFilterDefinitions[key]}</option>`
   ).join("");
+
+  const shortcutButtons = available.map(key =>
+    `<button type="button" class="quick-filter-btn" data-add-optional-filter="${key}">${optionalFilterDefinitions[key]}</button>`
+  ).join("");
+  document.getElementById("optionalFilterShortcuts").innerHTML = shortcutButtons || '<span style="color:var(--muted); font-size:12px;">No hay más filtros disponibles</span>';
+
 }
+
+document.getElementById('loteDesignSelect').addEventListener('change', event => {
+  document.querySelectorAll('.optional-filter-design').forEach(panel => {
+    panel.classList.toggle('active', panel.dataset.optionalDesign === event.target.value);
+  });
+});
+
+document.querySelectorAll('#optionalFilterShortcuts').forEach(container => {
+  container.addEventListener('click', event => {
+    const button = event.target.closest('[data-add-optional-filter]');
+    if (button) addOptionalFilter(button.dataset.addOptionalFilter);
+  });
+});
 
 function renderOptionalFilterFields(){
   const container = document.getElementById("selectedOptionalFilters");
