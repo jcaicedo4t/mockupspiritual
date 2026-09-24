@@ -414,6 +414,13 @@
     align-items: flex-end;
     gap: 14px;
   }
+  .filters-separator {
+    order: 8;
+    flex: 1 1 100%;
+    height: 1px;
+    margin: 2px 0 0;
+    background: var(--line);
+  }
   #buscarBtn,
   #clearFiltersBtn { order: 30; }
 
@@ -1043,6 +1050,7 @@
               </div>
             </div>
 
+            <div class="filters-separator" role="separator" aria-hidden="true"></div>
             <div id="selectedOptionalFilters" class="filter-fields-group"></div>
 
             <button class="btn btn-primary" id="buscarBtn">Buscar</button>
