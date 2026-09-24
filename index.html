@@ -408,9 +408,11 @@
   .custom-filter-trigger {
     width: 100%;
     justify-content: space-between;
+    min-height: 38px;
     background: #fff;
     border: 1px solid var(--line);
     color: var(--ink);
+    text-align: left;
   }
   .custom-filter-trigger::after { content: "▾"; color: var(--navy-800); font-size: 14px; }
   .custom-filter-dropdown.open .custom-filter-trigger { border-color: var(--navy-700); box-shadow: 0 0 0 3px rgba(38,94,133,0.15); }
@@ -443,6 +445,9 @@
     cursor: pointer;
   }
   .custom-filter-option:hover { background: var(--navy-100); color: var(--navy-900); }
+  .custom-filter-option.selected { color: var(--navy-800); background: var(--navy-50); font-weight: 700; }
+  .custom-filter-option.selected::after { content: "✓"; float: right; color: var(--green); font-size: 15px; font-weight: 800; }
+  .custom-filter-option.selected:hover { background: var(--navy-100); }
 
   .quick-filter-layout {
     display: grid;
@@ -1804,9 +1809,11 @@ function renderOptionalFilterOptions(){
   ).join("");
   document.getElementById("optionalFilterShortcuts").innerHTML = shortcutButtons || '<span style="color:var(--muted); font-size:12px;">No hay más filtros disponibles</span>';
 
-  const dropdownOptions = available.map(key =>
-    `<button type="button" class="custom-filter-option" role="option" data-add-optional-filter="${key}">${optionalFilterDefinitions[key]}</button>`
-  ).join("");
+  const dropdownOptions = activeTypeConfig().optionalFilters.map(key => {
+    const selected = selectedOptionalFilters.includes(key);
+    return `<button type="button" class="custom-filter-option${selected ? " selected" : ""}" role="option" aria-selected="${selected}" data-add-optional-filter="${key}">${optionalFilterDefinitions[key]}</button>`;
+  
+  }).join("");
   document.getElementById("optionalFilterDropdownMenu").innerHTML = dropdownOptions || '<span style="padding:9px 10px; color:var(--muted); font-size:12px;">No hay más filtros disponibles</span>';
 
 }
