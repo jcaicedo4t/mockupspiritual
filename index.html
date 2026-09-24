@@ -401,11 +401,14 @@
   .filter-design.active { display: block; }
   .optional-filter-design { display: none; }
   .optional-filter-design.active { display: flex; }
+  .optional-filter-design { order: 5; }
+  .optional-filter-design[data-optional-design="1"],
+  .optional-filter-design[data-optional-design="3"] { margin-left: auto; }
   .optional-filter-design[data-optional-design="2"] { flex: 1 1 100%; min-width: 100%; }
-  .optional-filter-design { order: 20; }
   #selectedOptionalFilters {
     order: 10;
     flex: 1 1 100%;
+    min-width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
