@@ -402,6 +402,17 @@
   .optional-filter-design { display: none; }
   .optional-filter-design.active { display: flex; }
   .optional-filter-design[data-optional-design="2"] { flex: 1 1 100%; min-width: 100%; }
+  .optional-filter-design { order: 20; }
+  #selectedOptionalFilters {
+    order: 10;
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+  }
+  #buscarBtn,
+  #clearFiltersBtn { order: 30; }
 
   .optional-filter-design[data-optional-design="3"] { position: relative; }
   .custom-filter-dropdown { position: relative; min-width: 230px; }
@@ -1010,21 +1021,21 @@
             <div class="field-inline" id="codeField"></div>
 
             <div class="field-inline optional-filter-design active" data-optional-design="1">
-              <label>Agregar filtro</label>
+              <label>Más filtros</label>
               <select id="optionalFilterSelect">
-                <option value="">Seleccionar filtros</option>
+                <option value="">Más filtros</option>
               </select>
             </div>
 
             <div class="field-inline optional-filter-design" data-optional-design="2">
-              <label>Agregar filtro · Atajos</label>
+              <label>Más filtros · Atajos</label>
               <div id="optionalFilterShortcuts" class="quick-filter-group"></div>
             </div>
 
             <div class="field-inline optional-filter-design" data-optional-design="3">
-              <label>Agregar filtro</label>
+              <label>Más filtros · Dropdown</label>
               <div id="optionalFilterDropdown" class="custom-filter-dropdown">
-                <button type="button" class="btn custom-filter-trigger" id="optionalFilterDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">Seleccionar filtros</button>
+                <button type="button" class="btn custom-filter-trigger" id="optionalFilterDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">Más filtros</button>
                 <div id="optionalFilterDropdownMenu" class="custom-filter-menu" role="listbox"></div>
               </div>
             </div>
@@ -1801,7 +1812,7 @@ function renderTypeFilterFields(){
 function renderOptionalFilterOptions(){
   const select = document.getElementById("optionalFilterSelect");
   const available = activeTypeConfig().optionalFilters.filter(key => !selectedOptionalFilters.includes(key));
-  select.innerHTML = '<option value="">Seleccionar filtros</option>' + available.map(key =>
+  select.innerHTML = '<option value="">Más filtros</option>' + available.map(key =>
     `<option value="${key}">${optionalFilterDefinitions[key]}</option>`
   ).join("");
 
